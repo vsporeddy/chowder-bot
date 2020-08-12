@@ -127,7 +127,10 @@ class ChowderCog(commands.Cog):
             if "rank" in words:
                 await message.channel.send("I deserve to be plat goddammit")
                 return
-                
+            
+            if "pin" in words:
+                await message.channel.send("Yeah that is a pen in my mouth. What's it to you?")
+                return
 
 def get_condescending_name():
     return random.choice(config["condescending_names"])
