@@ -1,7 +1,7 @@
 {
-    "role_req": 2,
-    "default_channel_id": 742906298257113199,
-    "spam_cooldown": 15,
+    "role_req": 13,
+    "default_channel_id": 454492770682404877,
+    "spam_cooldown": 400,
 
     "spam_quotes" : [
         "Where's my pen, I need to take some notes",
@@ -9,7 +9,12 @@
         "Whoa, I just stood up too fast",
         "Brb, going to the gas station",
         "This server's deader than aids",
-        "🎵 There's a she-wolf in the closet... 🎵"
+        "🎵 There's a she-wolf in the closet... 🎵",
+        "I think I just shit my pants",
+        "Yo who took my dip?",
+        "Anyone wanna watch a movie?",
+        "I'm a star so I put a neutron on my pinkie",
+        "!play mr. lonely"
     ],
 
     "condescending_names": [
@@ -25,7 +30,8 @@
         "sup",
         "suh",
         "🤙 yo,",
-        "how's it goin'"
+        "how's it goin'",
+        "<:ChowderPalmers:541700042407280650> why hello"
     ],
 
     "greetings": [
@@ -55,7 +61,7 @@
         "REEEEEEEE",
         "TRIGGERED",
         "TILT",
-        ":ChowderWtf:"
+        "<:ChowderWtf:728954277115985970>"
     ],
 
     "happy_words": [
@@ -65,8 +71,8 @@
     ],
 
     "happy_responses": [
-        ":ChowderHappy:",
-        ":ChowderSmile:"
+        "<:ChowderHappy:511436641844461579>",
+        "<:ChowderSmile:664313737255321632>"
     ],
 
     "insult_words": [
@@ -78,5 +84,19 @@
 
     "insult_responses": [
         "fuck you too"
+    ],
+
+    "suicide_words": [
+        "suicide",
+        "kms",
+        "rope",
+        "<:kms:714385140763066378>",
+        "kms?",
+        "rope?"
+    ],
+
+    "suicide_responses": [
+        "Great deal on rope here https://www.amazon.com/T-W-Evans-Cordage-23-410-100-Feet/dp/B00DKA3OGO/ref=sr_1_5?dchild=1&keywords=rope&qid=1596673550&sr=8-5",
+        "Help is available. Call the suicide hotline today: 1-800-273-8255"
     ]
 }
