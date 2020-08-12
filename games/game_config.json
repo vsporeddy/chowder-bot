@@ -1,0 +1,19 @@
+{
+    "channels": [742569511978270730, 742906298257113199],
+    "games": {
+        "hangman": {
+            "emote": "<:widepeepohappy:742242007002644500>",
+            "min_players": 1,
+            "wait_time": 20,
+            "start_req": 1,
+            "stop_req": 1
+        },
+        "telewave": {
+            "emote": "<:widepeepohappy:742242007002644500>",
+            "min_players": 4,
+            "wait_time": 20,
+            "start_req": 1,
+            "stop_req": 1
+        }
+    }
+}

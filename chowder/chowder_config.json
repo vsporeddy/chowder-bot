@@ -1,0 +1,82 @@
+{
+    "role_req": 2,
+    "default_channel_id": 742906298257113199,
+    "spam_cooldown": 15,
+
+    "spam_quotes" : [
+        "Where's my pen, I need to take some notes",
+        "Uhhhhhhh hellooooo????",
+        "Whoa, I just stood up too fast",
+        "Brb, going to the gas station",
+        "This server's deader than aids",
+        "🎵 There's a she-wolf in the closet... 🎵"
+    ],
+
+    "condescending_names": [
+        "buddy",
+        "skipper",
+        "sport",
+        "bud",
+        "champ",
+        "kiddo"
+    ],
+
+    "chowder_greetings": [
+        "sup",
+        "suh",
+        "🤙 yo,",
+        "how's it goin'"
+    ],
+
+    "greetings": [
+        "sup",
+        "suh",
+        "👋",
+        "hello",
+        "hi",
+        "hey"
+    ],
+
+    "trigger_words": [
+        "liberal",
+        "liberals",
+        "socialist",
+        "government",
+        "socialism",
+        "microsoft",
+        "sjw",
+        "sjws",
+        "vegan",
+        "vegans",
+        "work"
+    ],
+
+    "tilt_responses": [
+        "REEEEEEEE",
+        "TRIGGERED",
+        "TILT",
+        ":ChowderWtf:"
+    ],
+
+    "happy_words": [
+        "guns",
+        "hunting",
+        "mod"
+    ],
+
+    "happy_responses": [
+        ":ChowderHappy:",
+        ":ChowderSmile:"
+    ],
+
+    "insult_words": [
+        "suck",
+        "sucks",
+        "fuck",
+        "hate"
+    ],
+
+    "insult_responses": [
+        "fuck you too"
+    ]
+}
