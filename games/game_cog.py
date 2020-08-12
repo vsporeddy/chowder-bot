@@ -22,7 +22,9 @@ class GameCog(commands.Cog):
         """Rallies people for a game."""
         await self.set_game_status(game)
 
-        message = await ctx.send("Yo, **" + initiator.mention + "** is tryna play **" + game + "**. React here with " + game_config[game]["emote"] + " in the next " + str(game_config[game]["wait_time"]) + " seconds if you're in")
+        message = await ctx.send("Yo, **" + initiator.mention + "** is tryna play **" + game + "**. React here with " \
+                                    + game_config[game]["emote"] + " in the next " + str(game_config[game]["wait_time"]) \
+                                    + " seconds if you're in")
         await message.add_reaction(game_config[game]["emote"])
 
         # Wait for people to join
@@ -64,7 +66,8 @@ class GameCog(commands.Cog):
         initiator = ctx.author
         start_req = game_config[game]["start_req"]
         if initiator.top_role.position < start_req:
-            await ctx.send("Sorry " + chowder_cog.get_condescending_name() + ", you're not high enough rank to start a game of " + game + ". Try getting promoted.")
+            await ctx.send("Sorry " + chowder_cog.get_condescending_name() + \
+                            + ", you're not high enough rank to start a game of " + game + ". Try getting promoted.")
             return
         if self.in_game:
             await ctx.send("Sorry " + chowder_cog.get_condescending_name() + ", I'm in a game of " + self.current_game + " already")
@@ -86,7 +89,8 @@ class GameCog(commands.Cog):
         game = self.current_game
 
         if ctx.author.top_role.position < game_config[game]["stop_req"]:
-            await ctx.send("Sorry " + chowder_cog.get_condescending_name() + ", you're not high enough stop a game of " + game + ". Try getting promoted.")
+            await ctx.send("Sorry " + chowder_cog.get_condescending_name() + ", you're not high enough stop a game of " \
+                            + game + ". Try getting promoted.")
             return
 
         await ctx.send("Rip " + game)

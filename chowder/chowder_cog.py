@@ -39,13 +39,15 @@ class ChowderCog(commands.Cog):
     async def on_message_delete(self, message):
         if message.channel.id != config["default_channel_id"] or message.author == self.bot.user:
             return
-        await message.channel.send("Whoa " + message.author.mention + " why you deleting messages " + get_condescending_name() + "? Sketch.") 
+        await message.channel.send("Whoa " + message.author.mention + " why you deleting messages " \
+                                    + get_condescending_name() + "? Sketch.") 
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
         if before.channel.id != config["default_channel_id"] or before.author == self.bot.user:
             return
-        await before.channel.send("Whoa " + before.author.mention + " why you editing messages " + get_condescending_name() + "? Sketch.") 
+        await before.channel.send("Whoa " + before.author.mention + " why you editing messages " \
+                                    + get_condescending_name() + "? Sketch.") 
 
     @commands.command(name="promote", brief="Nominate a user for promotion.")
     async def promote(self, ctx):
@@ -59,7 +61,8 @@ class ChowderCog(commands.Cog):
             return
         nominee = nominees[0]
         if nominee.top_role.position >= config["promotion_cap"]:
-            await ctx.send("Sorry " + get_condescending_name() + ", no democratic promotions at " + nominee.top_role.name + " rank. Please contact a board member for a manual review.")
+            await ctx.send("Sorry " + get_condescending_name() + ", no democratic promotions at " \
+                            + nominee.top_role.name + " rank. Please contact a board member for a manual review.")
             return
         if nominee.id == nominator.id:
             await ctx.send("Can't nominate yourself " + get_condescending_name() + ", get one of your simps to do it.")
@@ -70,22 +73,25 @@ class ChowderCog(commands.Cog):
         if nominee.id not in self.promotion_nominees:
             self.promotion_nominees[nominee.id] = set([nominator.id])
         elif nominator.id in self.promotion_nominees[nominee.id]:
-            await ctx.send("Settle down " + get_condescending_name() + ", you already nominated " + nominee.mention + " for a promotion.")
+            await ctx.send("Settle down " + get_condescending_name() + ", you already nominated " + nominee.mention \
+                            + " for a promotion.")
             return
         else:
             self.promotion_nominees[nominee.id].add(nominator.id)
 
         noms_needed = config["min_nominations"] - len(self.promotion_nominees[nominee.id])
         if noms_needed > 0:
-            await ctx.send("Hey " + get_condescending_name() + "s, " + nominator.mention + " has nominated " + nominee.mention + " for a promotion." + \
-                            "They still need " + str(noms_needed) + " more nominations though.")
+            await ctx.send("Hey " + get_condescending_name() + "s, " + nominator.mention + " has nominated " \
+                            + nominee.mention + " for a promotion." + "They still need " + str(noms_needed) \
+                            + " more nominations though.")
             return
         else:
             # TODO maybe actually promote them instead
             self.promotion_nominees[nominee.id] = set([])
-            await ctx.send("Congratulations " + nominee.mention + ", you just got promoted from " + nominee.top_role.name + \
-                            " to--Sike! Y'all thought this was a democracy? It's a dictatorship " + get_condescending_name() + \
-                            "s. Maybe buy me a drink and I'll think about promoting you.")
+            await ctx.send("Congratulations " + nominee.mention + ", you just got promoted from " \
+                            + nominee.top_role.name + " to--Sike! Y'all thought this was a democracy? "
+                            + "It's a dictatorship " + get_condescending_name() \
+                            + "s. Maybe buy me a drink and I'll think about promoting you.")
 
     @commands.command(name="demote", brief="Nominate a user for demotion.")
     async def demote(self, ctx):
@@ -114,7 +120,8 @@ class ChowderCog(commands.Cog):
 
         if "chowder" in comment and "pls" not in comment:
             if message.author.top_role.position < config["role_req"]:
-                await message.channel.send("You're only a " + message.author.top_role.name + ", don't even talk to me " + get_condescending_name())
+                await message.channel.send("You're only a " + message.author.top_role.name + ", don't even talk to me " \
+                                            + get_condescending_name())
                 return
             
             greetings = [word for word in words if word in config["greetings"]]
