@@ -1,7 +1,10 @@
 {
-    "role_req": 13,
+    "role_req": 1,
     "default_channel_id": 454492770682404877,
     "spam_cooldown": 400,
+    "promotion_cap": 12,
+    "promotion_floor": 8,
+    "min_nominations": 5,
 
     "spam_quotes" : [
         "Where's my pen, I need to take some notes",
@@ -13,7 +16,7 @@
         "I think I just shit my pants",
         "Yo who took my dip?",
         "Anyone wanna watch a movie?",
-        "I'm a star so I put a neutron on my pinkie",
+        "🎵 I'm a star so I put a neutron on my pinkie 🎵",
         "!play mr. lonely"
     ],
 
