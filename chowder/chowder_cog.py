@@ -89,7 +89,10 @@ class ChowderCog(commands.Cog):
             if "rope" in words:
                 await message.channel.send("kms")
                 return
-                
+            
+            if "pin" in words:
+                await message.channel.send("Yeah that is a pen in my mouth. What's it to you?")
+                return
 
 def get_condescending_name():
     return random.choice(config["condescending_names"])
