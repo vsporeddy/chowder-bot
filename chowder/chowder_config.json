@@ -1,7 +1,8 @@
 {
     "role_req": 13,
+    "respect_req": 15,
     "default_channel": 454492770682404877,
-    "channels": [742569511978270730, 742906298257113199, 689297802823860225, 454492770682404877],
+    "channels": [742569511978270730, 742906298257113199, 689297802823860225, 454492770682404877, 565381938022449152],
     "spam_cooldown": 500,
     "revive_cooldown": 21600,
     "min_revival_users": 6,
@@ -22,8 +23,9 @@
         "Yo who took my dip?",
         "Anyone wanna watch a movie?",
         "🎵 I'm a star so I put a neutron on my pinkie 🎵",
-        "!play mr. lonely",
-        "KELLEEEEEEEEEY! Slurpee?"
+        "-play mr. lonely",
+        "KELLEEEEEEEEEY! Slurpee?",
+        "ESO dude?"
     ],
 
     "condescending_names": [
@@ -32,6 +34,13 @@
         "sport",
         "bud",
         "champ"
+    ],
+
+    "respectful_names": [
+        "dude",
+        "bro",
+        "bruh",
+        "boss"
     ],
 
     "chowder_greetings": [
@@ -69,7 +78,7 @@
         "REEEEEEEE",
         "TRIGGERED",
         "TILT",
-        "<:ChowderWtf:728954277115985970>"
+        "<:ChowderWut:541707580662349856>"
     ],
 
     "happy_words": [

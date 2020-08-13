@@ -50,12 +50,13 @@ class GameCog(commands.Cog):
         return players
 
     @commands.group(name="play", brief="Initiates a game.")
-    async def play(self, ctx, game):
+    async def play(self, ctx, game:str = None):
         if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
             return
+        name = chowder_cog.get_name(ctx.author)
 
         if not game:
-            await ctx.send("Uhh hello? What game " + chowder_cog.get_condescending_name() + "?")
+            await ctx.send("Uhh hello? What game " + name + "?")
             return
 
         games = game_config.keys()
@@ -66,11 +67,11 @@ class GameCog(commands.Cog):
         initiator = ctx.author
         start_req = game_config[game]["start_req"]
         if initiator.top_role.position < start_req:
-            await ctx.send("Sorry " + chowder_cog.get_condescending_name() + \
+            await ctx.send("Sorry " + name + \
                             + ", you're not high enough rank to start a game of " + game + ". Try getting promoted.")
             return
         if self.in_game:
-            await ctx.send("Sorry " + chowder_cog.get_condescending_name() + ", I'm in a game of " + self.current_game + " already")
+            await ctx.send("Sorry " + name + ", I'm in a game of " + self.current_game + " already")
             return
 
         players = await self.rally(ctx, game, initiator)
@@ -81,15 +82,16 @@ class GameCog(commands.Cog):
     async def stop(self, ctx):
         if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
             return
+        name = chowder_cog.get_name(ctx.author)
 
         if not self.in_game:
-            await ctx.send("Stop what? I'm not doing anything " + chowder_cog.get_condescending_name())
+            await ctx.send("Stop what? I'm not doing anything " + name)
             return
         
         game = self.current_game
 
         if ctx.author.top_role.position < game_config[game]["stop_req"]:
-            await ctx.send("Sorry " + chowder_cog.get_condescending_name() + ", you're not high enough stop a game of " \
+            await ctx.send("Sorry " + name + ", you're not high enough stop a game of " \
                             + game + ". Try getting promoted.")
             return
 
