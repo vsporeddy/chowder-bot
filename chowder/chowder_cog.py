@@ -42,10 +42,10 @@ class ChowderCog(commands.Cog):
         if len(boys) < config["min_revival_users"]:
             return
 
-        await channel.send("Time to revive this dead server boys, poll time:")
+        await channel.send("Time to revive this dead server boys, poll:")
         if random.getrandbits(1):
-            chosen_boys = random.sample(boys, 3)
-            poll = await channel.send("Who would win at " + get_random_activity() + ", " + chosen_boys[0].mention \
+            chosen_boys = random.sample(boys, 2)
+            poll = await channel.send("Who would win at " + get_activity() + ", " + chosen_boys[0].mention \
                                         + " (" + config["option_1"] + "), or " + chosen_boys[1].mention + " (" \
                                         + config["option_2"] + ")?")
         else:
@@ -65,39 +65,44 @@ class ChowderCog(commands.Cog):
     async def on_message_delete(self, message):
         if message.channel.id not in config["channels"] or message.author == self.bot.user:
             return
+        name = get_name(message.author)
+
         await message.channel.send("Whoa " + message.author.mention + " why you deleting messages " \
-                                    + get_condescending_name() + "? Sketch.") 
+                                    + name + "? Sketch.") 
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
         if before.channel.id not in config["channels"] or before.author == self.bot.user:
             return
+        name = get_name(before.author)
+
         await before.channel.send("Whoa " + before.author.mention + " why you editing messages " \
-                                    + get_condescending_name() + "? Sketch.") 
+                                    + name + "? Sketch.") 
 
     @commands.command(name="promote", brief="Nominate a user for promotion.")
     async def promote(self, ctx):
         if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
             return
         nominator = ctx.author
+        name = get_name(nominator)
         if not ctx.message.mentions:
-            await ctx.send("Gotta mention someone to nominate them, " + get_condescending_name())
+            await ctx.send("Gotta mention someone to nominate them, " + name)
             return
         nominee = ctx.message.mentions[0]
         if nominee.id == nominator.id:
-            await ctx.send("Can't nominate yourself " + get_condescending_name() + ", get one of your symphs to do it.")
+            await ctx.send("Can't nominate yourself " + name + ", get one of your symphs to do it.")
             return
         if nominee == self.bot.user:
-            await ctx.send("I appreciate the thought but I'm happy at my rank, " + get_condescending_name())
+            await ctx.send("I appreciate the thought but I'm happy at my rank, " + name)
             return
         if nominee.top_role.position >= config["promotion_cap"]:
-            await ctx.send("Sorry " + get_condescending_name() + ", no democratic promotions at " \
+            await ctx.send("Sorry " + name + ", no democratic promotions at " \
                             + nominee.top_role.name + " rank. Please contact a board member for a manual review.")
             return
         if nominee.id not in self.promotion_nominees:
             self.promotion_nominees[nominee.id] = set([nominator.id])
         elif nominator.id in self.promotion_nominees[nominee.id]:
-            await ctx.send("Settle down " + get_condescending_name() + ", you already nominated " + nominee.mention \
+            await ctx.send("Settle down " + name + ", you already nominated " + nominee.mention \
                             + " for a promotion.")
             return
         else:
@@ -119,52 +124,62 @@ class ChowderCog(commands.Cog):
 
     @commands.command(name="demote", brief="Nominate a user for demotion.")
     async def demote(self, ctx):
-        await ctx.send("Demotion features coming soon, sit tight " + get_condescending_name())
+        name = get_name(ctx.author)
+        await ctx.send("Demotion features coming soon, sit tight " + name)
 
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.channel.id not in config["channels"] or message.author == self.bot.user:
             return
-            
-        comment = message.content.lower()
-        words = comment.strip().split(' ')
 
+        name = get_name(message.author)
+            
+        comment = message.content.strip().lower()
+        if comment == "chowder pls":
+            await message.channel.send("You seem to be confused " + name + ", try *chowder pls help*")
+            return
+            
         if "brendan" in comment:
-            await message.channel.send("Who's Brendan? He sounds like a real " + get_condescending_name())
+            await message.channel.send("Who's Brendan? He sounds like a real " + name)
             return
 
         if "stfu" in comment or "shut" in comment:
-            await message.channel.send("Freedom of speech, " + get_condescending_name())
+            await message.channel.send("Freedom of speech, " + name)
             return
 
+        words = comment.strip().split(' ')
         trigger_words = [word for word in words if word in config["trigger_words"]]
         if trigger_words:
-            await message.channel.send(trigger_words[0] + "? " + get_random_tilt_response())
+            await message.channel.send(trigger_words[0] + "? " + get_tilt_response())
             return
 
         if "chowder" in comment and "pls" not in comment:
             if message.author.top_role.position < config["role_req"]:
                 await message.channel.send("You're only a " + message.author.top_role.name + ", don't even talk to me " \
-                                            + get_condescending_name())
+                                            + name)
                 return
             
+            if "help" in words:
+                await message.channel.send("You seem to be confused " + name + ", try *chowder pls help*")
+                return
+
             greetings = [word for word in words if word in config["greetings"]]
             if greetings:
-                await message.channel.send(get_random_greeting() + " " + get_condescending_name())
+                await message.channel.send(get_greeting() + " " + name)
                 return
 
             if any(insult_word in words for insult_word in config["insult_words"]):
-                await message.channel.send(get_random_insult_response() + " " + get_condescending_name())
+                await message.channel.send(get_insult_response() + " " + name)
                 return
 
             happy_words = [word for word in words if word in config["happy_words"]]
             if any(happy_word in words for happy_word in config["happy_words"]):
-                await message.channel.send(happy_words[0] + "? " + get_random_happy_response())
+                await message.channel.send(happy_words[0] + "? " + get_happy_response())
                 return
 
             suicide_words = [word for word in words if word in config["suicide_words"]]
             if any(suicide_word in words for suicide_word in config["suicide_words"]):
-                await message.channel.send(get_random_suicide_response())
+                await message.channel.send(get_suicide_response())
                 return
 
             if "please" in words:
@@ -180,7 +195,7 @@ class ChowderCog(commands.Cog):
                 return
 
             if "kys" in words:
-                await message.channel.send("I'm trying " + get_condescending_name())
+                await message.channel.send("I'm trying " + name)
                 return
 
             if "think" in words:
@@ -191,28 +206,35 @@ class ChowderCog(commands.Cog):
                 await message.channel.send("I deserve to be plat goddammit")
                 return
 
-            await message.channel.send("Uhh what? Speak up " + get_condescending_name() + ", or say *chowder pls help*")
+            await message.channel.send("Uhh what? Speak up " + name + ", or say *chowder pls help*")
+
+def get_name(author):
+    name = get_respectful_name() if author.top_role.position >= config["respect_req"] else get_condescending_name()
+    return name
 
 def get_condescending_name():
     return random.choice(config["condescending_names"])
 
-def get_random_greeting():
+def get_greeting():
     return random.choice(config["chowder_greetings"])
 
-def get_random_tilt_response():
+def get_tilt_response():
     return random.choice(config["tilt_responses"])
 
-def get_random_insult_response():
+def get_insult_response():
     return random.choice(config["insult_responses"])
 
-def get_random_happy_response():
+def get_happy_response():
     return random.choice(config["happy_responses"])
 
-def get_random_suicide_response():
+def get_suicide_response():
     return random.choice(config["suicide_responses"])
 
-def get_random_activity():
+def get_activity():
     return random.choice(config["activities"])
+
+def get_respectful_name():
+    return random.choice(config["respectful_names"])
 
 def setup(bot):
     bot.add_cog(ChowderCog(bot))
