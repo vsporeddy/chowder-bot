@@ -1,10 +1,15 @@
 {
-    "role_req": 1,
-    "default_channel_id": 454492770682404877,
-    "spam_cooldown": 400,
+    "role_req": 13,
+    "default_channel": 454492770682404877,
+    "channels": [742569511978270730, 742906298257113199, 689297802823860225, 454492770682404877],
+    "spam_cooldown": 500,
+    "revive_cooldown": 21600,
+    "min_revival_users": 6,
     "promotion_cap": 15,
     "promotion_floor": 8,
     "min_nominations": 5,
+    "option_1": "<:SpatikaTsm:609892878726070273>",
+    "option_2": "<:SpatikaClutch:609867523155951621>",
 
     "spam_quotes" : [
         "Where's my pen, I need to take some notes",
@@ -17,7 +22,8 @@
         "Yo who took my dip?",
         "Anyone wanna watch a movie?",
         "🎵 I'm a star so I put a neutron on my pinkie 🎵",
-        "!play mr. lonely"
+        "!play mr. lonely",
+        "KELLEEEEEEEEEY! Slurpee?"
     ],
 
     "condescending_names": [
@@ -25,8 +31,7 @@
         "skipper",
         "sport",
         "bud",
-        "champ",
-        "kiddo"
+        "champ"
     ],
 
     "chowder_greetings": [
@@ -70,7 +75,10 @@
     "happy_words": [
         "guns",
         "hunting",
-        "mod"
+        "mod",
+        "gambling",
+        "scotch",
+        "poker"
     ],
 
     "happy_responses": [
@@ -102,5 +110,15 @@
     "suicide_responses": [
         "Great deal on rope here https://www.amazon.com/T-W-Evans-Cordage-23-410-100-Feet/dp/B00DKA3OGO/ref=sr_1_5?dchild=1&keywords=rope&qid=1596673550&sr=8-5",
         "Help is available. Call the suicide hotline today: 1-800-273-8255"
+    ],
+
+    "activities": [
+        "League",
+        "golf",
+        "chess",
+        "TFT",
+        "bowling",
+        "watching anime",
+        "ping pong"
     ]
 }
