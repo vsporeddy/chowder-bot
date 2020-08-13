@@ -26,6 +26,7 @@ class ChowderCog(commands.Cog):
 
     @tasks.loop(seconds=60)
     async def spam(self):
+        """Chowder bot can't contain himself"""
         channel = self.bot.get_channel(config["default_channel"])
         last_message = channel.last_message
         if not last_message or last_message.author == self.bot.user:
@@ -45,20 +46,34 @@ class ChowderCog(commands.Cog):
             return
 
         await channel.send("Time to revive this dead server boys, poll:")
-        if random.getrandbits(1):
-            chosen_boys = random.sample(boys, 2)
-            poll = await channel.send("Who's better at " + get_activity() + ", " + chosen_boys[0].mention \
-                                        + " (" + config["option_1"] + "), or " + chosen_boys[1].mention + " (" \
-                                        + config["option_2"] + ")?")
-        else:
-            activities = random.sample(config["activities"], 2)
-            poll = await channel.send("What's more fun, " + activities[0] + " (" + config["option_1"] + ") or " \
-                                        + activities[1] + " (" + config["option_2"] + ")?")
+        chosen_boys = random.sample(boys, 2)
+        activity = get_activity()
+        poll = await channel.send("Who's better at " + activity + ", " + chosen_boys[0].mention \
+                                    + " (" + config["option_1"] + "), or " + chosen_boys[1].mention + " (" \
+                                    + config["option_2"] + ")? Vote in the next " + str(config["voting_time"])) \
+                                    + " seconds."
         await poll.add_reaction(config["option_1"])
         await poll.add_reaction(config["option_2"])
 
+        await asyncio.sleep(config["voting_time"])
+        poll = await channel.fetch_message(poll.id)
+        votes1 = discord.utils.find(lambda r: str(r.emoji) == config["option_1"], poll.reactions).users().flatten()
+        votes2 = discord.utils.find(lambda r: str(r.emoji) == config["option_2"], poll.reactions).users().flatten()
+        votes1.remove(self.bot.user)
+        votes2.remove(self.bot.user)
+
+        winner, loser = chosen_boys[0], chosen_boys[1] if len(votes1) > len(votes2) else chosen_boys[1], chosen_boys[0]
+        tie = "I voted for " + winner.mention + " btw" if len(votes1) == len(votes2) else None
+
+        await channel.send("It's decided, " + winner.mention + " is the best at " + activity + "! (on paper)")
+        await channel.send(winner.mention + " gets 5 ChowderCoins and all voters get 1 each. " + loser.mention \
+                            + " is deducted 10 ChowderCoins for sucking.")
+        if tie:
+            await channel.send(tie)
+
     @tasks.loop(seconds=60)
     async def fomo(self):
+        """Chowder bot doesn't want to miss out on the fun"""
         guild = self.bot.get_guild(config["guild_id"])
         channel = discord.utils.find(lambda c: len(c.members) >= config["fomo_threshold"], guild.voice_channels)
         voice = discord.utils.get(self.bot.voice_clients, guild=guild)
@@ -163,11 +178,7 @@ class ChowderCog(commands.Cog):
             return
             
         if "brendan" in comment:
-            await message.channel.send("Who's Brendan? He sounds like a real " + name)
-            return
-
-        if "stfu" in comment or "shut" in comment:
-            await message.channel.send("Freedom of speech, " + name)
+            await message.channel.send("Who's Brendan? He sounds like a real " + get_respectful_name())
             return
 
         words = comment.strip().split(' ')
@@ -203,6 +214,10 @@ class ChowderCog(commands.Cog):
             suicide_words = [word for word in words if word in config["suicide_words"]]
             if any(suicide_word in words for suicide_word in config["suicide_words"]):
                 await message.channel.send(get_suicide_response())
+                return
+
+            if "stfu" in comment or "shut" in comment:
+                await message.channel.send("Freedom of speech, " + name)
                 return
 
             if "please" in words:
