@@ -15,51 +15,75 @@ class ChowderCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.spam.start()
+        self.revive.start()
         self.promotion_nominees = {}
 
     def cog_unload(self):
         self.spam.cancel()
+        self.revive.cancel()
 
     @tasks.loop(seconds=60)
     async def spam(self):
-        """Chowder bot tries to revive the dead server"""
-        channel = self.bot.get_channel(config["default_channel_id"])
+        channel = self.bot.get_channel(config["default_channel"])
         last_message = channel.last_message
-        if last_message and last_message.author != self.bot.user:
-            time_since_last_message = datetime.utcnow() - channel.last_message.created_at
-            if time_since_last_message.seconds > config["spam_cooldown"]:
-                await self.bot.get_channel(config["default_channel_id"]).send(random.choice(config["spam_quotes"]))
+        if not last_message or last_message.author == self.bot.user:
+            return
+        if (datetime.utcnow() - channel.last_message.created_at).seconds >= config["spam_cooldown"]:
+            await channel.send(random.choice(config["spam_quotes"]))
 
+    @tasks.loop(seconds=60)
+    async def revive(self):
+        """Chowder bot tries to revive the dead server"""
+        channel = self.bot.get_channel(config["default_channel"])
+        last_message = channel.last_message
+        if not last_message or (datetime.utcnow() - channel.last_message.created_at).seconds < config["revive_cooldown"]:
+            return
+        boys = [user for user in channel.members if user.status == discord.Status.online and user.top_role.position >= config["role_req"]]
+        if len(boys) < config["min_revival_users"]:
+            return
+
+        await channel.send("Time to revive this dead server boys, poll time:")
+        if random.getrandbits(1):
+            chosen_boys = random.sample(boys, 3)
+            poll = await channel.send("Who would win at " + get_random_activity() + ", " + chosen_boys[0].mention \
+                                        + " (" + config["option_1"] + "), or " + chosen_boys[1].mention + " (" \
+                                        + config["option_2"] + ")?")
+        else:
+            activities = random.sample(config["activities"], 2)
+            poll = await channel.send("What's more fun, " + activities[0] + " (" + config["option_1"] + ") or " \
+                                        + activities[1] + " (" + config["option_2"] + ")?")
+        await poll.add_reaction(config["option_1"])
+        await poll.add_reaction(config["option_2"])
+            
     @spam.before_loop
+    @revive.before_loop
     async def before_spam(self):
         print('waiting...')
         await self.bot.wait_until_ready()
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
-        if message.channel.id != config["default_channel_id"] or message.author == self.bot.user:
+        if message.channel.id not in config["channels"] or message.author == self.bot.user:
             return
         await message.channel.send("Whoa " + message.author.mention + " why you deleting messages " \
                                     + get_condescending_name() + "? Sketch.") 
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
-        if before.channel.id != config["default_channel_id"] or before.author == self.bot.user:
+        if before.channel.id not in config["channels"] or before.author == self.bot.user:
             return
         await before.channel.send("Whoa " + before.author.mention + " why you editing messages " \
                                     + get_condescending_name() + "? Sketch.") 
 
     @commands.command(name="promote", brief="Nominate a user for promotion.")
     async def promote(self, ctx):
-        if ctx.channel.id != config["default_channel_id"] or ctx.author == self.bot.user:
+        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
             return
-
         nominator = ctx.author
-        nominees = ctx.message.mentions
-        if not nominees:
+        if not ctx.message.mentions:
             await ctx.send("Gotta mention someone to nominate them, " + get_condescending_name())
             return
-        nominee = nominees[0]
+        nominee = ctx.message.mentions[0]
         if nominee.id == nominator.id:
             await ctx.send("Can't nominate yourself " + get_condescending_name() + ", get one of your symphs to do it.")
             return
@@ -82,8 +106,8 @@ class ChowderCog(commands.Cog):
         noms_needed = config["min_nominations"] - len(self.promotion_nominees[nominee.id])
         if noms_needed > 0:
             await ctx.send("Hey " + get_condescending_name() + "s, " + nominator.mention + " has nominated " \
-                            + nominee.mention + " for a promotion." + "They still need " + str(noms_needed) \
-                            + " more nominations though.")
+                            + nominee.mention + " for a promotion. " + str(noms_needed) + " more nominations and " \
+                            + nominee.mention + " will be promoted.")
             return
         else:
             # TODO maybe actually promote them instead
@@ -99,7 +123,7 @@ class ChowderCog(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.channel.id != config["default_channel_id"] or message.author == self.bot.user:
+        if message.channel.id not in config["channels"] or message.author == self.bot.user:
             return
             
         comment = message.content.lower()
@@ -186,6 +210,9 @@ def get_random_happy_response():
 
 def get_random_suicide_response():
     return random.choice(config["suicide_responses"])
+
+def get_random_activity():
+    return random.choice(config["activities"])
 
 def setup(bot):
     bot.add_cog(ChowderCog(bot))
