@@ -16,11 +16,13 @@ class ChowderCog(commands.Cog):
         self.bot = bot
         self.spam.start()
         self.revive.start()
+        self.fomo.start()
         self.promotion_nominees = {}
 
     def cog_unload(self):
         self.spam.cancel()
         self.revive.cancel()
+        self.fomo.cancel()
 
     @tasks.loop(seconds=60)
     async def spam(self):
@@ -45,7 +47,7 @@ class ChowderCog(commands.Cog):
         await channel.send("Time to revive this dead server boys, poll:")
         if random.getrandbits(1):
             chosen_boys = random.sample(boys, 2)
-            poll = await channel.send("Who would win at " + get_activity() + ", " + chosen_boys[0].mention \
+            poll = await channel.send("Who's better at " + get_activity() + ", " + chosen_boys[0].mention \
                                         + " (" + config["option_1"] + "), or " + chosen_boys[1].mention + " (" \
                                         + config["option_2"] + ")?")
         else:
@@ -54,9 +56,30 @@ class ChowderCog(commands.Cog):
                                         + activities[1] + " (" + config["option_2"] + ")?")
         await poll.add_reaction(config["option_1"])
         await poll.add_reaction(config["option_2"])
-            
+
+    @tasks.loop(seconds=60)
+    async def fomo(self):
+        guild = self.bot.get_guild(config["guild_id"])
+        channel = discord.utils.find(lambda c: len(c.members) >= config["fomo_threshold"], guild.voice_channels)
+        voice = discord.utils.get(self.bot.voice_clients, guild=guild)
+        if not channel and (not voice or not voice.is_connected()):
+            return
+        if not channel and voice and voice.is_connected():
+            await voice.disconnect()
+            await self.bot.get_channel(config["default_channel"]).send(config["rip_emote"])
+            return
+        if channel and voice and voice.channel == channel:
+            return
+        if channel and voice and voice.is_connected():
+            await voice.move_to(channel)
+        elif channel:
+            voice = await channel.connect()
+            await voice.main_ws.voice_state(guild.id, channel.id, self_mute=True)
+        await self.bot.get_channel(config["default_channel"]).send(config["happy_emote"] + " we playin' something?")
+
     @spam.before_loop
     @revive.before_loop
+    @fomo.before_loop
     async def before_spam(self):
         print('waiting...')
         await self.bot.wait_until_ready()

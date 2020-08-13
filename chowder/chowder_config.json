@@ -1,4 +1,5 @@
 {
+    "guild_id": 454492770682404875,
     "role_req": 13,
     "respect_req": 15,
     "default_channel": 454492770682404877,
@@ -11,6 +12,9 @@
     "min_nominations": 5,
     "option_1": "<:SpatikaTsm:609892878726070273>",
     "option_2": "<:SpatikaClutch:609867523155951621>",
+    "fomo_threshold": 3,
+    "rip_emote": "<:ChowderRIP:589966977188102161>",
+    "happy_emote": "<:ChowderHappy:511436641844461579>",
 
     "spam_quotes" : [
         "Where's my pen, I need to take some notes",
@@ -128,6 +132,7 @@
         "TFT",
         "bowling",
         "watching anime",
-        "ping pong"
+        "ping pong",
+        "val"
     ]
 }
