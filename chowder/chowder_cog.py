@@ -60,15 +60,15 @@ class ChowderCog(commands.Cog):
             await ctx.send("Gotta mention someone to nominate them, " + get_condescending_name())
             return
         nominee = nominees[0]
-        if nominee.top_role.position >= config["promotion_cap"]:
-            await ctx.send("Sorry " + get_condescending_name() + ", no democratic promotions at " \
-                            + nominee.top_role.name + " rank. Please contact a board member for a manual review.")
-            return
         if nominee.id == nominator.id:
-            await ctx.send("Can't nominate yourself " + get_condescending_name() + ", get one of your simps to do it.")
+            await ctx.send("Can't nominate yourself " + get_condescending_name() + ", get one of your symphs to do it.")
             return
         if nominee == self.bot.user:
             await ctx.send("I appreciate the thought but I'm happy at my rank, " + get_condescending_name())
+            return
+        if nominee.top_role.position >= config["promotion_cap"]:
+            await ctx.send("Sorry " + get_condescending_name() + ", no democratic promotions at " \
+                            + nominee.top_role.name + " rank. Please contact a board member for a manual review.")
             return
         if nominee.id not in self.promotion_nominees:
             self.promotion_nominees[nominee.id] = set([nominator.id])
@@ -166,6 +166,8 @@ class ChowderCog(commands.Cog):
             if "rank" in words:
                 await message.channel.send("I deserve to be plat goddammit")
                 return
+
+            await message.channel.send("Uhh what? Speak up " + get_condescending_name() + ", or say *chowder pls help*")
 
 def get_condescending_name():
     return random.choice(config["condescending_names"])
