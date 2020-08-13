@@ -2,7 +2,7 @@
     "role_req": 1,
     "default_channel_id": 454492770682404877,
     "spam_cooldown": 400,
-    "promotion_cap": 12,
+    "promotion_cap": 15,
     "promotion_floor": 8,
     "min_nominations": 5,
 
@@ -86,7 +86,8 @@
     ],
 
     "insult_responses": [
-        "fuck you too"
+        "fuck you too",
+        "fuck off"
     ],
 
     "suicide_words": [
