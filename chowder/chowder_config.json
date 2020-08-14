@@ -5,7 +5,7 @@
     "default_channel": 454492770682404877,
     "channels": [742569511978270730, 742906298257113199, 689297802823860225, 454492770682404877, 565381938022449152],
     "spam_cooldown": 500,
-    "revive_cooldown": 7200,
+    "revive_cooldown": 3000,
     "min_revival_users": 6,
     "promotion_cap": 15,
     "promotion_floor": 8,
@@ -13,7 +13,7 @@
     "option_1": "<:SpatikaTsm:609892878726070273>",
     "option_2": "<:SpatikaClutch:609867523155951621>",
     "voting_time": 60,
-    "fomo_threshold": 3,
+    "fomo_threshold": 2,
     "rip_emote": "<:ChowderRIP:589966977188102161>",
     "happy_emote": "<:ChowderHappy:511436641844461579>",
     "heads": "<:SpatikaClutch:609867523155951621>",
@@ -128,6 +128,11 @@
     "suicide_responses": [
         "Great deal on rope here https://www.amazon.com/T-W-Evans-Cordage-23-410-100-Feet/dp/B00DKA3OGO/ref=sr_1_5?dchild=1&keywords=rope&qid=1596673550&sr=8-5",
         "Help is available. Call the suicide hotline today: 1-800-273-8255"
+    ],
+
+    "join_phrases": [
+        "where we dropping",
+        "what are we playing"
     ],
 
     "activities": [

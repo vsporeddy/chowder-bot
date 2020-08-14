@@ -4,6 +4,7 @@
 
 import json
 import random
+import asyncio
 import discord
 from datetime import datetime
 from discord.ext import tasks, commands
@@ -50,8 +51,8 @@ class Chowder(commands.Cog):
         activity = get_activity()
         poll = await channel.send("Who's better at " + activity + ", " + chosen_boys[0].mention \
                                     + " (" + config["option_1"] + "), or " + chosen_boys[1].mention + " (" \
-                                    + config["option_2"] + ")? Vote in the next " + str(config["voting_time"])) \
-                                    + " seconds."
+                                    + config["option_2"] + ")? Vote in the next " + str(config["voting_time"]) \
+                                    + " seconds.")
         await poll.add_reaction(config["option_1"])
         await poll.add_reaction(config["option_2"])
 
@@ -89,8 +90,8 @@ class Chowder(commands.Cog):
         elif channel:
             voice = await channel.connect()
             await voice.main_ws.voice_state(guild.id, channel.id, self_mute=True)
-        await self.bot.get_channel(config["default_channel"]).send(config["happy_emote"] + " we playin' something" \
-                                                                    + get_condescending_names() + "s?")
+        await self.bot.get_channel(config["default_channel"]).send(config["happy_emote"] + " " + get_join_phrase() \
+                                                                    + " " + get_condescending_name() + "s?")
 
     @spam.before_loop
     @revive.before_loop
@@ -273,6 +274,9 @@ def get_activity():
 
 def get_respectful_name():
     return random.choice(config["respectful_names"])
+
+def get_join_phrase():
+    return random.choice(config["join_phrases"])
 
 def setup(bot):
     bot.add_cog(Chowder(bot))
