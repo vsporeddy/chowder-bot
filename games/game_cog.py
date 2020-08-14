@@ -112,6 +112,10 @@ class Game(commands.Cog):
 
     @commands.group(name="slots", brief="Try your luck at the slots.")
     async def slots(self, ctx, *args):
+        bal = chowder_cog.get_balance(ctx.author.id)
+        if (bal == None):
+            await ctx.send("You need an account to play slots, " + ctx.author.mention + ".")
+            return
         game = config["games"]["slots"]
         emotes = game["emotes"]
         reels = game["reels"]
@@ -119,15 +123,10 @@ class Game(commands.Cog):
             await ctx.send("You need to enter a bet for slots.")
             return
         roll = [random.randint(1,len(emotes)) for x in range(reels)]
-        for streak in check_slots(roll):
-            if streak[1] == 3:
-
-
         roll_str = ""
         for i in roll:
             roll_str += emotes.get(str(i))
             roll_str += " "
-        print()
         embed = discord.Embed(
             title = "Chowder Slots",
             color = 4188997,
@@ -149,14 +148,9 @@ def check_slots(roll):
             temp = roll[i]
             streak = 1
         if (i == (len(roll)-1)):
-            print("final {}".format(i))
             stats.append([roll[i], streak])
     return stats
 
 
 def setup(bot):
-<<<<<<< Updated upstream
     bot.add_cog(Game(bot))
-=======
-    bot.add_cog(GameCog(bot))
->>>>>>> Stashed changes

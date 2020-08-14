@@ -1,11 +1,5 @@
 {
-<<<<<<< Updated upstream
-    "guild": "Dark Times", 
-    "prefixes": ["chowder pls ", "$", "Chowder pls ", "$chowder "]
-}
-=======
     "guild": "chowderbot test",
     "prefixes": ["chowder pls ", "$", "Chowder pls "],
     "DATABASE": "chowder.db"
 }
->>>>>>> Stashed changes
