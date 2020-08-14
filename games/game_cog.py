@@ -12,7 +12,7 @@ with open("games/game_config.json", "r") as read_file:
     config = json.load(read_file)
     game_config = config["games"]
 
-class GameCog(commands.Cog):
+class Game(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.in_game = False
@@ -110,4 +110,4 @@ class GameCog(commands.Cog):
         await self.bot.change_presence(activity=discord.Game(name=game))
 
 def setup(bot):
-    bot.add_cog(GameCog(bot))
+    bot.add_cog(Game(bot))

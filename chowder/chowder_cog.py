@@ -11,7 +11,7 @@ from discord.ext import tasks, commands
 with open("chowder/chowder_config.json", "r") as read_file:
     config = json.load(read_file)
 
-class ChowderCog(commands.Cog):
+class Chowder(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.spam.start()
@@ -59,15 +59,14 @@ class ChowderCog(commands.Cog):
         poll = await channel.fetch_message(poll.id)
         votes1 = discord.utils.find(lambda r: str(r.emoji) == config["option_1"], poll.reactions).users().flatten()
         votes2 = discord.utils.find(lambda r: str(r.emoji) == config["option_2"], poll.reactions).users().flatten()
-        votes1.remove(self.bot.user)
-        votes2.remove(self.bot.user)
 
         winner, loser = chosen_boys[0], chosen_boys[1] if len(votes1) > len(votes2) else chosen_boys[1], chosen_boys[0]
         tie = "I voted for " + winner.mention + " btw" if len(votes1) == len(votes2) else None
 
         await channel.send("It's decided, " + winner.mention + " is the best at " + activity + "! (on paper)")
-        await channel.send(winner.mention + " gets 5 ChowderCoins and all voters get 1 each. " + loser.mention \
-                            + " is deducted 10 ChowderCoins for sucking.")
+        await channel.send(winner.mention + " gets 5 ChowderCoin™️ and all voters get 1 each. " + loser.mention \
+                            + " is deducted 10 ChowderCoin™️ for sucking.")
+        # TODO @TimmahC award ChowderCoins
         if tie:
             await channel.send(tie)
 
@@ -90,7 +89,8 @@ class ChowderCog(commands.Cog):
         elif channel:
             voice = await channel.connect()
             await voice.main_ws.voice_state(guild.id, channel.id, self_mute=True)
-        await self.bot.get_channel(config["default_channel"]).send(config["happy_emote"] + " we playin' something?")
+        await self.bot.get_channel(config["default_channel"]).send(config["happy_emote"] + " we playin' something" \
+                                                                    + get_condescending_names() + "s?")
 
     @spam.before_loop
     @revive.before_loop
@@ -104,7 +104,6 @@ class ChowderCog(commands.Cog):
         if message.channel.id not in config["channels"] or message.author == self.bot.user:
             return
         name = get_name(message.author)
-
         await message.channel.send("Whoa " + message.author.mention + " why you deleting messages " \
                                     + name + "? Sketch.") 
 
@@ -113,7 +112,6 @@ class ChowderCog(commands.Cog):
         if before.channel.id not in config["channels"] or before.author == self.bot.user:
             return
         name = get_name(before.author)
-
         await before.channel.send("Whoa " + before.author.mention + " why you editing messages " \
                                     + name + "? Sketch.") 
 
@@ -165,18 +163,33 @@ class ChowderCog(commands.Cog):
         name = get_name(ctx.author)
         await ctx.send("Demotion features coming soon, sit tight " + name)
 
+    @commands.command(name="roll", brief="Woll dat shit", aliases=["woll", "wolldatshit"])
+    async def roll(self, ctx, max_roll:int = 6):
+        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
+            return
+        name = get_name(ctx.author)
+        roll_value = random.randint(1, max_roll)
+        if roll_value >= max_roll / 2:
+            await ctx.send("Not bad " + name + ", you rolled a **" + str(roll_value) + "**")
+        else:
+            await ctx.send("Get rekt " + name + ", you rolled a **" + str(roll_value) + "**")
+
+    @commands.command(name="flip", brief="Flip a coin", aliases=["coin", "flipdatshit"])
+    async def flip(self, ctx):
+        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
+            return
+        await ctx.send(random.choice([config["heads"], config["tails"]]))
+
     @commands.Cog.listener()
     async def on_message(self, message):
+        # TODO Refactor this mess
         if message.channel.id not in config["channels"] or message.author == self.bot.user:
             return
-
         name = get_name(message.author)
-            
         comment = message.content.strip().lower()
         if comment == "chowder pls":
             await message.channel.send("You seem to be confused " + name + ", try *chowder pls help*")
             return
-            
         if "brendan" in comment:
             await message.channel.send("Who's Brendan? He sounds like a real " + get_respectful_name())
             return
@@ -187,63 +200,50 @@ class ChowderCog(commands.Cog):
             await message.channel.send(trigger_words[0] + "? " + get_tilt_response())
             return
 
-        if "chowder" in comment and "pls" not in comment:
+        if "chowder" in words and "pls" not in words:
             if message.author.top_role.position < config["role_req"]:
                 await message.channel.send("You're only a " + message.author.top_role.name + ", don't even talk to me " \
                                             + name)
                 return
-            
             if "help" in words:
                 await message.channel.send("You seem to be confused " + name + ", try *chowder pls help*")
                 return
-
             greetings = [word for word in words if word in config["greetings"]]
             if greetings:
                 await message.channel.send(get_greeting() + " " + name)
                 return
-
             if any(insult_word in words for insult_word in config["insult_words"]):
                 await message.channel.send(get_insult_response() + " " + name)
                 return
-
             happy_words = [word for word in words if word in config["happy_words"]]
             if any(happy_word in words for happy_word in config["happy_words"]):
                 await message.channel.send(happy_words[0] + "? " + get_happy_response())
                 return
-
             suicide_words = [word for word in words if word in config["suicide_words"]]
             if any(suicide_word in words for suicide_word in config["suicide_words"]):
                 await message.channel.send(get_suicide_response())
                 return
-
             if "stfu" in comment or "shut" in comment:
-                await message.channel.send("Freedom of speech, " + name)
+                await message.channel.send("freedom of speech, " + name)
                 return
-
             if "please" in words:
                 await message.channel.send("That's not how you spell pls")
                 return
-
             if "pin" in words:
                 await message.channel.send("Yeah that is a pen in my mouth. What's it to you?")
                 return
-
             if "life" in words:
                 await message.channel.send("Bro you think I have a life? I just sit in this server all day")
                 return
-
             if "kys" in words:
-                await message.channel.send("I'm trying " + name)
+                await message.channel.send("I'm trying, " + name)
                 return
-
             if "think" in words:
                 await message.channel.send("Thinking is not my strong suit")
                 return
-
             if "rank" in words:
                 await message.channel.send("I deserve to be plat goddammit")
                 return
-
             await message.channel.send("Uhh what? Speak up " + name + ", or say *chowder pls help*")
 
 def get_name(author):
@@ -275,4 +275,4 @@ def get_respectful_name():
     return random.choice(config["respectful_names"])
 
 def setup(bot):
-    bot.add_cog(ChowderCog(bot))
+    bot.add_cog(Chowder(bot))
