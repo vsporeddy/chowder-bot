@@ -5,11 +5,11 @@
     "default_channel": 454492770682404877,
     "channels": [742569511978270730, 742906298257113199, 689297802823860225, 454492770682404877, 565381938022449152],
     "spam_cooldown": 500,
-    "revive_cooldown": 3000,
-    "min_revival_users": 6,
-    "promotion_cap": 15,
-    "promotion_floor": 8,
-    "min_nominations": 5,
+    "revive_cooldown": 4000,
+    "min_revival_users": 7,
+    "promotion_cap": 13,
+    "promotion_floor": 10,
+    "min_nominations": 6,
     "option_1": "<:SpatikaTsm:609892878726070273>",
     "option_2": "<:SpatikaClutch:609867523155951621>",
     "voting_time": 60,
@@ -143,6 +143,10 @@
         "bowling",
         "watching anime",
         "ping pong",
-        "val"
+        "VAL",
+        "dancing",
+        "hearts",
+        "Magic: the Gathering",
+        "being a simp"
     ]
 }

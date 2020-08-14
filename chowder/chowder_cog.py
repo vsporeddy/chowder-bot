@@ -18,7 +18,8 @@ class Chowder(commands.Cog):
         self.spam.start()
         self.revive.start()
         self.fomo.start()
-        self.promotion_nominees = {}
+        self.promotions = {}
+        self.demotions = {}
 
     def cog_unload(self):
         self.spam.cancel()
@@ -58,8 +59,8 @@ class Chowder(commands.Cog):
 
         await asyncio.sleep(config["voting_time"])
         poll = await channel.fetch_message(poll.id)
-        votes1 = discord.utils.find(lambda r: str(r.emoji) == config["option_1"], poll.reactions).users().flatten()
-        votes2 = discord.utils.find(lambda r: str(r.emoji) == config["option_2"], poll.reactions).users().flatten()
+        votes1 = await discord.utils.find(lambda r: str(r.emoji) == config["option_1"], poll.reactions).users().flatten()
+        votes2 = await discord.utils.find(lambda r: str(r.emoji) == config["option_2"], poll.reactions).users().flatten()
 
         winner, loser = chosen_boys[0], chosen_boys[1] if len(votes1) > len(votes2) else chosen_boys[1], chosen_boys[0]
         tie = "I voted for " + winner.mention + " btw" if len(votes1) == len(votes2) else None
@@ -118,6 +119,13 @@ class Chowder(commands.Cog):
 
     @commands.command(name="promote", brief="Nominate a user for promotion.")
     async def promote(self, ctx):
+        await self.nomination_helper(ctx, True)
+
+    @commands.command(name="demote", brief="Nominate a user for demotion.")
+    async def demote(self, ctx):
+        await self.nomination_helper(ctx, False)
+
+    async def nomination_helper(self, ctx, is_promotion):
         if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
             return
         nominator = ctx.author
@@ -127,42 +135,55 @@ class Chowder(commands.Cog):
             return
         nominee = ctx.message.mentions[0]
         if nominee.id == nominator.id:
-            await ctx.send("Can't nominate yourself " + name + ", get one of your symphs to do it.")
+            simps = "symphs" if is_promotion else "haters"
+            await ctx.send("Can't nominate yourself " + name + ", get one of your " + simps + " to do it.")
             return
         if nominee == self.bot.user:
-            await ctx.send("I appreciate the thought but I'm happy at my rank, " + name)
+            message = "I appreciate the thought but I'm happy at my rank, " if is_promotion else \
+                        "Nice try, can't demote me "
+            await ctx.send(message + name)
             return
-        if nominee.top_role.position >= config["promotion_cap"]:
-            await ctx.send("Sorry " + name + ", no democratic promotions at " \
-                            + nominee.top_role.name + " rank. Please contact a board member for a manual review.")
+        if (is_promotion and nominee.top_role.position + 1 >= config["promotion_cap"]) or \
+            (not is_promotion and nominee.top_role.position >= config["promotion_cap"]):
+            await ctx.send("Sorry " + name + ", no democratic promotions/demotions at **" \
+                            + nominee.top_role.name + "** rank. Please contact a board member for a manual review.")
             return
-        if nominee.id not in self.promotion_nominees:
-            self.promotion_nominees[nominee.id] = set([nominator.id])
-        elif nominator.id in self.promotion_nominees[nominee.id]:
+        if not is_promotion and nominee.top_role.position <= config["promotion_floor"]:
+            await ctx.send("Leave poor " + nominee.mention + " alone, they're only **" + nominee.top_role.name + "** rank.")
+            return
+        nominees = self.promotions if is_promotion else self.demotions
+        promotion_str = "promotion" if is_promotion else "demotion"
+        if nominee.id not in nominees:
+            nominees[nominee.id] = set([nominator.id])
+        elif nominator.id in nominees[nominee.id]:
             await ctx.send("Settle down " + name + ", you already nominated " + nominee.mention \
-                            + " for a promotion.")
+                            + " for a " + promotion_str)
             return
         else:
-            self.promotion_nominees[nominee.id].add(nominator.id)
+            nominees[nominee.id].add(nominator.id)
 
-        noms_needed = config["min_nominations"] - len(self.promotion_nominees[nominee.id])
+        noms_needed = config["min_nominations"] - len(nominees[nominee.id])
         if noms_needed > 0:
             await ctx.send("Hey " + get_condescending_name() + "s, " + nominator.mention + " has nominated " \
-                            + nominee.mention + " for a promotion. " + str(noms_needed) + " more nominations and " \
-                            + nominee.mention + " will be promoted.")
+                            + nominee.mention + " for a " + promotion_str + ". " + str(noms_needed) + " more " \
+                            + "nominations and " + nominee.mention + " will get a " + promotion_str)
             return
         else:
-            # TODO maybe actually promote them instead
-            self.promotion_nominees[nominee.id] = set([])
-            await ctx.send("Congratulations " + nominee.mention + ", you just got promoted from " \
-                            + nominee.top_role.name + " to--Sike! Y'all thought this was a democracy? "
-                            + "It's a dictatorship " + get_condescending_name() \
-                            + "s. Maybe buy me a drink and I'll think about promoting you.")
+            current_rank = nominee.top_role
+            increment = 1 if is_promotion else -1
+            roles = self.bot.get_guild(config["guild_id"]).roles
+            new_rank = discord.utils.find(lambda r: r.position == current_rank.position + increment, roles)
+            nominees[nominee.id] = set([])
 
-    @commands.command(name="demote", brief="Nominate a user for demotion.")
-    async def demote(self, ctx):
-        name = get_name(ctx.author)
-        await ctx.send("Demotion features coming soon, sit tight " + name)
+            await nominee.add_roles(new_rank)
+            await nominee.remove_roles(current_rank)
+
+            if is_promotion:
+                await ctx.send(config["happy_emote"] + " Congratulations " + nominee.mention + ", you just got promoted from **" \
+                                + current_rank.name + "** to **" + new_rank.name + "**!")
+            else:
+                await ctx.send(config["rip_emote"] + " Yikes " + nominee.mention + ", by popular demand you've been demoted down to **" \
+                                + new_rank.name + "** rank.")
 
     @commands.command(name="roll", brief="Woll dat shit", aliases=["woll", "wolldatshit"])
     async def roll(self, ctx, max_roll:int = 6):
