@@ -4,6 +4,7 @@
 
 import discord
 import asyncio
+import random
 import json
 from discord.ext import commands
 from chowder import chowder_cog
@@ -87,7 +88,7 @@ class Game(commands.Cog):
         if not self.in_game:
             await ctx.send("Stop what? I'm not doing anything " + name)
             return
-        
+
         game = self.current_game
 
         if ctx.author.top_role.position < game_config[game]["stop_req"]:
@@ -109,5 +110,53 @@ class Game(commands.Cog):
         self.current_game = game
         await self.bot.change_presence(activity=discord.Game(name=game))
 
+    @commands.group(name="slots", brief="Try your luck at the slots.")
+    async def slots(self, ctx, *args):
+        game = config["games"]["slots"]
+        emotes = game["emotes"]
+        reels = game["reels"]
+        if (len(args) != 1):
+            await ctx.send("You need to enter a bet for slots.")
+            return
+        roll = [random.randint(1,len(emotes)) for x in range(reels)]
+        for streak in check_slots(roll):
+            if streak[1] == 3:
+
+
+        roll_str = ""
+        for i in roll:
+            roll_str += emotes.get(str(i))
+            roll_str += " "
+        print()
+        embed = discord.Embed(
+            title = "Chowder Slots",
+            color = 4188997,
+            description = roll_str
+        )
+        await ctx.send(embed=embed)
+        print(chowder_cog.get_balance(ctx.author.id))
+
+def check_slots(roll):
+    temp = roll[0]
+    streak = 1
+    stats = []
+    for i in range(1, len(roll)):
+        if (roll[i] == temp):
+            streak += 1
+        else:
+            tup = [temp, streak]
+            stats.append(tup)
+            temp = roll[i]
+            streak = 1
+        if (i == (len(roll)-1)):
+            print("final {}".format(i))
+            stats.append([roll[i], streak])
+    return stats
+
+
 def setup(bot):
+<<<<<<< Updated upstream
     bot.add_cog(Game(bot))
+=======
+    bot.add_cog(GameCog(bot))
+>>>>>>> Stashed changes

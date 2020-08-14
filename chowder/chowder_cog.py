@@ -6,6 +6,7 @@ import json
 import random
 import asyncio
 import discord
+import sqlite3 as sqlite
 from datetime import datetime
 from discord.ext import tasks, commands
 
@@ -106,7 +107,7 @@ class Chowder(commands.Cog):
             return
         name = get_name(message.author)
         await message.channel.send("Whoa " + message.author.mention + " why you deleting messages " \
-                                    + name + "? Sketch.") 
+                                    + name + "? Sketch.")
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
@@ -114,7 +115,7 @@ class Chowder(commands.Cog):
             return
         name = get_name(before.author)
         await before.channel.send("Whoa " + before.author.mention + " why you editing messages " \
-                                    + name + "? Sketch.") 
+                                    + name + "? Sketch.")
 
     @commands.command(name="promote", brief="Nominate a user for promotion.")
     async def promote(self, ctx):
@@ -180,6 +181,38 @@ class Chowder(commands.Cog):
         if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
             return
         await ctx.send(random.choice([config["heads"], config["tails"]]))
+
+    """Chowder coin stuff"""
+    @commands.command(name="balance", brief="Check current balance of Chowder coins.")
+    async def balance(self, ctx):
+        bal = get_balance(ctx.author.id)
+        if (bal == None):
+            await ctx.send(ctx.author.mention + " has no account. Making a new one for you.")
+            new_account(ctx.author.id, ctx.author.name)
+        else:
+            await ctx.send(ctx.author.mention + " currrently has {} coins.".format(bal))
+
+    @commands.command(name="give", brief="Transfer coins from one user to another. \
+                        Specify who you're sending to via mention and the amount.")
+    async def give(self, ctx, *args):
+        sender = ctx.author
+        if (get_balance(sender.id) == None):
+            await ctx.author.mention + " You don't have an account. Go make one first."
+            return
+        mentions = ctx.message.mentions
+        if (len(args) != 2 or len(mentions) != 1):
+            await ctx.send("You seem a bit confused, " + get_condescending_name() + ". Maybe you should look for help.")
+            return
+        rec = getUserFromMention(self, args[0])
+        if (rec != None):
+            response = give_checker(sender.id, rec, args[1])
+        else:
+            rec = getUserFromMention(self, args[1])
+            response = give_checker(sender.id, rec, args[0])
+        if (response[0] == 1):
+            conn = sqlite.connect()
+        else:
+            await ctx.send(response[1])
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -271,6 +304,62 @@ def get_suicide_response():
 
 def get_activity():
     return random.choice(config["activities"])
+
+def getUserFromMention(self, mention):
+    if (not mention):
+        return
+    if (mention.startswith('<@') and mention.endswith('>')):
+        mention = mention[2:-1]
+        if (mention.startswith('!')):
+            mention = mention[1:]
+        return int(mention)
+
+def get_balance(id):
+    conn = sqlite.connect(config["DATABASE"])
+    c = conn.cursor()
+    query = "SELECT balance FROM accounts WHERE id = {}".format(id)
+    bal = c.execute(query).fetchone()
+    conn.close()
+    if (bal == None):
+        return None
+    else:
+        return bal[0]
+
+def new_account(id, name, balance=0):
+    conn = sqlite.connect(config["DATABASE"])
+    c = conn.cursor()
+    c.execute("INSERT INTO accounts('id', 'name', 'balance') VALUES ('{}', '{}', 0)".format(id, name))
+    conn.commit()
+    conn.close()
+
+def give_checker(send_id, rec_id, amount):
+    response = []
+    if (send_id == rec_id):
+        response = [-1, "Sending money to yourself? That's sad."]
+    elif (get_balance(rec_id) == None):
+        response = [-1, "You're sending coins to someone who doesn't have an account."]
+    if (amount.isdigit()):
+        amount = int(amount)
+        if (amount < 1):
+            response = [-1, "Invalid amount of coins."]
+        elif (amount > get_balance(send_id)):
+            response = [-1, "Looks like you don't have enough coins, " + get_condescending_name() + "."]
+        else:
+            response = [1, "Success"]
+    return response
+
+def give_helper(send_id, rec_id, amount):
+    conn = sqlite.connect(config["DATABASE"])
+    c = conn.cursor()
+    new_bal = get_balance(send_id) - amount
+    c.execute("UPDATE accounts SET balance = {} where id = {}".format(new_bal, send_id))
+    new_bal = get_balance(rec_id) + amount
+    c.execute("UPDATE accounts SET balance = {} where id = {}".format(new_bal, rec_id))
+    c.execute("INSERT INTO TRANSACTIONS (receiver_id, amount, sender_id) \
+                    VALUES ({}, {}, {})".format(rec_id, amount, send_id))
+    conn.commit()
+    conn.close()
+    return 1
 
 def get_respectful_name():
     return random.choice(config["respectful_names"])

@@ -2,6 +2,7 @@ import os
 import discord
 import asyncio
 import json
+import sqlite3 as sqlite
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -12,6 +13,23 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 with open("config.json", "r") as read_file:
     config = json.load(read_file)
+
+def create_db():
+    if os.path.isfile(config["DATABASE"]):
+        print("Database file found.")
+    else:
+        print("Database not found. Creating...")
+        conn = sqlite.connect(config["DATABASE"])
+        c = conn.cursor()
+        c.execute("""CREATE TABLE accounts
+                    (id text NOT NULL PRIMARY KEY, name text, balance integer)""")
+        c.execute("""CREATE TABLE transactions
+                    (receiver_id text NOT NULL, amount integer, sender_id text,
+                    FOREIGN KEY(receiver_id) REFERENCES accounts(id))""")
+        c.execute("INSERT INTO accounts VALUES ('1', 'BANK', 1)")
+        conn.commit()
+        conn.close()
+        print("Done.")
 
 def get_prefix(bot, message):
     prefixes = config["prefixes"]
@@ -33,6 +51,7 @@ if __name__ == '__main__':
 
 @bot.event
 async def on_ready():
+    create_db()
     guild = discord.utils.get(bot.guilds, name=config["guild"])
     await bot.change_presence(activity=None)
 
