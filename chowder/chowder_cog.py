@@ -69,10 +69,16 @@ class Chowder(commands.Cog):
         votes1 = await discord.utils.find(lambda r: str(r.emoji) == config["option_1"], poll.reactions).users().flatten()
         votes2 = await discord.utils.find(lambda r: str(r.emoji) == config["option_2"], poll.reactions).users().flatten()
 
-        winner, loser = chosen_boys[0], chosen_boys[1] if len(votes1) > len(votes2) else chosen_boys[1], chosen_boys[0]
+        if len(votes1) > len(votes2):
+            winner = chosen_boys[0]
+            loser = chosen_boys[1]
+        else:
+            winner = chosen_boys[1]
+            loser = chosen_boys[0]
+
         tie = f"I voted for {winner.mention} btw" if len(votes1) == len(votes2) else None
 
-        await channel.send(f"It's decided, {winner.mention} is the best on paper at {activity}!")
+        await channel.send(f"It's decided, {winner.mention} is the best at {activity}! (on paper)")
         await channel.send(f"{winner.mention} wins 5 ChowderCoin™️ and all voters get 1 each. {loser.mention} is "
                             f"deducted 10 ChowderCoin™️")
         # TODO @TimmahC award ChowderCoins
