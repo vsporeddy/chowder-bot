@@ -29,7 +29,7 @@ class Game(commands.Cog):
         """Rallies people for a game."""
         await self.set_game_status(game)
 
-        message = await ctx.send(f"Yo, **{initiator.mention}** is tryna play **{game}**. React here with " 
+        message = await ctx.send(f"Yo, **{initiator.mention}** is tryna play **{game}**. React here with "
                                     f"{game_config[game]['emote']} in the next {game_config[game]['wait_time']} "
                                     f" seconds if you're in")
         await message.add_reaction(game_config[game]["emote"])
@@ -229,20 +229,24 @@ class Game(commands.Cog):
     Additional bonus field if there is a wildcard
 """
 def check_slots(roll, wildcard=None):
-    prev = -1
-    streak = 0
+    prev = roll[0]
+    streak = 1
     stats = []
+    prev_wildcard = False
     bonus = 0
-    print(roll)
-    for i in range(0, len(roll)):
-        if (i == 0):
-            prev = roll[0]
+    if (roll[0] == wildcard):
+        bonus += 1
+        roll[0] = roll[1]
+    if (roll[-1] == wildcard):
+        bonus += 1
+        roll[-1] = roll[-2]
+    for i in range(1, len(roll)):
         if (roll[i] == wildcard):
             bonus += 1
         if (roll[i] == prev or roll[i] == wildcard or prev == wildcard):
             streak += 1
             if (prev == wildcard):
-                prev == roll[i]
+                prev = roll[i]
         else:
             tup = [prev, streak]
             stats.append(tup)
@@ -257,9 +261,7 @@ def get_hand(result):
     pair = 0
     mult = 0
     msg = ""
-    print("sup")
     for streak in result[0]:
-        print(streak)
         if (streak[1] == 5):
             mult = 50
             msg = "**FIVE IN A ROW!!!**"
