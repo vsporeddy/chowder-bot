@@ -34,11 +34,10 @@ if __name__ == '__main__':
 @bot.event
 async def on_ready():
     guild = discord.utils.get(bot.guilds, name=config["guild"])
-    await bot.change_presence(activity=None)
 
     print(
-        f'{bot.user.name} is connected to the following guild:\n'
-        f'{guild.name}(id: {guild.id})'
+        f"{bot.user.name} is connected to the following guild:\n"
+        f"{guild.name}(id: {guild.id})"
     )
 
 bot.run(TOKEN, bot=True, reconnect=True)

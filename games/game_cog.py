@@ -5,7 +5,8 @@
 import discord
 import asyncio
 import json
-from discord.ext import commands
+import random
+from discord.ext import commands, tasks
 from chowder import chowder_cog
 
 with open("games/game_config.json", "r") as read_file:
@@ -17,6 +18,10 @@ class Game(commands.Cog):
         self.bot = bot
         self.in_game = False
         self.current_game = None
+        self.update_status.start()
+
+    def cog_unload(self):
+        self.update_status.cancel()
 
     async def rally(self, ctx, game, initiator):
         """Rallies people for a game."""
@@ -94,16 +99,32 @@ class Game(commands.Cog):
         await ctx.send(f"Rip {game}")
         await self.clear_game_status()
 
+    @tasks.loop(seconds=3600)
+    async def update_status(self):
+        if not self.in_game:
+            await self.set_new_status()
+
+    @update_status.before_loop
+    async def before_status(self):
+        await self.bot.wait_until_ready()
 
     async def clear_game_status(self):
         self.in_game = False
         self.current_game = None
-        await self.bot.change_presence(activity=None)
+        await self.set_new_status()
 
     async def set_game_status(self, game):
         self.in_game = True
         self.current_game = game
         await self.bot.change_presence(activity=discord.Game(name=game))
+
+    async def set_new_status(self):
+        activity = random.choice([
+                discord.Activity(name="hentai", type=discord.ActivityType.watching),
+                discord.Game(name="with myself"),
+                discord.Activity(type=discord.ActivityType.listening, name="a banger")
+            ])
+        await self.bot.change_presence(activity=activity)
 
 def setup(bot):
     bot.add_cog(Game(bot))

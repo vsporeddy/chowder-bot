@@ -121,7 +121,7 @@ deducted 10 ChowderCoin™️")
         if before.channel.id not in config["channels"] or before.author == self.bot.user:
             return
         name = get_name(before.author)
-        await message.channel.send(f"Whoa {before.author.mention} why you editing messages {name}? Sketch")
+        await before.channel.send(f"Whoa {before.author.mention} why you editing messages {name}? Sketch")
 
     @commands.command(name="promote", brief="Nominate a user for promotion.")
     async def promote(self, ctx):
