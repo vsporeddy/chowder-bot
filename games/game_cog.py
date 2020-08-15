@@ -96,7 +96,7 @@ class Game(commands.Cog):
         if game in games and ctx.author.top_role.position < game_config[game]["stop_req"]:
             await ctx.send(f"Sorry {name}, you're not high enough stop a game of {game}. Try getting promoted.")
             return
-            
+
         await ctx.send(f"Rip {game}")
         await self.clear_game_status()
 

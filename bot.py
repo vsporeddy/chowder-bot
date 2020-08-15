@@ -44,11 +44,10 @@ async def on_ready():
 
 @bot.check
 async def check_commands(ctx):
-    print(ctx.command)
     if ctx.channel.id not in channels or ctx.author == bot.user:
         return False
     if ctx.invoked_with != "help" and random.random() <= config["insubordination_rate"]:
-        await ctx.send("Fuck off, you're not my manager")
+        await ctx.send(random.choice(config["insubordination_messages"]))
         return False
     return True
 
