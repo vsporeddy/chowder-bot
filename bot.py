@@ -2,6 +2,7 @@ import os
 import discord
 import asyncio
 import json
+import random
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -42,7 +43,13 @@ async def on_ready():
     )
 
 @bot.check
-def check_commands(ctx):
-    return ctx.channel.id in channels and ctx.author != bot.user
+async def check_commands(ctx):
+    print(ctx.command)
+    if ctx.channel.id not in channels or ctx.author == bot.user:
+        return False
+    if ctx.invoked_with != "help" and random.random() <= config["insubordination_rate"]:
+        await ctx.send("Fuck off, you're not my manager")
+        return False
+    return True
 
 bot.run(TOKEN, bot=True, reconnect=True)
