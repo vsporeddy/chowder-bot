@@ -1,0 +1,9 @@
+{
+    "guild_id": 454492770682404875,
+    "channels": [742569511978270730, 742906298257113199, 689297802823860225, 454492770682404877, 565381938022449152],
+    "promotion_cap": 14,
+    "promotion_floor": 10,
+    "min_nominations": 6,
+    "demotion_emote": "<:ChowderRIP:589966977188102161>",
+    "promotion_emote": "<:ChowderHappy:511436641844461579>"
+}

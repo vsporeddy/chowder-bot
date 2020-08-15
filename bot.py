@@ -9,7 +9,7 @@ from discord.ext import commands
 from discord.ext.commands import CommandNotFound
 
 load_dotenv()
-TOKEN = os.getenv('DISCORD_TOKEN')
+TOKEN = os.getenv("DISCORD_TOKEN")
 
 with open("config.json", "r") as read_file:
     config = json.load(read_file)
@@ -43,9 +43,9 @@ async def on_command_error(ctx, error):
         return
     raise error
 
-extensions = ['games.game_cog', 'chowder.chowder_cog']
+extensions = ["games.game_cog", "chowder.chowder_cog", "governance.governance_cog"]
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     for extension in extensions:
         bot.load_extension(extension)
 
