@@ -134,6 +134,11 @@ class Chowder(commands.Cog):
         await before.channel.send(f"Whoa {before.author.mention} why you editing messages {name}? Sketch")
 
     @commands.Cog.listener()
+    async def on_member_join(self, member):
+        channel = self.get_default_channel()
+        await channel.send(f"{get_collective_name()}, please welcome {member.mention} {get_emote()}")
+
+    @commands.Cog.listener()
     async def on_message(self, message):
         if message.channel.id not in channels or message.author == self.bot.user:
             return
@@ -143,7 +148,10 @@ class Chowder(commands.Cog):
         if comment == "chowder pls":
             return f"You seem confused {name}, try *chowder pls help*"
 
-        if "chowder" in comment and "pls" not in comment:
+        prev_message = (await message.channel.history(limit=1, before=message).flatten())
+        addressing_chowder = prev_message and prev_message[0].author == self.bot.user \
+                                or ("chowder" in comment and "pls" not in comment)
+        if addressing_chowder:
             tokens = tokenizer.tokenize(comment)
             lemmas = [lemmatizer.lemmatize(t) for t in tokens]
 
@@ -153,7 +161,8 @@ class Chowder(commands.Cog):
                     response = random.choice(speech['responses'][intent]).format(name=name, word=lemma)
                     await message.channel.send(response)
                     return
-            await message.channel.send(f"Uhh what? Speak up {name}, or say *chowder pls help*")
+            if "chowder" in comment:
+                await message.channel.send(f"Uhh what? Speak up {name}, or say *chowder pls help*")
 
     def get_default_channel(self):
         return self.bot.get_channel(config["default_channel"])
@@ -186,6 +195,9 @@ def get_goodbye():
 
 def get_collective_name():
     return random.choice(speech["collective_names"])
+
+def get_emote():
+    return random.choice(speech["emotes"])
 
 def setup(bot):
     bot.add_cog(Chowder(bot))

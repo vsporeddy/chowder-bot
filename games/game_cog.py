@@ -94,7 +94,7 @@ class Game(commands.Cog):
             return
         game = self.current_game
         if game in games and ctx.author.top_role.position < game_config[game]["stop_req"]:
-            await ctx.send(f"Sorry {name}, you're not high enough stop a game of {game}. Try getting promoted.")
+            await ctx.send(f"Sorry {name}, you're not high enough rank to stop a game of {game}. Try getting promoted.")
             return
 
         await ctx.send(f"Rip {game}")

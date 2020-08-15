@@ -1,4 +1,10 @@
 {
+    "emotes": [
+        "<:ChowderHappy:511436641844461579>",
+        "<:ChowderPalmers:541700042407280650>",
+        "<:ChowderSmile:664313737255321632>"
+    ],
+
     "triggers": {
         "liberal": "tilt",
         "socialist": "tilt",
@@ -75,7 +81,6 @@
             "<:ChowderPalmers:541700042407280650> why hello there {name}"
         ],
         "goodbye": [
-            "<:ChowderWut:541707580662349856> uh, bye?",
             "have a good life {name}"
         ],
         "abuse": [
@@ -136,10 +141,10 @@
         "watching anime",
         "ping pong",
         "VAL",
-        "dancing",
+        "dancing <:PhantahSee:644815069531734016>",
         "hearts",
-        "Magic: the Gathering",
-        "being a simp"
+        "Magic: the Gathering <:DanteTears:549492738249195521>",
+        "simping "
     ],
 
     "spam_quotes" : [
