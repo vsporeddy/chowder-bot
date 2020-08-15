@@ -24,6 +24,12 @@
         "hi": "greeting",
         "hey": "greeting",
 
+        "bye": "goodbye",
+        "cya": "goodbye",
+        "goodbye": "goodbye",
+        "later": "goodbye",
+        "peace": "goodbye",
+
         "suck": "abuse",
         "fuck": "abuse",
         "hate": "abuse",
@@ -68,6 +74,10 @@
             "how's it goin' {name}",
             "<:ChowderPalmers:541700042407280650> why hello there {name}"
         ],
+        "goodbye": [
+            "<:ChowderWut:541707580662349856> uh, bye?",
+            "have a good life {name}"
+        ],
         "abuse": [
             "fuck you too {name}",
             "fuck off {name}",
@@ -106,9 +116,15 @@
         "boss"
     ],
 
+    "collective_names": [
+        "boys",
+        "bois",
+        "skippers"
+    ],
+
     "join_phrases": [
-        "where we dropping",
-        "what are we playing"
+        "where we dropping, {names}? <:ChowderGaming:511432684971491328>",
+        "<:ChowderGaming:511432684971491328> sup {names}, we playin' something?"
     ],
 
     "activities": [

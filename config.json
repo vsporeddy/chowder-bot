@@ -1,4 +1,5 @@
 {
     "guild": "Dark Times", 
-    "prefixes": ["chowder pls ", "$", "Chowder pls ", "$chowder "]
+    "prefixes": ["chowder pls ", "$", "Chowder pls ", "$chowder "],
+    "channels": [742569511978270730, 742906298257113199, 689297802823860225, 454492770682404877, 565381938022449152]
 }

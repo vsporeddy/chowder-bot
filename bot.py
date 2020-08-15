@@ -18,6 +18,7 @@ def get_prefix(bot, message):
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
 bot = commands.Bot(command_prefix=get_prefix)
+channels = set(config["channels"])
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -39,5 +40,9 @@ async def on_ready():
         f"{bot.user.name} is connected to the following guild:\n"
         f"{guild.name}(id: {guild.id})"
     )
+
+@bot.check
+def check_commands(ctx):
+    return ctx.channel.id in channels and ctx.author != bot.user
 
 bot.run(TOKEN, bot=True, reconnect=True)

@@ -17,17 +17,15 @@ class Governance(commands.Cog):
         self.promotions = {}
         self.demotions = {}
 
-    @commands.command(name="promote", brief="Nominate a user for promotion.")
+    @commands.command(name="promote", brief="Nominate a user for promotion")
     async def promote(self, ctx):
         await self.nomination_helper(ctx, True)
 
-    @commands.command(name="demote", brief="Nominate a user for demotion.")
+    @commands.command(name="demote", brief="Nominate a user for demotion")
     async def demote(self, ctx):
         await self.nomination_helper(ctx, False)
 
     async def nomination_helper(self, ctx, is_promotion):
-        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
-            return
         nominator = ctx.author
         name = chowder_cog.get_name(nominator)
         if not ctx.message.mentions:
@@ -60,10 +58,10 @@ class Governance(commands.Cog):
             return
         else:
             nominees[nominee.id].add(nominator.id)
-
+        
         noms_needed = config["min_nominations"] - len(nominees[nominee.id])
         if noms_needed > 0:
-            await ctx.send(f"Hey {chowder_cog.get_condescending_name()}s, {nominator.mention} has nominated "
+            await ctx.send(f"Hey {chowder_cog.get_collective_name()}, {nominator.mention} has nominated "
                             f"{nominee.mention} for a {promotion_str}. They need {noms_needed} more nominations.")
             return
         else:
