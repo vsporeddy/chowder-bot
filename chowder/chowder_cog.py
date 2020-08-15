@@ -189,23 +189,6 @@ for a {promotion_str}. They need {noms_needed} more nominations.")
                 await ctx.send(f"{config['rip_emote']} Yikes {nominee.mention}, by popular demand you've been demoted \
 down to **{new_rank.name}** rank.")
 
-    @commands.command(name="roll", brief="Woll dat shit", aliases=["woll", "wolldatshit"])
-    async def roll(self, ctx, max_roll:int = 6):
-        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
-            return
-        name = get_name(ctx.author)
-        roll_value = random.randint(1, max_roll)
-        if roll_value >= max_roll / 2:
-            await ctx.send(f"Not bad {name}, you rolled a **{roll_value}**")
-        else:
-            await ctx.send(f"Get rekt {name}, you rolled a **{roll_value}**")
-
-    @commands.command(name="flip", brief="Flip a coin", aliases=["coin", "flipdatshit"])
-    async def flip(self, ctx):
-        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
-            return
-        await ctx.send(random.choice([config["heads"], config["tails"]]))
-
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.channel.id not in config["channels"] or message.author == self.bot.user:
