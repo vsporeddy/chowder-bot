@@ -27,8 +27,9 @@ class Game(commands.Cog):
         """Rallies people for a game."""
         await self.set_game_status(game)
 
-        message = await ctx.send(f"Yo, **{initiator.mention}** is tryna play **{game}**. React here with \
-{game_config[game]['emote']} in the next {game_config[game]['wait_time']} seconds if you're in")
+        message = await ctx.send(f"Yo, **{initiator.mention}** is tryna play **{game}**. React here with " 
+                                    f"{game_config[game]['emote']} in the next {game_config[game]['wait_time']} "
+                                    f" seconds if you're in")
         await message.add_reaction(game_config[game]["emote"])
 
         # Wait for people to join
