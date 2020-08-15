@@ -7,11 +7,19 @@ import random
 import asyncio
 import discord
 import sqlite3 as sqlite
+import nltk
+from nltk.stem import WordNetLemmatizer
 from datetime import datetime
 from discord.ext import tasks, commands
 
 with open("chowder/chowder_config.json", "r") as read_file:
     config = json.load(read_file)
+
+with open("chowder/speech.json", "r") as read_file:
+    speech = json.load(read_file)
+
+tokenizer = nltk.tokenize.RegexpTokenizer(r"\w+")
+lemmatizer = WordNetLemmatizer()
 
 class Chowder(commands.Cog):
     def __init__(self, bot):
@@ -19,7 +27,8 @@ class Chowder(commands.Cog):
         self.spam.start()
         self.revive.start()
         self.fomo.start()
-        self.promotion_nominees = {}
+        self.promotions = {}
+        self.demotions = {}
 
     def cog_unload(self):
         self.spam.cancel()
@@ -34,7 +43,7 @@ class Chowder(commands.Cog):
         if not last_message or last_message.author == self.bot.user:
             return
         if (datetime.utcnow() - channel.last_message.created_at).seconds >= config["spam_cooldown"]:
-            await channel.send(random.choice(config["spam_quotes"]))
+            await channel.send(get_spam_quote())
 
     @tasks.loop(seconds=60)
     async def revive(self):
@@ -43,31 +52,31 @@ class Chowder(commands.Cog):
         last_message = channel.last_message
         if not last_message or (datetime.utcnow() - channel.last_message.created_at).seconds < config["revive_cooldown"]:
             return
-        boys = [user for user in channel.members if user.status == discord.Status.online and user.top_role.position >= config["role_req"]]
+        boys = [user for user in channel.members if user.status == discord.Status.online \
+                and user.top_role.position >= config["role_req"]]
         if len(boys) < config["min_revival_users"]:
             return
 
         await channel.send("Time to revive this dead server boys, poll:")
         chosen_boys = random.sample(boys, 2)
         activity = get_activity()
-        poll = await channel.send("Who's better at " + activity + ", " + chosen_boys[0].mention \
-                                    + " (" + config["option_1"] + "), or " + chosen_boys[1].mention + " (" \
-                                    + config["option_2"] + ")? Vote in the next " + str(config["voting_time"]) \
-                                    + " seconds.")
+        poll = await channel.send(f"Who's better at {activity}, {chosen_boys[0].mention} ({config['option_1']}) or \
+{chosen_boys[1].mention} ({config['option_2']})? Vote in the next {config['voting_time']} seconds.")
+
         await poll.add_reaction(config["option_1"])
         await poll.add_reaction(config["option_2"])
 
         await asyncio.sleep(config["voting_time"])
         poll = await channel.fetch_message(poll.id)
-        votes1 = discord.utils.find(lambda r: str(r.emoji) == config["option_1"], poll.reactions).users().flatten()
-        votes2 = discord.utils.find(lambda r: str(r.emoji) == config["option_2"], poll.reactions).users().flatten()
+        votes1 = await discord.utils.find(lambda r: str(r.emoji) == config["option_1"], poll.reactions).users().flatten()
+        votes2 = await discord.utils.find(lambda r: str(r.emoji) == config["option_2"], poll.reactions).users().flatten()
 
         winner, loser = chosen_boys[0], chosen_boys[1] if len(votes1) > len(votes2) else chosen_boys[1], chosen_boys[0]
-        tie = "I voted for " + winner.mention + " btw" if len(votes1) == len(votes2) else None
+        tie = f"I voted for {winner.mention} btw" if len(votes1) == len(votes2) else None
 
-        await channel.send("It's decided, " + winner.mention + " is the best at " + activity + "! (on paper)")
-        await channel.send(winner.mention + " gets 5 ChowderCoin™️ and all voters get 1 each. " + loser.mention \
-                            + " is deducted 10 ChowderCoin™️ for sucking.")
+        await channel.send(f"It's decided, {winner.mention} is the best on paper at {activity}!")
+        await channel.send(f"{winner.mention} wins 5 ChowderCoin™️ and all voters get 1 each. {loser.mention} is \
+deducted 10 ChowderCoin™️")
         # TODO @TimmahC award ChowderCoins
         if tie:
             await channel.send(tie)
@@ -82,7 +91,7 @@ class Chowder(commands.Cog):
             return
         if not channel and voice and voice.is_connected():
             await voice.disconnect()
-            await self.bot.get_channel(config["default_channel"]).send(config["rip_emote"])
+            await self.bot.get_channel(config["default_channel"]).send(f"{config['rip_emote']} uh, bye?")
             return
         if channel and voice and voice.channel == channel:
             return
@@ -91,8 +100,8 @@ class Chowder(commands.Cog):
         elif channel:
             voice = await channel.connect()
             await voice.main_ws.voice_state(guild.id, channel.id, self_mute=True)
-        await self.bot.get_channel(config["default_channel"]).send(config["happy_emote"] + " " + get_join_phrase() \
-                                                                    + " " + get_condescending_name() + "s?")
+        await self.bot.get_channel(config["default_channel"]).send(f"{config['happy_emote']} {get_join_phrase()} \
+{get_condescending_name()}s?")
 
     @spam.before_loop
     @revive.before_loop
@@ -106,81 +115,80 @@ class Chowder(commands.Cog):
         if message.channel.id not in config["channels"] or message.author == self.bot.user:
             return
         name = get_name(message.author)
-        await message.channel.send("Whoa " + message.author.mention + " why you deleting messages " \
-                                    + name + "? Sketch.")
+        await message.channel.send(f"Whoa {message.author.mention} why you deleting messages {name}? Sketch")
 
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
         if before.channel.id not in config["channels"] or before.author == self.bot.user:
             return
         name = get_name(before.author)
-        await before.channel.send("Whoa " + before.author.mention + " why you editing messages " \
-                                    + name + "? Sketch.")
+        await before.channel.send(f"Whoa {before.author.mention} why you editing messages {name}? Sketch")
 
     @commands.command(name="promote", brief="Nominate a user for promotion.")
     async def promote(self, ctx):
+        await self.nomination_helper(ctx, True)
+
+    @commands.command(name="demote", brief="Nominate a user for demotion.")
+    async def demote(self, ctx):
+        await self.nomination_helper(ctx, False)
+
+    async def nomination_helper(self, ctx, is_promotion):
         if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
             return
         nominator = ctx.author
         name = get_name(nominator)
         if not ctx.message.mentions:
-            await ctx.send("Gotta mention someone to nominate them, " + name)
+            await ctx.send(f"Gotta mention someone to nominate them, {name}")
             return
         nominee = ctx.message.mentions[0]
         if nominee.id == nominator.id:
-            await ctx.send("Can't nominate yourself " + name + ", get one of your symphs to do it.")
+            simps = "symphs" if is_promotion else "haters"
+            await ctx.send(f"Can't nominate yourself {name}, get one of your {simps} to do it.")
             return
         if nominee == self.bot.user:
-            await ctx.send("I appreciate the thought but I'm happy at my rank, " + name)
+            message = "I appreciate the thought but I'm happy at my rank, " if is_promotion else \
+                        "Nice try, can't demote me "
+            await ctx.send(f"{message} {name}")
             return
-        if nominee.top_role.position >= config["promotion_cap"]:
-            await ctx.send("Sorry " + name + ", no democratic promotions at " \
-                            + nominee.top_role.name + " rank. Please contact a board member for a manual review.")
+        if (is_promotion and nominee.top_role.position + 1 >= config["promotion_cap"]) or \
+            (not is_promotion and nominee.top_role.position >= config["promotion_cap"]):
+            await ctx.send(f"Sorry {name}, no democratic promotions/demotions at **{nominee.top_role.name}** \
+rank. Please contact a board member for a manual review.")
             return
-        if nominee.id not in self.promotion_nominees:
-            self.promotion_nominees[nominee.id] = set([nominator.id])
-        elif nominator.id in self.promotion_nominees[nominee.id]:
-            await ctx.send("Settle down " + name + ", you already nominated " + nominee.mention \
-                            + " for a promotion.")
+        if not is_promotion and nominee.top_role.position <= config["promotion_floor"]:
+            await ctx.send(f"Leave poor {nominee.mention} alone, they're only **{nominee.top_role.name}** rank.")
+            return
+        nominees = self.promotions if is_promotion else self.demotions
+        promotion_str = "promotion" if is_promotion else "demotion"
+        if nominee.id not in nominees:
+            nominees[nominee.id] = set([nominator.id])
+        elif nominator.id in nominees[nominee.id]:
+            await ctx.send(f"Settle down {name}, you already nominated {nominee.mention} for a {promotion_str}")
             return
         else:
-            self.promotion_nominees[nominee.id].add(nominator.id)
+            nominees[nominee.id].add(nominator.id)
 
-        noms_needed = config["min_nominations"] - len(self.promotion_nominees[nominee.id])
+        noms_needed = config["min_nominations"] - len(nominees[nominee.id])
         if noms_needed > 0:
-            await ctx.send("Hey " + get_condescending_name() + "s, " + nominator.mention + " has nominated " \
-                            + nominee.mention + " for a promotion. " + str(noms_needed) + " more nominations and " \
-                            + nominee.mention + " will be promoted.")
+            await ctx.send(f"Hey {get_condescending_name()}s, {nominator.mention} has nominated {nominee.mention} \
+for a {promotion_str}. They need {noms_needed} more nominations.")
             return
         else:
-            # TODO maybe actually promote them instead
-            self.promotion_nominees[nominee.id] = set([])
-            await ctx.send("Congratulations " + nominee.mention + ", you just got promoted from " \
-                            + nominee.top_role.name + " to--Sike! Y'all thought this was a democracy? "
-                            + "It's a dictatorship " + get_condescending_name() \
-                            + "s. Maybe buy me a drink and I'll think about promoting you.")
+            current_rank = nominee.top_role
+            increment = 1 if is_promotion else -1
+            roles = self.bot.get_guild(config["guild_id"]).roles
+            new_rank = discord.utils.find(lambda r: r.position == current_rank.position + increment, roles)
+            nominees[nominee.id] = set([])
 
-    @commands.command(name="demote", brief="Nominate a user for demotion.")
-    async def demote(self, ctx):
-        name = get_name(ctx.author)
-        await ctx.send("Demotion features coming soon, sit tight " + name)
+            await nominee.add_roles(new_rank)
+            await nominee.remove_roles(current_rank)
 
-    @commands.command(name="roll", brief="Woll dat shit", aliases=["woll", "wolldatshit"])
-    async def roll(self, ctx, max_roll:int = 6):
-        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
-            return
-        name = get_name(ctx.author)
-        roll_value = random.randint(1, max_roll)
-        if roll_value >= max_roll / 2:
-            await ctx.send("Not bad " + name + ", you rolled a **" + str(roll_value) + "**")
-        else:
-            await ctx.send("Get rekt " + name + ", you rolled a **" + str(roll_value) + "**")
-
-    @commands.command(name="flip", brief="Flip a coin", aliases=["coin", "flipdatshit"])
-    async def flip(self, ctx):
-        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
-            return
-        await ctx.send(random.choice([config["heads"], config["tails"]]))
+            if is_promotion:
+                await ctx.send(f"{config['happy_emote']} Congratulations {nominee.mention}, you just got promoted from \
+**{current_rank.name}** to **{new_rank.name}**!")
+            else:
+                await ctx.send(f"{config['rip_emote']} Yikes {nominee.mention}, by popular demand you've been demoted \
+down to **{new_rank.name}** rank.")
 
     """Chowder coin stuff"""
     @commands.command(name="balance", brief="Check current balance of Chowder coins.")
@@ -190,7 +198,7 @@ class Chowder(commands.Cog):
             await ctx.send(ctx.author.mention + " has no account. Making a new one for you.")
             new_account(ctx.author.id, ctx.author.name)
         else:
-            await ctx.send(ctx.author.mention + " currrently has {} coins.".format(bal))
+            await ctx.send(ctx.author.mention + f" currrently has {bal} coins.")
 
     @commands.command(name="give", brief="Transfer coins from one user to another. \
                         Specify who you're sending to via mention and the amount.")
@@ -213,100 +221,41 @@ class Chowder(commands.Cog):
             amount = args[0]
         if (response[0] == 1):
             if(transfer(sender.id, rec, int(amount))):
-                await ctx.send("<@{}> has sent some coins to <@{}>".format(sender.id, rec))
+                await ctx.send(f"<@{sender.id}> has sent some coins to <@{rec}>")
         else:
             await ctx.send(response[1])
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        # TODO Refactor this mess
         if message.channel.id not in config["channels"] or message.author == self.bot.user:
             return
         name = get_name(message.author)
         comment = message.content.strip().lower()
+
         if comment == "chowder pls":
-            await message.channel.send("You seem to be confused " + name + ", try *chowder pls help*")
-            return
-        if "brendan" in comment:
-            await message.channel.send("Who's Brendan? He sounds like a real " + get_respectful_name())
-            return
+            return f"You seem confused {name}, try *chowder pls help*"
 
-        words = comment.strip().split(' ')
-        trigger_words = [word for word in words if word in config["trigger_words"]]
-        if trigger_words:
-            await message.channel.send(trigger_words[0] + "? " + get_tilt_response())
-            return
+        if "chowder" in comment and "pls" not in comment:
+            tokens = tokenizer.tokenize(comment)
+            lemmas = [lemmatizer.lemmatize(t) for t in tokens]
 
-        if "chowder" in words and "pls" not in words:
-            if message.author.top_role.position < config["role_req"]:
-                await message.channel.send("You're only a " + message.author.top_role.name + ", don't even talk to me " \
-                                            + name)
-                return
-            if "help" in words:
-                await message.channel.send("You seem to be confused " + name + ", try *chowder pls help*")
-                return
-            greetings = [word for word in words if word in config["greetings"]]
-            if greetings:
-                await message.channel.send(get_greeting() + " " + name)
-                return
-            if any(insult_word in words for insult_word in config["insult_words"]):
-                await message.channel.send(get_insult_response() + " " + name)
-                return
-            happy_words = [word for word in words if word in config["happy_words"]]
-            if any(happy_word in words for happy_word in config["happy_words"]):
-                await message.channel.send(happy_words[0] + "? " + get_happy_response())
-                return
-            suicide_words = [word for word in words if word in config["suicide_words"]]
-            if any(suicide_word in words for suicide_word in config["suicide_words"]):
-                await message.channel.send(get_suicide_response())
-                return
-            if "stfu" in comment or "shut" in comment:
-                await message.channel.send("freedom of speech, " + name)
-                return
-            if "please" in words:
-                await message.channel.send("That's not how you spell pls")
-                return
-            if "pin" in words:
-                await message.channel.send("Yeah that is a pen in my mouth. What's it to you?")
-                return
-            if "life" in words:
-                await message.channel.send("Bro you think I have a life? I just sit in this server all day")
-                return
-            if "kys" in words:
-                await message.channel.send("I'm trying, " + name)
-                return
-            if "think" in words:
-                await message.channel.send("Thinking is not my strong suit")
-                return
-            if "rank" in words:
-                await message.channel.send("I deserve to be plat goddammit")
-                return
-            await message.channel.send("Uhh what? Speak up " + name + ", or say *chowder pls help*")
+            for lemma in lemmas:
+                if lemma in speech["triggers"]:
+                    intent = speech["triggers"][lemma]
+                    response = random.choice(speech['responses'][intent]).format(name=name, word=lemma)
+                    await message.channel.send(response)
+                    return
+            await message.channel.send(f"Uhh what? Speak up {name}, or say *chowder pls help*")
 
 def get_name(author):
     name = get_respectful_name() if author.top_role.position >= config["respect_req"] else get_condescending_name()
     return name
 
 def get_condescending_name():
-    return random.choice(config["condescending_names"])
-
-def get_greeting():
-    return random.choice(config["chowder_greetings"])
-
-def get_tilt_response():
-    return random.choice(config["tilt_responses"])
-
-def get_insult_response():
-    return random.choice(config["insult_responses"])
-
-def get_happy_response():
-    return random.choice(config["happy_responses"])
-
-def get_suicide_response():
-    return random.choice(config["suicide_responses"])
+    return random.choice(speech["condescending_names"])
 
 def get_activity():
-    return random.choice(config["activities"])
+    return random.choice(speech["activities"])
 
 def getUserFromMention(self, mention):
     if (not mention):
@@ -321,7 +270,7 @@ def getUserFromMention(self, mention):
 def get_balance(id):
     conn = sqlite.connect(config["DATABASE"])
     c = conn.cursor()
-    query = "SELECT balance FROM accounts WHERE id = {}".format(id)
+    query = f"SELECT balance FROM accounts WHERE id = {id}"
     bal = c.execute(query).fetchone()
     conn.close()
     if (bal == None):
@@ -332,7 +281,7 @@ def get_balance(id):
 def new_account(id, name, balance=0):
     conn = sqlite.connect(config["DATABASE"])
     c = conn.cursor()
-    c.execute("INSERT INTO accounts('id', 'name', 'balance') VALUES ('{}', '{}', 0)".format(id, name))
+    c.execute("INSERT INTO accounts('id', 'name', 'balance') VALUES ('{}', '{}', 0)")
     conn.commit()
     conn.close()
 
@@ -354,12 +303,16 @@ def give_checker(send_id, rec_id, amount):
 
 """Updates the balance of both sender and receiver and leaves a record in transactions."""
 def transfer(send_id, rec_id, amount):
-    update_balance(send_id, -1*amount)
-    update_balance(rec_id, amount)
+    if (rec_id == 1):
+        #transfer to and from nothing
+        update_balance(send_id, amount)
+    else:
+        update_balance(send_id, -1*amount)
+        update_balance(rec_id, amount)
     conn = sqlite.connect(config["DATABASE"])
     c = conn.cursor()
-    c.execute("INSERT INTO TRANSACTIONS (receiver_id, amount, sender_id) \
-                    VALUES ({}, {}, {})".format(rec_id, amount, send_id))
+    c.execute(f"INSERT INTO TRANSACTIONS (receiver_id, amount, sender_id) \
+                    VALUES ({rec_id}, {amount}, {send_id})")
     conn.commit()
     conn.close()
     return 1
@@ -369,15 +322,18 @@ def update_balance(id, amount):
     conn = sqlite.connect(config["DATABASE"])
     c = conn.cursor()
     new_bal = get_balance(id) + amount
-    c.execute("UPDATE accounts SET balance = {} where id = {}".format(new_bal, id))
+    c.execute(f"UPDATE accounts SET balance = {new_bal} where id = {id}")
     conn.commit()
     conn.close()
 
 def get_respectful_name():
-    return random.choice(config["respectful_names"])
+    return random.choice(speech["respectful_names"])
 
 def get_join_phrase():
-    return random.choice(config["join_phrases"])
+    return random.choice(speech["join_phrases"])
+
+def get_spam_quote():
+    return random.choice(speech["spam_quotes"])
 
 def setup(bot):
     bot.add_cog(Chowder(bot))

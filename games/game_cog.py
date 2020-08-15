@@ -6,8 +6,9 @@ import discord
 import asyncio
 import random
 import json
-from discord.ext import commands
-from math import ceil
+import random
+from math import ceil, pow
+from discord.ext import commands, tasks
 from chowder import chowder_cog
 
 with open("games/game_config.json", "r") as read_file:
@@ -19,14 +20,17 @@ class Game(commands.Cog):
         self.bot = bot
         self.in_game = False
         self.current_game = None
+        self.update_status.start()
+
+    def cog_unload(self):
+        self.update_status.cancel()
 
     async def rally(self, ctx, game, initiator):
         """Rallies people for a game."""
         await self.set_game_status(game)
 
-        message = await ctx.send("Yo, **" + initiator.mention + "** is tryna play **" + game + "**. React here with " \
-                                    + game_config[game]["emote"] + " in the next " + str(game_config[game]["wait_time"]) \
-                                    + " seconds if you're in")
+        message = await ctx.send(f"Yo, **{initiator.mention}** is tryna play **{game}**. React here with \
+{game_config[game]['emote']} in the next {game_config[game]['wait_time']} seconds if you're in")
         await message.add_reaction(game_config[game]["emote"])
 
         # Wait for people to join
@@ -45,7 +49,7 @@ class Game(commands.Cog):
             players.append(initiator)
 
         if len(players) < game_config[game]["min_players"]:
-            await ctx.send("Dead game, we need at least " + str(game_config[game]["min_players"]) + " people")
+            await ctx.send(f"Dead game, we need at least {game_config[game]['min_players']} people")
             await self.clear_game_status()
             return
 
@@ -58,26 +62,24 @@ class Game(commands.Cog):
         name = chowder_cog.get_name(ctx.author)
 
         if not game:
-            await ctx.send("Uhh hello? What game " + name + "?")
+            await ctx.send(f"Uhh hello? What game {name}?")
             return
 
         games = game_config.keys()
         if game not in games:
-            await ctx.send("Wtf is " + game + "? I only know these games: " + ', '.join([g for g in games]))
+            await ctx.send(f"Wtf is {game}? I only know these games: {', '.join([g for g in games])}")
             return
 
         initiator = ctx.author
         start_req = game_config[game]["start_req"]
         if initiator.top_role.position < start_req:
-            await ctx.send("Sorry " + name + \
-                            + ", you're not high enough rank to start a game of " + game + ". Try getting promoted.")
+            await ctx.send(f"Sorry {name}, you're not high enough rank to start a game of {game}. Try getting promoted.")
             return
         if self.in_game:
-            await ctx.send("Sorry " + name + ", I'm in a game of " + self.current_game + " already")
+            await ctx.send(f"Sorry {name}, I'm in a game of {self.current_game} already")
             return
 
         players = await self.rally(ctx, game, initiator)
-
         # TODO actually start the game
 
     @commands.command(name="stop", brief="Stops game if there's a game in progress.")
@@ -87,24 +89,48 @@ class Game(commands.Cog):
         name = chowder_cog.get_name(ctx.author)
 
         if not self.in_game:
-            await ctx.send("Stop what? I'm not doing anything " + name)
+            await ctx.send(f"Stop what? I'm not doing anything {name}")
             return
 
         game = self.current_game
 
         if ctx.author.top_role.position < game_config[game]["stop_req"]:
-            await ctx.send("Sorry " + name + ", you're not high enough stop a game of " \
-                            + game + ". Try getting promoted.")
+            await ctx.send(f"Sorry {name}, you're not high enough stop a game of {game}. Try getting promoted.")
             return
 
-        await ctx.send("Rip " + game)
+        await ctx.send(f"Rip {game}")
         await self.clear_game_status()
 
+    @commands.command(name="roll", brief="Woll dat shit", aliases=["woll", "wolldatshit"])
+    async def roll(self, ctx, max_roll:int = 6):
+        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
+            return
+        name = chowder_cog.get_name(ctx.author)
+        roll_value = random.randint(1, max_roll)
+        if roll_value >= max_roll / 2:
+            await ctx.send(f"Not bad {name}, you rolled a **{roll_value}**")
+        else:
+            await ctx.send(f"Get rekt {name}, you rolled a **{roll_value}**")
+
+    @commands.command(name="flip", brief="Flip a coin", aliases=["coin", "flipdatshit"])
+    async def flip(self, ctx):
+        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
+            return
+        await ctx.send(random.choice([config["heads"], config["tails"]]))
+
+    @tasks.loop(seconds=3600)
+    async def update_status(self):
+        if not self.in_game:
+            await self.set_new_status()
+
+    @update_status.before_loop
+    async def before_status(self):
+        await self.bot.wait_until_ready()
 
     async def clear_game_status(self):
         self.in_game = False
         self.current_game = None
-        await self.bot.change_presence(activity=None)
+        await self.set_new_status()
 
     async def set_game_status(self, game):
         self.in_game = True
@@ -120,18 +146,20 @@ class Game(commands.Cog):
         game = config["games"]["slots"]
         emotes = game["emotes"]
         reels = game["reels"]
+        wildcard = game["wildcard"]
         if (len(args) == 0):
             embed = discord.Embed(
                 title = "help",
                 description = "$slots [bet number]"
             )
-            embed.add_field(name="Payouts", inline=True, value="""
-                1 pair = 1.5x
-                2 pair = 3x
-                3 in a row = 5x
-                4 in a row = 20x
-                5 in a row = 50x
-                Full House = 10x
+            embed.add_field(name="Payouts", inline=True, value=f"""
+                1 pair = **1.5x**
+                2 pair = **3x**
+                3 in a row = **5x**
+                4 in a row = **20x**
+                5 in a row = **50x**
+                Full House = **10x**
+                {emotes.get(str(wildcard))} wildcard counts as any symbol. Winnings are also doubled per wildcard.
             """)
             await ctx.send(embed=embed)
             return
@@ -153,7 +181,6 @@ class Game(commands.Cog):
         rolls = []
         symbols = game["symbols"]
         weight = game["weights"]
-        wildcard = game["wildcard"]
         for i in range(reels):
             roll = random.choices(symbols, weights=weight)[0]
             rolls.append(roll)
@@ -164,7 +191,9 @@ class Game(commands.Cog):
         win = False
         winnings = 0
         msg = ""
-        for streak in check_slots(rolls, game["wildcard"]):
+        result = check_slots(rolls, game["wildcard"])
+        print(result)
+        for streak in result[0]:
             if (streak[1] == 5):
                 winnings = bet*51
                 msg = "**FIVE IN A ROW!!!**"
@@ -175,56 +204,78 @@ class Game(commands.Cog):
                 triple = True
             elif (streak[1] == 2):
                 pair += 1
-        if (triple):
-            if (pair == 1):
-                winnings = bet*11
-                msg = "**FULL HOUSE!!**"
+        if (winnings == 0):
+            if (triple):
+                if (pair == 1):
+                    winnings = bet*11
+                    msg = "**FULL HOUSE!!**"
+                else:
+                    winnings = bet*6
+                    msg = "**YOU WON!**"
+            elif (pair == 2):
+                winnings = bet*4
+                msg = "**TWO PAIR**"
+            elif (pair == 1):
+                winnings = ceil(bet*2.5)
+                msg = "**YOU WON!**"
             else:
-                winnings = bet*6
-                mgs = "**YOU WON**"
-        elif (pair == 2):
-            winnings = bet*4
-            msg = "**TWO PAIR**"
-        elif (pair == 1):
-            winnings = ceil(bet*2.5)
-            msg = "**YOU WON**"
-        else:
-            msg = "**YOU LOST. TOO BAD**"
+                msg = "**YOU LOST. TOO BAD**"
         roll_str = "**------------------------------**\n**| **"
         for i in rolls:
             roll_str += emotes.get(str(i))
             roll_str += "** | **"
         roll_str += "\n**------------------------------**"
         roll_str += "\n" + msg
+        if (result[1] > 0):
+            multiplier =  pow(2, result[1])
+            roll_str += f"""\n **{result[1]} wildcards in your roll = {multiplier}x.**"""
+            winnings *= multiplier
         embed = discord.Embed(
             title = "Slots | Player: " + ctx.author.name + "#" + ctx.author.discriminator,
             color = 4188997,
             description = roll_str
         )
-        diff = winnings-bet
+        diff = int(winnings-bet)
+        new_bal = bal+diff
+        chowder_cog.transfer(ctx.author.id, 1, diff)
+        embed.add_field(name="Winnings", inline=True, value=diff)
         if (diff > 0):
             diff = "+" + str(diff)
-        embed.add_field(name="Winnings", inline=True, value=winnings)
-        embed.add_field(name="Balance", inline=True, value="{}({})".format(bal, diff))
+        embed.add_field(name="Balance", inline=True, value=f"{new_bal}({diff})")
         await ctx.send(embed=embed)
 
-"""Checks to see what streaks showed up in a slot roll. Returned as a list of tuples"""
+    async def set_new_status(self):
+        activity = random.choice([
+                discord.Activity(name="hentai", type=discord.ActivityType.watching),
+                discord.Game(name="with myself"),
+                discord.Activity(type=discord.ActivityType.listening, name="a banger")
+            ])
+        await self.bot.change_presence(activity=activity)
+
+"""Checks to see what streaks showed up in a slot roll. Returned as a list of tuples.
+    Additional bonus field if there is a wildcard
+"""
 def check_slots(roll, wildcard=None):
-    temp = roll[0]
-    streak = 1
+    prev = -1
+    streak = 0
     stats = []
-    for i in range(1, len(roll)):
-        if (roll[i] == temp):
+    bonus = 0
+    for i in range(0, len(roll)):
+        print(roll[i])
+        if (i == 0):
+            prev = roll[0]
+        if (roll[i] == wildcard):
+            bonus += 1
+        if (roll[i] == prev or roll[i] == wildcard or prev == wildcard):
             streak += 1
         else:
-            tup = [temp, streak]
+            tup = [prev, streak]
             stats.append(tup)
-            temp = roll[i]
+            prev = roll[i]
             streak = 1
         if (i == (len(roll)-1)):
             stats.append([roll[i], streak])
-    return stats
-
+    return [stats, bonus]
 
 def setup(bot):
     bot.add_cog(Game(bot))
