@@ -7,6 +7,7 @@ import asyncio
 import random
 import json
 from discord.ext import commands
+from math import ceil
 from chowder import chowder_cog
 
 with open("games/game_config.json", "r") as read_file:
@@ -119,23 +120,96 @@ class Game(commands.Cog):
         game = config["games"]["slots"]
         emotes = game["emotes"]
         reels = game["reels"]
-        if (len(args) != 1):
-            await ctx.send("You need to enter a bet for slots.")
+        if (len(args) == 0):
+            embed = discord.Embed(
+                title = "help",
+                description = "$slots [bet number]"
+            )
+            embed.add_field(name="Payouts", inline=True, value="""
+                1 pair = 1.5x
+                2 pair = 3x
+                3 in a row = 5x
+                4 in a row = 20x
+                5 in a row = 50x
+                Full House = 10x
+            """)
+            await ctx.send(embed=embed)
             return
-        roll = [random.randint(1,len(emotes)) for x in range(reels)]
-        roll_str = ""
-        for i in roll:
+        elif (len(args) != 1):
+            await ctx.send("Invalid input.")
+            return
+        bet = args[0]
+        if (isinstance(bet, str) and bet.lower() == "all" and bal > 0):
+            bet = bal
+        elif (bet.isdigit()):
+            bet = int(bet)
+            if (bet > bal):
+                await ctx.send("You don't have enough coin to play, " + \
+                                chowder_cog.get_condescending_name() + ".")
+                return
+        else:
+            await ctx.send("Invalid bet input.")
+            return
+        rolls = []
+        symbols = game["symbols"]
+        weight = game["weights"]
+        wildcard = game["wildcard"]
+        for i in range(reels):
+            roll = random.choices(symbols, weights=weight)[0]
+            rolls.append(roll)
+            if (game["scam"] and roll != wildcard):
+                weight[roll] *= game["scam_value"]
+        triple = False
+        pair = 0
+        win = False
+        winnings = 0
+        msg = ""
+        for streak in check_slots(rolls, game["wildcard"]):
+            if (streak[1] == 5):
+                winnings = bet*51
+                msg = "**FIVE IN A ROW!!!**"
+            elif (streak[1] == 4):
+                winnings = bet*21
+                msg = "**FOUR IN A ROW!!**"
+            elif (streak[1] == 3):
+                triple = True
+            elif (streak[1] == 2):
+                pair += 1
+        if (triple):
+            if (pair == 1):
+                winnings = bet*11
+                msg = "**FULL HOUSE!!**"
+            else:
+                winnings = bet*6
+                mgs = "**YOU WON**"
+        elif (pair == 2):
+            winnings = bet*4
+            msg = "**TWO PAIR**"
+        elif (pair == 1):
+            winnings = ceil(bet*2.5)
+            msg = "**YOU WON**"
+        else:
+            msg = "**YOU LOST. TOO BAD**"
+        roll_str = "**------------------------------**\n**| **"
+        for i in rolls:
             roll_str += emotes.get(str(i))
-            roll_str += " "
+            roll_str += "** | **"
+        roll_str += "\n**------------------------------**"
+        roll_str += "\n" + msg
         embed = discord.Embed(
-            title = "Chowder Slots",
+            title = "Slots | Player: " + ctx.author.name + "#" + ctx.author.discriminator,
             color = 4188997,
             description = roll_str
         )
+        diff = winnings-bet
+        if (diff > 0):
+            diff = "+" + str(diff)
+        embed.add_field(name="Winnings", inline=True, value=winnings)
+        embed.add_field(name="Balance", inline=True, value="{}({})".format(bal, diff))
         await ctx.send(embed=embed)
-        print(chowder_cog.get_balance(ctx.author.id))
 
-def check_slots(roll):
+"""Checks to see what streaks showed up in a slot roll. Returned as a list of tuples"""
+def check_slots(roll, wildcard=None):
     temp = roll[0]
     streak = 1
     stats = []

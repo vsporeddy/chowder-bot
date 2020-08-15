@@ -197,7 +197,7 @@ class Chowder(commands.Cog):
     async def give(self, ctx, *args):
         sender = ctx.author
         if (get_balance(sender.id) == None):
-            await ctx.author.mention + " You don't have an account. Go make one first."
+            await ctx.send(ctx.author.mention + " You don't have an account. Go make one first.")
             return
         mentions = ctx.message.mentions
         if (len(args) != 2 or len(mentions) != 1):
@@ -206,11 +206,14 @@ class Chowder(commands.Cog):
         rec = getUserFromMention(self, args[0])
         if (rec != None):
             response = give_checker(sender.id, rec, args[1])
+            amount = args[1]
         else:
             rec = getUserFromMention(self, args[1])
             response = give_checker(sender.id, rec, args[0])
+            amount = args[0]
         if (response[0] == 1):
-            conn = sqlite.connect()
+            if(transfer(sender.id, rec, int(amount))):
+                await ctx.send("<@{}> has sent some coins to <@{}>".format(sender.id, rec))
         else:
             await ctx.send(response[1])
 
@@ -314,6 +317,7 @@ def getUserFromMention(self, mention):
             mention = mention[1:]
         return int(mention)
 
+"""Use this method to get the current balance of any user, based on id"""
 def get_balance(id):
     conn = sqlite.connect(config["DATABASE"])
     c = conn.cursor()
@@ -323,7 +327,7 @@ def get_balance(id):
     if (bal == None):
         return None
     else:
-        return bal[0]
+        return int(bal[0])
 
 def new_account(id, name, balance=0):
     conn = sqlite.connect(config["DATABASE"])
@@ -333,12 +337,12 @@ def new_account(id, name, balance=0):
     conn.close()
 
 def give_checker(send_id, rec_id, amount):
-    response = []
+    response = [-1, "Default error"]
     if (send_id == rec_id):
         response = [-1, "Sending money to yourself? That's sad."]
     elif (get_balance(rec_id) == None):
         response = [-1, "You're sending coins to someone who doesn't have an account."]
-    if (amount.isdigit()):
+    elif (amount.isdigit()):
         amount = int(amount)
         if (amount < 1):
             response = [-1, "Invalid amount of coins."]
@@ -348,18 +352,26 @@ def give_checker(send_id, rec_id, amount):
             response = [1, "Success"]
     return response
 
-def give_helper(send_id, rec_id, amount):
+"""Updates the balance of both sender and receiver and leaves a record in transactions."""
+def transfer(send_id, rec_id, amount):
+    update_balance(send_id, -1*amount)
+    update_balance(rec_id, amount)
     conn = sqlite.connect(config["DATABASE"])
     c = conn.cursor()
-    new_bal = get_balance(send_id) - amount
-    c.execute("UPDATE accounts SET balance = {} where id = {}".format(new_bal, send_id))
-    new_bal = get_balance(rec_id) + amount
-    c.execute("UPDATE accounts SET balance = {} where id = {}".format(new_bal, rec_id))
     c.execute("INSERT INTO TRANSACTIONS (receiver_id, amount, sender_id) \
                     VALUES ({}, {}, {})".format(rec_id, amount, send_id))
     conn.commit()
     conn.close()
     return 1
+
+"""Update user's balance by 'x' amount. 'x' can be positive or negative"""
+def update_balance(id, amount):
+    conn = sqlite.connect(config["DATABASE"])
+    c = conn.cursor()
+    new_bal = get_balance(id) + amount
+    c.execute("UPDATE accounts SET balance = {} where id = {}".format(new_bal, id))
+    conn.commit()
+    conn.close()
 
 def get_respectful_name():
     return random.choice(config["respectful_names"])

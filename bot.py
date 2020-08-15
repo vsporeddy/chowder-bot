@@ -56,7 +56,7 @@ async def on_ready():
     await bot.change_presence(activity=None)
 
     print(
-        f'{bot.user.name} is connected to the following guild:\n'
+        f'{bot.user.name} is connected to the following guild:\n\t'
         f'{guild.name}(id: {guild.id})'
     )
 
