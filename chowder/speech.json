@@ -1,0 +1,144 @@
+{
+    "triggers": {
+        "liberal": "tilt",
+        "socialist": "tilt",
+        "government": "tilt",
+        "socialism": "tilt",
+        "microsoft": "tilt",
+        "sjw": "tilt",
+        "vegan": "tilt",
+        "work": "tilt",
+
+        "gun": "happy",
+        "hunting": "happy",
+        "mod": "happy",
+        "gambling": "happy",
+        "scotch": "happy",
+        "poker": "happy",
+        "carlo": "happy",
+
+        "sup": "greeting",
+        "suh": "greeting",
+        "👋": "greeting",
+        "hello": "greeting",
+        "hi": "greeting",
+        "hey": "greeting",
+
+        "suck": "abuse",
+        "fuck": "abuse",
+        "hate": "abuse",
+        "dumb": "abuse",
+        "dumbass": "abuse",
+        "retard": "abuse",
+        "retarded": "abuse",
+        "stupid": "abuse",
+        "kys": "abuse",
+
+        "suicide": "suicide",
+        "kms": "suicide",
+        "rope": "suicide",
+        "714385140763066378": "suicide",
+
+        "stfu": "silence",
+        "shut": "silence",
+
+        "please": "please",
+
+        "life": "life",
+
+        "think": "think"
+    },
+
+    "responses": {
+        "tilt": [
+            "{word}? REEEEEEEE",
+            "{word}? TRIGGERED",
+            "{word}? TILT",
+            "<:ChowderWut:541707580662349856>"
+        ],
+        "happy": [
+            "{word}? <:ChowderHappy:511436641844461579>",
+            "{word}? <:ChowderSmile:664313737255321632>",
+            "{word}? <:ChowderPalmers:541700042407280650>"
+        ],
+        "greeting": [
+            "sup {name}",
+            "suh, {name}",
+            "🤙 yo, {name}",
+            "how's it goin' {name}",
+            "<:ChowderPalmers:541700042407280650> why hello there {name}"
+        ],
+        "abuse": [
+            "fuck you too {name}",
+            "fuck off {name}",
+            "let's be civil, {name}"
+        ],
+        "suicide": [
+            "Great deal on rope here https://www.amazon.com/T-W-Evans-Cordage-23-410-100-Feet/dp/B00DKA3OGO/ref=sr_1_5?dchild=1&keywords=rope&qid=1596673550&sr=8-5",
+            "Help is available, {name}. Call the suicide hotline today: 1-800-273-8255"
+        ],
+        "silence": [
+            "freedom of speech, {name}"
+        ],
+        "please": [
+            "that's not how you spell pls, {name}"
+        ],
+        "life": [
+            "{name} you think I have a life? I just sit in this server all day"
+        ],
+        "think": [
+            "Thinking is not my strong suit, {name}"
+        ]
+    },
+
+    "condescending_names": [
+        "buddy",
+        "skipper",
+        "sport",
+        "bud",
+        "champ"
+    ],
+
+    "respectful_names": [
+        "dude",
+        "bro",
+        "bruh",
+        "boss"
+    ],
+
+    "join_phrases": [
+        "where we dropping",
+        "what are we playing"
+    ],
+
+    "activities": [
+        "League",
+        "golf",
+        "chess",
+        "TFT",
+        "bowling",
+        "watching anime",
+        "ping pong",
+        "VAL",
+        "dancing",
+        "hearts",
+        "Magic: the Gathering",
+        "being a simp"
+    ],
+
+    "spam_quotes" : [
+        "Where's my pen, I need to take some notes",
+        "Uhhhhhhh hellooooo????",
+        "Whoa, I just stood up too fast",
+        "Brb, going to the gas station",
+        "This server's deader than aids",
+        "🎵 There's a she-wolf in the closet... 🎵",
+        "I think I just shit my pants",
+        "Yo who took my dip?",
+        "Anyone wanna watch a movie?",
+        "🎵 I'm a star so I put a neutron on my pinkie 🎵",
+        "-play mr. lonely",
+        "KELLEEEEEEEEEY! Slurpee?",
+        "ESO dude?"
+    ]
+}
