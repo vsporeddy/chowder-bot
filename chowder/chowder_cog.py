@@ -200,8 +200,7 @@ down to **{new_rank.name}** rank.")
         else:
             await ctx.send(ctx.author.mention + f" currrently has {bal} coins.")
 
-    @commands.command(name="give", brief="Transfer coins from one user to another. \
-                        Specify who you're sending to via mention and the amount.")
+    @commands.command(name="give", brief="Transfer coins from one user to another.")
     async def give(self, ctx, *args):
         sender = ctx.author
         if (get_balance(sender.id) == None):
@@ -281,7 +280,7 @@ def get_balance(id):
 def new_account(id, name, balance=0):
     conn = sqlite.connect(config["DATABASE"])
     c = conn.cursor()
-    c.execute("INSERT INTO accounts('id', 'name', 'balance') VALUES ('{}', '{}', 0)")
+    c.execute(f"INSERT INTO accounts('id', 'name', 'balance') VALUES ('{id}', '{name}', 0)")
     conn.commit()
     conn.close()
 

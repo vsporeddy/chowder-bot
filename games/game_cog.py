@@ -186,40 +186,12 @@ class Game(commands.Cog):
             rolls.append(roll)
             if (game["scam"] and roll != wildcard):
                 weight[roll] *= game["scam_value"]
-        triple = False
-        pair = 0
-        win = False
-        winnings = 0
-        msg = ""
         result = check_slots(rolls, game["wildcard"])
-        print(result)
-        for streak in result[0]:
-            if (streak[1] == 5):
-                winnings = bet*51
-                msg = "**FIVE IN A ROW!!!**"
-            elif (streak[1] == 4):
-                winnings = bet*21
-                msg = "**FOUR IN A ROW!!**"
-            elif (streak[1] == 3):
-                triple = True
-            elif (streak[1] == 2):
-                pair += 1
-        if (winnings == 0):
-            if (triple):
-                if (pair == 1):
-                    winnings = bet*11
-                    msg = "**FULL HOUSE!!**"
-                else:
-                    winnings = bet*6
-                    msg = "**YOU WON!**"
-            elif (pair == 2):
-                winnings = bet*4
-                msg = "**TWO PAIR**"
-            elif (pair == 1):
-                winnings = ceil(bet*2.5)
-                msg = "**YOU WON!**"
-            else:
-                msg = "**YOU LOST. TOO BAD**"
+        msg, mult = get_hand(result)
+        if (mult > 0):
+            winnings = ceil(bet*(1+mult))
+        else:
+            winnings = 0
         roll_str = "**------------------------------**\n**| **"
         for i in rolls:
             roll_str += emotes.get(str(i))
@@ -241,7 +213,7 @@ class Game(commands.Cog):
         embed.add_field(name="Winnings", inline=True, value=diff)
         if (diff > 0):
             diff = "+" + str(diff)
-        embed.add_field(name="Balance", inline=True, value=f"{new_bal}({diff})")
+        embed.add_field(name="Balance", inline=True, value=f"{bal}({diff})")
         await ctx.send(embed=embed)
 
     async def set_new_status(self):
@@ -260,14 +232,16 @@ def check_slots(roll, wildcard=None):
     streak = 0
     stats = []
     bonus = 0
+    print(roll)
     for i in range(0, len(roll)):
-        print(roll[i])
         if (i == 0):
             prev = roll[0]
         if (roll[i] == wildcard):
             bonus += 1
         if (roll[i] == prev or roll[i] == wildcard or prev == wildcard):
             streak += 1
+            if (prev == wildcard):
+                prev == roll[i]
         else:
             tup = [prev, streak]
             stats.append(tup)
@@ -276,6 +250,42 @@ def check_slots(roll, wildcard=None):
         if (i == (len(roll)-1)):
             stats.append([roll[i], streak])
     return [stats, bonus]
+
+def get_hand(result):
+    triple = False
+    pair = 0
+    mult = 0
+    msg = ""
+    print("sup")
+    for streak in result[0]:
+        print(streak)
+        if (streak[1] == 5):
+            mult = 50
+            msg = "**FIVE IN A ROW!!!**"
+        elif (streak[1] == 4):
+            mult = 20
+            msg = "**FOUR IN A ROW!!**"
+        elif (streak[1] == 3):
+            triple = True
+        elif (streak[1] == 2):
+            pair += 1
+    if (mult == 0):
+        if (triple):
+            if (pair == 1):
+                mult= 10
+                msg = "**FULL HOUSE!!**"
+            else:
+                mult = 5
+                msg = "**THREE IN A ROW!**"
+        elif (pair == 2):
+            mult = 3
+            msg = "**TWO PAIR**"
+        elif (pair == 1):
+            mult = 1.5
+            msg = "**YOU WON!**"
+        else:
+            msg = "**YOU LOST. TOO BAD**"
+    return [msg, mult]
 
 def setup(bot):
     bot.add_cog(Game(bot))
