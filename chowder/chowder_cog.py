@@ -93,7 +93,10 @@ class Chowder(commands.Cog):
     async def fomo(self):
         """Chowder bot doesn't want to miss out on the fun"""
         guild = self.get_default_guild()
-        voice_channel = discord.utils.find(lambda c: len(c.members) >= config["fomo_threshold"], guild.voice_channels)
+        voice_channels = guild.voice_channels.sort(key=lambda c: len(c.members), reverse=True)
+        voice_channels = None
+        if voice_channels and len(voice_channels[0].members) > config["fomo_threshold"]:
+            voice_channel = voice_channels[0]
         text_channel = self.get_default_channel()
         voice = discord.utils.get(self.bot.voice_clients, guild=guild)
         names = get_collective_name()
@@ -108,10 +111,11 @@ class Chowder(commands.Cog):
             return
         if voice_channel and voice and voice.is_connected():
             await voice.move_to(voice_channel)
+            await text_channel.send(get_goodbye().format(name=names))
         elif voice_channel:
             voice = await voice_channel.connect()
             await voice.main_ws.voice_state(guild.id, voice_channel.id, self_mute=True)
-        await text_channel.send(get_join_phrase().format(names=names))
+            await text_channel.send(get_join_phrase().format(names=names))
 
     @spam.before_loop
     @revive.before_loop
