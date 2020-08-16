@@ -9,4 +9,4 @@
 5. Run `bot.py` using Python 3
 
 ### Deploy/CI
-* Coming soon...
+* Pushing to master will automatically build and deploy the bot to [Heroku](https://chowdertron.herokuapp.com/)
