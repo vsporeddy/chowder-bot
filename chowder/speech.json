@@ -29,6 +29,9 @@
         "hello": "greeting",
         "hi": "greeting",
         "hey": "greeting",
+        "yo": "greeting",
+        "going": "greeting",
+        "doing": "greeting",
 
         "bye": "goodbye",
         "cya": "goodbye",
@@ -64,7 +67,19 @@
         "sorry": "apology",
 
         "thank": "thank",
-        "thanks": "thank"
+        "thanks": "thank",
+
+        "who": "query",
+        "why": "query",
+        "what": "query",
+        "how": "query",
+        "when": "query",
+        "?": "query",
+
+        "wtf": "confusion",
+        "???": "confusion",
+        "broken": "confusion",
+        "dead": "confusion"
     },
 
     "responses": {
@@ -117,6 +132,19 @@
         "thank": [
             "don't worry about it {name}",
             "no problem {name}"
+        ],
+        "query": [
+            "{name}, do I look like I know?",
+            "how am I supposed to answer that {name}",
+            "chill with the questions, {name}",
+            "idk",
+            "no clue {name}",
+            "Can you ask me again in all caps?",
+            "the answer's gonna cost you one ChowderCoin"
+        ],
+        "confusion": [
+            "chill {name}, everything's under control",
+            "please remain calm {name}s"
         ]
     },
 
