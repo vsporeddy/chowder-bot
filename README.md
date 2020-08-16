@@ -7,6 +7,9 @@
 3. Invite your bot to your guild
 4. Edit the `guild` value`config.json` to your guild's name 
 5. Run `bot.py` using Python 3
+###### Alternatively with Docker
+5. Run `docker build -t chowder-bot .` from the base directory after step 4.
+6. `docker run chowder-bot`
 
 ### Deploy/CI
 * Pushing to master will automatically build and deploy the bot to [Heroku](https://chowdertron.herokuapp.com/)
