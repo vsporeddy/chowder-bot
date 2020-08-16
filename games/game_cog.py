@@ -15,6 +15,7 @@ with open("games/game_config.json", "r") as read_file:
 
 games = list(game_config.keys())
 
+
 class Game(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -34,9 +35,9 @@ class Game(commands.Cog):
             min_players = game_config[game]['min_players']
         else:
             emote = config['default_emote']
-        
+
         message = await ctx.send(f"Yo, {chowder_cog.get_collective_name()}, **{initiator.mention}** is tryna play "
-                                f"**{game}**. React here with {emote} in the next {wait_time} seconds if you're in")
+                                 f"**{game}**. React here with {emote} in the next {wait_time} seconds if you're in")
         await message.add_reaction(emote)
         # Wait for people to join
         await asyncio.sleep(wait_time)
@@ -59,7 +60,7 @@ class Game(commands.Cog):
         return players
 
     @commands.group(name="play", brief="Initiate a discord game", aliases=games)
-    async def play(self, ctx, game:str = None):
+    async def play(self, ctx, game: str = None):
         name = chowder_cog.get_name(ctx.author)
 
         if ctx.invoked_with in games:
@@ -101,7 +102,7 @@ class Game(commands.Cog):
         await self.clear_game_status()
 
     @commands.command(name="rally", brief="Rally players for an actual game")
-    async def rally(self, ctx, game:str = None, wait_time:int = 60):
+    async def rally(self, ctx, game: str = None, wait_time: int = 60):
         name = chowder_cog.get_name(ctx.author)
         if not game:
             await ctx.send(f"Uhh hello? What game {name}?")
@@ -114,7 +115,7 @@ class Game(commands.Cog):
         await self.clear_game_status()
 
     @commands.command(name="roll", brief="Woll dat shit", aliases=["woll", "wolldatshit"])
-    async def roll(self, ctx, max_roll:int = 6):
+    async def roll(self, ctx, max_roll: int = 6):
         name = chowder_cog.get_name(ctx.author)
         roll_value = random.randint(1, max_roll)
         if roll_value >= max_roll / 2:
@@ -152,6 +153,7 @@ class Game(commands.Cog):
                 discord.Activity(type=discord.ActivityType.listening, name="a banger")
             ])
         await self.bot.change_presence(activity=activity)
+
 
 def setup(bot):
     bot.add_cog(Game(bot))

@@ -1,6 +1,5 @@
 import os
 import discord
-import asyncio
 import json
 import random
 
@@ -14,12 +13,15 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 with open("config.json", "r") as read_file:
     config = json.load(read_file)
 
+
 def get_prefix(bot, message):
     prefixes = config["prefixes"]
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
+
 bot = commands.Bot(command_prefix=get_prefix)
 channels = set(config["channels"])
+
 
 @bot.event
 async def on_command_error(ctx, error):
@@ -33,6 +35,7 @@ if __name__ == "__main__":
     for extension in extensions:
         bot.load_extension(extension)
 
+
 @bot.event
 async def on_ready():
     guild = discord.utils.get(bot.guilds, name=config["guild"])
@@ -41,6 +44,7 @@ async def on_ready():
         f"{bot.user.name} is connected to the following guild:\n"
         f"{guild.name}(id: {guild.id})"
     )
+
 
 @bot.check
 async def check_commands(ctx):

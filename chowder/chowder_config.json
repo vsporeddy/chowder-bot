@@ -4,7 +4,7 @@
     "respect_req": 15,
     "default_channel": 454492770682404877,
     "channels": [742569511978270730, 742906298257113199, 689297802823860225, 454492770682404877, 565381938022449152],
-    "spam_cooldown": 500,
+    "spam_cooldown": 800,
     "revive_cooldown": 4000,
     "min_revival_users": 7,
     "option_1": "<:SpatikaTsm:609892878726070273>",
