@@ -94,7 +94,7 @@ class Chowder(commands.Cog):
         """Chowder bot doesn't want to miss out on the fun"""
         guild = self.get_default_guild()
         voice_channels = guild.voice_channels.sort(key=lambda c: len(c.members), reverse=True)
-        voice_channels = None
+        voice_channel = None
         if voice_channels and len(voice_channels[0].members) > config["fomo_threshold"]:
             voice_channel = voice_channels[0]
         text_channel = self.get_default_channel()
