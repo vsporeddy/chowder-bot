@@ -32,8 +32,6 @@
         "hi": "greeting",
         "hey": "greeting",
         "yo": "greeting",
-        "going": "greeting",
-        "doing": "greeting",
 
         "bye": "goodbye",
         "cya": "goodbye",
@@ -77,6 +75,9 @@
         "how": "query",
         "when": "query",
         "?": "query",
+        "are": "query",
+        "where": "query",
+        "is": "query",
 
         "wtf": "confusion",
         "???": "confusion",
