@@ -45,20 +45,26 @@
         "retarded": "abuse",
         "stupid": "abuse",
         "kys": "abuse",
+        "shit": "abuse",
+        "trash": "abuse",
+        "stfu": "abuse",
+        "shut": "abuse",
 
         "suicide": "suicide",
         "kms": "suicide",
         "rope": "suicide",
         "714385140763066378": "suicide",
 
-        "stfu": "silence",
-        "shut": "silence",
-
         "please": "please",
 
         "life": "life",
 
-        "think": "think"
+        "think": "think",
+
+        "sorry": "apology",
+
+        "thank": "thank",
+        "thanks": "thank"
     },
 
     "responses": {
@@ -86,7 +92,7 @@
         "abuse": [
             "fuck you too {name}",
             "fuck off {name}",
-            "let's be civil, {name}"
+            "you mad {name}?"
         ],
         "suicide": [
             "Great deal on rope here https://www.amazon.com/T-W-Evans-Cordage-23-410-100-Feet/dp/B00DKA3OGO/ref=sr_1_5?dchild=1&keywords=rope&qid=1596673550&sr=8-5",
@@ -103,6 +109,14 @@
         ],
         "think": [
             "Thinking is not my strong suit, {name}"
+        ],
+        "apology": [
+            "no worries {name}",
+            "all good, {name}"
+        ],
+        "thank": [
+            "don't worry about it {name}",
+            "no problem {name}"
         ]
     },
 
@@ -161,5 +175,10 @@
         "-play mr. lonely",
         "KELLEEEEEEEEEY! Slurpee?",
         "ESO dude?"
+    ],
+
+    "caps_responses": [
+        "No need to yell, {name}",
+        "Whoa, chill with the caps, {name}"
     ]
 }

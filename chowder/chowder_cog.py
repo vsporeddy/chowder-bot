@@ -152,6 +152,9 @@ class Chowder(commands.Cog):
         addressing_chowder = prev_message and prev_message[0].author == self.bot.user \
                                 or ("chowder" in comment and "pls" not in comment)
         if addressing_chowder:
+            if message.content.isupper():
+                await message.channel.send(get_caps_response().format(name=name))
+                return
             tokens = tokenizer.tokenize(comment)
             lemmas = [lemmatizer.lemmatize(t) for t in tokens]
 
@@ -198,6 +201,9 @@ def get_collective_name():
 
 def get_emote():
     return random.choice(speech["emotes"])
+
+def get_caps_response():
+    return random.choice(speech["caps_responses"])
 
 def setup(bot):
     bot.add_cog(Chowder(bot))
