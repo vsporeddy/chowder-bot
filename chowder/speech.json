@@ -1,4 +1,10 @@
 {
+    "emotes": [
+        "<:ChowderHappy:511436641844461579>",
+        "<:ChowderPalmers:541700042407280650>",
+        "<:ChowderSmile:664313737255321632>"
+    ],
+
     "triggers": {
         "liberal": "tilt",
         "socialist": "tilt",
@@ -8,6 +14,8 @@
         "sjw": "tilt",
         "vegan": "tilt",
         "work": "tilt",
+        "rhonda": "tilt",
+        "tax": "tilt",
 
         "gun": "happy",
         "hunting": "happy",
@@ -23,6 +31,13 @@
         "hello": "greeting",
         "hi": "greeting",
         "hey": "greeting",
+        "yo": "greeting",
+
+        "bye": "goodbye",
+        "cya": "goodbye",
+        "goodbye": "goodbye",
+        "later": "goodbye",
+        "peace": "goodbye",
 
         "suck": "abuse",
         "fuck": "abuse",
@@ -33,20 +48,41 @@
         "retarded": "abuse",
         "stupid": "abuse",
         "kys": "abuse",
+        "shit": "abuse",
+        "trash": "abuse",
+        "stfu": "abuse",
+        "shut": "abuse",
 
         "suicide": "suicide",
         "kms": "suicide",
         "rope": "suicide",
         "714385140763066378": "suicide",
 
-        "stfu": "silence",
-        "shut": "silence",
-
         "please": "please",
 
         "life": "life",
 
-        "think": "think"
+        "think": "think",
+
+        "sorry": "apology",
+
+        "thank": "thank",
+        "thanks": "thank",
+
+        "who": "query",
+        "why": "query",
+        "what": "query",
+        "how": "query",
+        "when": "query",
+        "?": "query",
+        "are": "query",
+        "where": "query",
+        "is": "query",
+
+        "wtf": "confusion",
+        "???": "confusion",
+        "broken": "confusion",
+        "dead": "confusion"
     },
 
     "responses": {
@@ -68,10 +104,13 @@
             "how's it goin' {name}",
             "<:ChowderPalmers:541700042407280650> why hello there {name}"
         ],
+        "goodbye": [
+            "have a good life {name}"
+        ],
         "abuse": [
             "fuck you too {name}",
             "fuck off {name}",
-            "let's be civil, {name}"
+            "you mad {name}?"
         ],
         "suicide": [
             "Great deal on rope here https://www.amazon.com/T-W-Evans-Cordage-23-410-100-Feet/dp/B00DKA3OGO/ref=sr_1_5?dchild=1&keywords=rope&qid=1596673550&sr=8-5",
@@ -88,6 +127,27 @@
         ],
         "think": [
             "Thinking is not my strong suit, {name}"
+        ],
+        "apology": [
+            "no worries {name}",
+            "all good, {name}"
+        ],
+        "thank": [
+            "don't worry about it {name}",
+            "no problem {name}"
+        ],
+        "query": [
+            "{name}, do I look like I know?",
+            "how am I supposed to answer that {name}",
+            "chill with the questions, {name}",
+            "idk",
+            "no clue {name}",
+            "Can you ask me again in all caps?",
+            "the answer's gonna cost you one ChowderCoin"
+        ],
+        "confusion": [
+            "chill {name}, everything's under control",
+            "please remain calm {name}s"
         ]
     },
 
@@ -106,9 +166,15 @@
         "boss"
     ],
 
+    "collective_names": [
+        "boys",
+        "bois",
+        "skippers"
+    ],
+
     "join_phrases": [
-        "where we dropping",
-        "what are we playing"
+        "where we dropping, {names}? <:ChowderGaming:511432684971491328>",
+        "<:ChowderGaming:511432684971491328> sup {names}, we playin' something?"
     ],
 
     "activities": [
@@ -120,10 +186,10 @@
         "watching anime",
         "ping pong",
         "VAL",
-        "dancing",
+        "dancing <:PhantahSee:644815069531734016>",
         "hearts",
-        "Magic: the Gathering",
-        "being a simp"
+        "Magic: the Gathering <:DanteTears:549492738249195521>",
+        "simping "
     ],
 
     "spam_quotes" : [
@@ -140,5 +206,10 @@
         "-play mr. lonely",
         "KELLEEEEEEEEEY! Slurpee?",
         "ESO dude?"
+    ],
+
+    "caps_responses": [
+        "No need to yell, {name}",
+        "Whoa, chill with the caps, {name}"
     ]
 }

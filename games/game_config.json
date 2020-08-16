@@ -3,6 +3,7 @@
     "DATABASE": "chowder.db",
     "heads": "<:SpatikaClutch:609867523155951621>",
     "tails": "<:SpatikaNope:712748554728243214>",
+    "default_emote": "<:ChowderGaming:511432684971491328>",
     "games": {
         "hangman": {
             "emote": "<:kms:714385140763066378>",
@@ -12,7 +13,7 @@
             "stop_req": 12
         },
         "telewave": {
-            "emote": "<:ChowderGaming:511432684971491328>",
+            "emote": "<:ZalteoNani:550595879585841153>",
             "min_players": 4,
             "wait_time": 20,
             "start_req": 12,

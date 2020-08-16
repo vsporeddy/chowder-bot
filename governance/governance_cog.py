@@ -4,12 +4,12 @@
 
 import discord
 import json
-import asyncio
 from discord.ext import commands
 from chowder import chowder_cog
 
 with open("governance/governance_config.json", "r") as read_file:
     config = json.load(read_file)
+
 
 class Governance(commands.Cog):
     def __init__(self, bot):
@@ -17,17 +17,15 @@ class Governance(commands.Cog):
         self.promotions = {}
         self.demotions = {}
 
-    @commands.command(name="promote", brief="Nominate a user for promotion.")
+    @commands.command(name="promote", brief="Nominate a user for promotion")
     async def promote(self, ctx):
         await self.nomination_helper(ctx, True)
 
-    @commands.command(name="demote", brief="Nominate a user for demotion.")
+    @commands.command(name="demote", brief="Nominate a user for demotion")
     async def demote(self, ctx):
         await self.nomination_helper(ctx, False)
 
     async def nomination_helper(self, ctx, is_promotion):
-        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
-            return
         nominator = ctx.author
         name = chowder_cog.get_name(nominator)
         if not ctx.message.mentions:
@@ -44,9 +42,9 @@ class Governance(commands.Cog):
             await ctx.send(f"{message} {name}")
             return
         if (is_promotion and nominee.top_role.position + 1 >= config["promotion_cap"]) or \
-            (not is_promotion and nominee.top_role.position >= config["promotion_cap"]):
+           (not is_promotion and nominee.top_role.position >= config["promotion_cap"]):
             await ctx.send(f"Sorry {name}, no democratic promotions/demotions at **{nominee.top_role.name}** "
-                            f"rank. Please contact a board member for a manual review.")
+                           f"rank. Please contact a board member for a manual review.")
             return
         if not is_promotion and nominee.top_role.position <= config["promotion_floor"]:
             await ctx.send(f"Leave poor {nominee.mention} alone, they're only **{nominee.top_role.name}** rank.")
@@ -63,8 +61,8 @@ class Governance(commands.Cog):
 
         noms_needed = config["min_nominations"] - len(nominees[nominee.id])
         if noms_needed > 0:
-            await ctx.send(f"Hey {chowder_cog.get_condescending_name()}s, {nominator.mention} has nominated "
-                            f"{nominee.mention} for a {promotion_str}. They need {noms_needed} more nominations.")
+            await ctx.send(f"Hey {chowder_cog.get_collective_name()}, {nominator.mention} has nominated "
+                           f"{nominee.mention} for a {promotion_str}. They need {noms_needed} more nominations.")
             return
         else:
             current_rank = nominee.top_role
@@ -78,10 +76,11 @@ class Governance(commands.Cog):
 
             if is_promotion:
                 await ctx.send(f"{config['promotion_emote']} Congratulations {nominee.mention}, you just got promoted "
-                                f"from **{current_rank.name}** to **{new_rank.name}**!")
+                               f"from **{current_rank.name}** to **{new_rank.name}**!")
             else:
                 await ctx.send(f"{config['demotion_emote']} Yikes {nominee.mention}, by popular demand you've been "
-                                f"demoted down to **{new_rank.name}** rank.")
+                               f"demoted down to **{new_rank.name}** rank.")
+
 
 def setup(bot):
     bot.add_cog(Governance(bot))

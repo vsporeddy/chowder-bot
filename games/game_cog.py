@@ -15,6 +15,9 @@ with open("games/game_config.json", "r") as read_file:
     config = json.load(read_file)
     game_config = config["games"]
 
+games = list(game_config.keys())
+
+
 class Game(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -25,87 +28,96 @@ class Game(commands.Cog):
     def cog_unload(self):
         self.update_status.cancel()
 
-    async def rally(self, ctx, game, initiator):
+    async def rally_helper(self, ctx, game, initiator, wait_time=0, min_players=0):
         """Rallies people for a game."""
         await self.set_game_status(game)
+        if game in games:
+            emote = game_config[game]['emote']
+            wait_time = game_config[game]['wait_time']
+            min_players = game_config[game]['min_players']
+        else:
+            emote = config['default_emote']
 
-        message = await ctx.send(f"Yo, **{initiator.mention}** is tryna play **{game}**. React here with "
-                                    f"{game_config[game]['emote']} in the next {game_config[game]['wait_time']} "
-                                    f" seconds if you're in")
-        await message.add_reaction(game_config[game]["emote"])
-
+        message = await ctx.send(f"Yo, {chowder_cog.get_collective_name()}, **{initiator.mention}** is tryna play "
+                                 f"**{game}**. React here with {emote} in the next {wait_time} seconds if you're in")
+        await message.add_reaction(emote)
         # Wait for people to join
-        await asyncio.sleep(game_config[game]["wait_time"])
-
+        await asyncio.sleep(wait_time)
         # If the game was stopped while rallying, end
         if not self.in_game:
-            return
+            return []
 
         message = await ctx.channel.fetch_message(message.id)
-        reaction = discord.utils.find(lambda r: str(r.emoji) == game_config[game]["emote"], message.reactions)
+        reaction = discord.utils.find(lambda r: str(r.emoji) == emote, message.reactions)
 
         players = await reaction.users().flatten()
         players.remove(self.bot.user)
         if initiator not in players:
             players.append(initiator)
 
-        if len(players) < game_config[game]["min_players"]:
-            await ctx.send(f"Dead game, we need at least {game_config[game]['min_players']} people")
+        if min_players and len(players) < min_players:
+            await ctx.send(f"Dead game, we need at least {min_players} people")
             await self.clear_game_status()
-            return
-
+            return []
         return players
 
-    @commands.group(name="play", brief="Initiates a game.")
-    async def play(self, ctx, game:str = None):
-        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
-            return
+    @commands.group(name="play", brief="Initiate a discord game", aliases=games)
+    async def play(self, ctx, game: str = None):
         name = chowder_cog.get_name(ctx.author)
 
-        if not game:
+        if ctx.invoked_with in games:
+            game = ctx.invoked_with
+        elif not game:
             await ctx.send(f"Uhh hello? What game {name}?")
             return
-
-        games = game_config.keys()
-        if game not in games:
-            await ctx.send(f"Wtf is {game}? I only know these games: {', '.join([g for g in games])}")
+        elif game not in games:
+            await ctx.send(f"Wtf is **{game}**? I only know these games: **[{', '.join([g for g in games])}]**. "
+                           f"If you're trying to rally people for an different game use *rally*, {name}.")
             return
 
         initiator = ctx.author
         start_req = game_config[game]["start_req"]
         if initiator.top_role.position < start_req:
-            await ctx.send(f"Sorry {name}, you're not high enough rank to start a game of {game}. Try getting promoted.")
+            await ctx.send(f"Sorry {name}, you're not high enough rank to start a game of **{game}**. Try getting promoted.")
             return
         if self.in_game:
             await ctx.send(f"Sorry {name}, I'm in a game of {self.current_game} already")
             return
 
-        players = await self.rally(ctx, game, initiator)
+        players = await self.rally_helper(ctx, game, initiator)
+        await ctx.send(f"Starting a game of **{game}** with these players: [{', '.join([p.mention for p in players])}]")
         # TODO actually start the game
 
-    @commands.command(name="stop", brief="Stops game if there's a game in progress.")
+    @commands.command(name="stop", brief="Stop in-progress game or rally")
     async def stop(self, ctx):
-        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
-            return
         name = chowder_cog.get_name(ctx.author)
 
         if not self.in_game:
             await ctx.send(f"Stop what? I'm not doing anything {name}")
             return
-
         game = self.current_game
-
-        if ctx.author.top_role.position < game_config[game]["stop_req"]:
-            await ctx.send(f"Sorry {name}, you're not high enough stop a game of {game}. Try getting promoted.")
+        if game in games and ctx.author.top_role.position < game_config[game]["stop_req"]:
+            await ctx.send(f"Sorry {name}, you're not high enough rank to stop a game of {game}. Try getting promoted.")
             return
 
         await ctx.send(f"Rip {game}")
         await self.clear_game_status()
 
-    @commands.command(name="roll", brief="Woll dat shit", aliases=["woll", "wolldatshit"])
-    async def roll(self, ctx, max_roll:int = 6):
-        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
+    @commands.command(name="rally", brief="Rally players for an actual game")
+    async def rally(self, ctx, game: str = None, wait_time: int = 60):
+        name = chowder_cog.get_name(ctx.author)
+        if not game:
+            await ctx.send(f"Uhh hello? What game {name}?")
             return
+        players = await self.rally_helper(ctx, game, ctx.author, wait_time)
+        if len(players) <= 0:
+            await ctx.send(f"Sorry {ctx.author.mention}, no one wants to play **{game}** with you, {name}. Dead server.")
+        else:
+            await ctx.send(f"Aite {', '.join([p.mention for p in players])}, time to play some **{game}**")
+        await self.clear_game_status()
+
+    @commands.command(name="roll", brief="Woll dat shit", aliases=["woll", "wolldatshit"])
+    async def roll(self, ctx, max_roll: int = 6):
         name = chowder_cog.get_name(ctx.author)
         roll_value = random.randint(1, max_roll)
         if roll_value >= max_roll / 2:
@@ -115,8 +127,6 @@ class Game(commands.Cog):
 
     @commands.command(name="flip", brief="Flip a coin", aliases=["coin", "flipdatshit"])
     async def flip(self, ctx):
-        if ctx.channel.id not in config["channels"] or ctx.author == self.bot.user:
-            return
         await ctx.send(random.choice([config["heads"], config["tails"]]))
 
     @tasks.loop(seconds=3600)
