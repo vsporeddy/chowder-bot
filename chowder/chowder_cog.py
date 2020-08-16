@@ -93,10 +93,9 @@ class Chowder(commands.Cog):
     async def fomo(self):
         """Chowder bot doesn't want to miss out on the fun"""
         guild = self.get_default_guild()
-        voice_channels = guild.voice_channels.sort(key=lambda c: len(c.members), reverse=True)
-        voice_channel = None
-        if voice_channels and len(voice_channels[0].members) > config["fomo_threshold"]:
-            voice_channel = voice_channels[0]
+        voice_channel = max(guild.voice_channels, key=lambda c: len(c.members))
+        if len(voice_channel.members) < config["fomo_threshold"]:
+            voice_channel = None
         text_channel = self.get_default_channel()
         voice = discord.utils.get(self.bot.voice_clients, guild=guild)
         names = get_collective_name()
@@ -104,15 +103,20 @@ class Chowder(commands.Cog):
         if not voice_channel and (not voice or not voice.is_connected()):
             return
         if not voice_channel and voice and voice.is_connected():
+            print(f"No populated voice channels, disconnecting from {voice.channel.name}")
             await voice.disconnect()
             await text_channel.send(get_goodbye().format(name=names))
             return
         if voice_channel and voice and voice.channel == voice_channel:
             return
-        if voice_channel and voice and voice.is_connected():
-            await voice.move_to(voice_channel)
-            await text_channel.send(get_goodbye().format(name=names))
+        elif voice_channel and voice and voice.is_connected():
+            print(f"Moving from {voice.channel.name} to {voice_channel.name}")
+            await voice.disconnect()
+            voice = await voice_channel.connect()
+            print(f"Successfully moved from {voice.channel.name} to {voice_channel.name}")
+            return
         elif voice_channel:
+            print(f"Connecting to voice channel {voice_channel.name}")
             voice = await voice_channel.connect()
             await voice.main_ws.voice_state(guild.id, voice_channel.id, self_mute=True)
             await text_channel.send(get_join_phrase().format(names=names))
@@ -169,8 +173,6 @@ class Chowder(commands.Cog):
                     response = random.choice(speech['responses'][intent]).format(name=name, word=lemma)
                     await message.channel.send(response)
                     return
-            if "chowder" in comment:
-                await message.channel.send(f"Uhh what? Speak up {name}, or say *chowder pls help*")
 
     def get_default_channel(self):
         return self.bot.get_channel(config["default_channel"])
