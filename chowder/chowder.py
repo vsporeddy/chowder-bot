@@ -61,9 +61,10 @@ class Chowder(commands.Cog):
         await channel.send(f"Time to revive this dead server, {names}, poll:")
         chosen_boys = random.sample(boys, 2)
         activity = get_activity()
-        poll = await channel.send(f"Who's better at {activity}, {chosen_boys[0].mention} ({config['option_1']}) or "
-                                  f"{chosen_boys[1].mention} ({config['option_2']})? Vote in the next "
-                                  f"{config['voting_time']} seconds.")
+        poll = await channel.send(
+            f"Who's better at {activity}, {chosen_boys[0].mention} ({config['option_1']}) or "
+            f"{chosen_boys[1].mention} ({config['option_2']})? Vote in the next {config['voting_time']} seconds."
+        )
 
         await poll.add_reaction(config["option_1"])
         await poll.add_reaction(config["option_2"])
@@ -83,8 +84,10 @@ class Chowder(commands.Cog):
         tie = f"I voted for {winner.mention} btw" if len(votes1) == len(votes2) else None
 
         await channel.send(f"It's decided, {names}. {winner.mention} is the best at {activity}! (on paper)")
-        await channel.send(f"{winner.mention} wins 5 ChowderCoin™️ and all voters get 1 each. {loser.mention} is "
-                           f"deducted 10 ChowderCoin™️.")
+        await channel.send(
+            f"{winner.mention} wins 5 ChowderCoin™️ and all voters get 1 each. {loser.mention} is "
+            f"deducted 10 ChowderCoin™️."
+        )
         # TODO @TimmahC award ChowderCoins
         if tie:
             await channel.send(tie)
@@ -113,6 +116,7 @@ class Chowder(commands.Cog):
             print(f"Moving from {voice.channel.name} to {voice_channel.name}")
             await voice.disconnect()
             voice = await voice_channel.connect()
+            await voice.main_ws.voice_state(guild.id, voice_channel.id, self_mute=True)
             print(f"Successfully moved from {voice.channel.name} to {voice_channel.name}")
             return
         elif voice_channel:

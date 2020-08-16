@@ -6,7 +6,7 @@
         "hangman": {
             "emote": "<:kms:714385140763066378>",
             "min_players": 1,
-            "wait_time": 20,
+            "wait_time": 1,
             "start_req": 12,
             "stop_req": 12
         },
