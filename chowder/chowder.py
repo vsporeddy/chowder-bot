@@ -62,9 +62,10 @@ class Chowder(commands.Cog):
         await channel.send(f"Time to revive this dead server, {names}, poll:")
         chosen_boys = random.sample(boys, 2)
         activity = get_activity()
-        poll = await channel.send(f"Who's better at {activity}, {chosen_boys[0].mention} ({config['option_1']}) or "
-                                  f"{chosen_boys[1].mention} ({config['option_2']})? Vote in the next "
-                                  f"{config['voting_time']} seconds.")
+        poll = await channel.send(
+            f"Who's better at {activity}, {chosen_boys[0].mention} ({config['option_1']}) or "
+            f"{chosen_boys[1].mention} ({config['option_2']})? Vote in the next {config['voting_time']} seconds."
+        )
 
         await poll.add_reaction(config["option_1"])
         await poll.add_reaction(config["option_2"])
@@ -84,8 +85,10 @@ class Chowder(commands.Cog):
         tie = f"I voted for {winner.mention} btw" if len(votes1) == len(votes2) else None
 
         await channel.send(f"It's decided, {names}. {winner.mention} is the best at {activity}! (on paper)")
-        await channel.send(f"{winner.mention} wins 5 ChowderCoin™️ and all voters get 1 each. {loser.mention} is "
-                           f"deducted 10 ChowderCoin™️.")
+        await channel.send(
+            f"{winner.mention} wins 5 ChowderCoin™️ and all voters get 1 each. {loser.mention} is "
+            f"deducted 10 ChowderCoin™️."
+        )
         # TODO @TimmahC award ChowderCoins
         if tie:
             await channel.send(tie)
@@ -94,7 +97,9 @@ class Chowder(commands.Cog):
     async def fomo(self):
         """Chowder bot doesn't want to miss out on the fun"""
         guild = self.get_default_guild()
-        voice_channel = discord.utils.find(lambda c: len(c.members) >= config["fomo_threshold"], guild.voice_channels)
+        voice_channel = max(guild.voice_channels, key=lambda c: len(c.members))
+        if len(voice_channel.members) < config["fomo_threshold"]:
+            voice_channel = None
         text_channel = self.get_default_channel()
         voice = discord.utils.get(self.bot.voice_clients, guild=guild)
         names = get_collective_name()
@@ -102,17 +107,24 @@ class Chowder(commands.Cog):
         if not voice_channel and (not voice or not voice.is_connected()):
             return
         if not voice_channel and voice and voice.is_connected():
+            print(f"No populated voice channels, disconnecting from {voice.channel.name}")
             await voice.disconnect()
             await text_channel.send(get_goodbye().format(name=names))
             return
         if voice_channel and voice and voice.channel == voice_channel:
             return
-        if voice_channel and voice and voice.is_connected():
-            await voice.move_to(voice_channel)
-        elif voice_channel:
+        elif voice_channel and voice and voice.is_connected():
+            print(f"Moving from {voice.channel.name} to {voice_channel.name}")
+            await voice.disconnect()
             voice = await voice_channel.connect()
             await voice.main_ws.voice_state(guild.id, voice_channel.id, self_mute=True)
-        await text_channel.send(get_join_phrase().format(names=names))
+            print(f"Successfully moved from {voice.channel.name} to {voice_channel.name}")
+            return
+        elif voice_channel:
+            print(f"Connecting to voice channel {voice_channel.name}")
+            voice = await voice_channel.connect()
+            await voice.main_ws.voice_state(guild.id, voice_channel.id, self_mute=True)
+            await text_channel.send(get_join_phrase().format(names=names))
 
     @spam.before_loop
     @revive.before_loop
@@ -200,8 +212,6 @@ class Chowder(commands.Cog):
                     response = random.choice(speech['responses'][intent]).format(name=name, word=lemma)
                     await message.channel.send(response)
                     return
-            if "chowder" in comment:
-                await message.channel.send(f"Uhh what? Speak up {name}, or say *chowder pls help*")
 
     def get_default_channel(self):
         return self.bot.get_channel(config["default_channel"])
