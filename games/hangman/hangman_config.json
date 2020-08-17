@@ -1,0 +1,82 @@
+{
+    "words": [
+        "RENEKTON FANART",
+        "TIME FOR A REBRAND",
+        "QUACK ADDICT",
+        "KING FISH",
+        "GOLF WITH YOUR FRIENDS",
+        "AUTOCHESS",
+        "SPOOKY BLACK",
+        "KEVIN GATES",
+        "DARK TIMES",
+        "ESO DUDE",
+        "ELDER SCROLLS ONLINE",
+        "MONEY LONG",
+        "CHEESY GORDITA CRUNCH",
+        "MOVIE MONDAY",
+        "COLD CHOWDER",
+        "RIP MARK",
+        "TRUE TEARS",
+        "EASY MONEY",
+        "COME TO DADDY",
+        "VIOLENCE SPEED MOMENTUM",
+        "FORGOTTEN ABOUT",
+        "FIGUREHEAD",
+        "ALL HAIL CHOWDERTRON",
+        "FOR SALE",
+        "GAS STATION",
+        "SLURPEE RUN",
+        "BUSHY BEARD",
+        "DEAD BY DAYLIGHT",
+        "FLY OR DIE",
+        "STREETS OF BELLEVUE",
+        "SEE SHADOW",
+        "PANDA EXPRESS",
+        "ESCAPE FROM TARKOV",
+        "MAGIC THE GATHERING",
+        "DOWN FOR ACROSS",
+        "KODAK BLACK",
+        "BIG GREEN TRACTOR",
+        "JUICE WORLD",
+        "SAINT LOUIS",
+        "YOUNGBOY NEVER BROKE AGAIN",
+        "BIG RHONDA",
+        "FUCK MICROSOFT",
+        "PEGGLE NIGHTS",
+        "FRAT MANOR",
+        "OUT OF THE PICTURE",
+        "QUAKE CHAMPIONS",
+        "LEAGUE OF LEGENDS",
+        "ULTIMATE CHICKEN HORSE",
+        "HUMAN FALL FLAT",
+        "ADDICTIVE PERSONALITY"
+    ],
+    "titles": [
+        "Chowder on a Rope",
+        "Six Feet off the Ground",
+        "The Gallows",
+        "Hung like a Racehorse",
+        "Hang 'em High",
+        "H A N G M A N"
+    ],
+    "strikes": 5,
+    "emote": "🤔",
+    "gallows": [
+        "https://www.yad.com/thumb/Hangman.jpg",
+        "https://www.yad.com/thumb/Hangman.jpg",
+        "https://www.yad.com/thumb/Hangman.jpg",
+        "https://www.yad.com/thumb/Hangman.jpg",
+        "https://www.yad.com/thumb/Hangman.jpg",
+        "https://www.yad.com/thumb/Hangman.jpg"
+    ],
+    "victory_messages": [
+        "Goddammit I wanted to die on that rope. Yeah it was **{word}** lol"
+    ],
+    "defeat_messages": [
+        "RIP Chowder, GG y'all suck. The answer was **{word}** btw"
+    ],
+    "strike_messages": [
+        "{guess}? Wtf why would you guess {guess}?",
+        "Uhh trolling? No there's no {guess} obviously"
+    ]
+}

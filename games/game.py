@@ -8,7 +8,7 @@ import json
 import random
 from discord.ext import commands, tasks
 from chowder import chowder
-from games.hangman.hangman import Hangman
+from games.hangman import hangman
 
 with open("games/game_config.json", "r") as read_file:
     config = json.load(read_file)
@@ -64,8 +64,11 @@ class Game(commands.Cog):
 
     async def start_game(self, ctx, game_name, players):
         if game_name == "hangman":
-            game = Hangman(ctx, players)
-            await game.start()
+            result = await hangman.start(self.bot, ctx, players)
+            # TODO call ChowderCoin stuff here with result
+        elif game_name == "telewave":
+            await ctx.send("Telewave is coming soon™️")
+        await self.clear_game_status()
 
     @commands.group(name="play", brief="Initiate a discord game", aliases=games)
     async def play(self, ctx, game: str = None):
