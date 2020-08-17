@@ -60,14 +60,14 @@
         "H A N G M A N"
     ],
     "strikes": 5,
-    "emote": "🤔",
+    "emote": "<:kms:714385140763066378>",
     "gallows": [
-        "https://www.yad.com/thumb/Hangman.jpg",
-        "https://www.yad.com/thumb/Hangman.jpg",
-        "https://www.yad.com/thumb/Hangman.jpg",
-        "https://www.yad.com/thumb/Hangman.jpg",
-        "https://www.yad.com/thumb/Hangman.jpg",
-        "https://www.yad.com/thumb/Hangman.jpg"
+        "https://cdn.discordapp.com/attachments/744644246883270659/744739681190674554/gallows6.png",
+        "https://cdn.discordapp.com/attachments/744644246883270659/744739665537532004/gallows5.png",
+        "https://cdn.discordapp.com/attachments/744644246883270659/744739645580902480/gallows4.png",
+        "https://cdn.discordapp.com/attachments/744644246883270659/744739629059801158/gallows3.png",
+        "https://cdn.discordapp.com/attachments/744644246883270659/744739610562789526/gallows2.png",
+        "https://cdn.discordapp.com/attachments/744644246883270659/744739592841723954/gallows1.png"
     ],
     "victory_messages": [
         "Goddammit I wanted to die on that rope. Yeah it was **{word}** lol"
@@ -77,6 +77,6 @@
     ],
     "strike_messages": [
         "{guess}? Wtf why would you guess {guess}?",
-        "Uhh trolling? No there's no {guess} obviously"
+        "Uhh trolling? No there's no **{guess}**"
     ]
 }
