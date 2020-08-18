@@ -57,23 +57,18 @@ async def play(bot, ctx, team1, team2):
         await wait(ctx, going_again, team1)
         prompt = get_prompt()
         answer = random.randint(0, 100)
-
         await display(
             ctx, team1, team2, prompt, max_score,
             text=f"\u200B\n\n\n**{team1.psychic.mention}** is thinking of a clue"
         )
 
         clue = await get_clue(bot, team1.psychic, prompt, answer)
-
-        # await ctx.send(f"Hold tight {chowder.get_collective_name()}, I just DMed {team1.psychic.mention} the prompt")
-
         await display(
             ctx, team1, team2, prompt, max_score,
             text=f"\u200B\n\n\n**{team1.psychic.mention}**'s clue: \"*{clue}*\""
         )
 
         guess = await get_guess(bot, ctx, team1)
-
         await display(
             ctx, team1, team2, prompt, max_score,
             text=f"\u200B\n\n\n**{team1.psychic.mention}**'s clue: \"*{clue}*\"\n"
@@ -81,11 +76,9 @@ async def play(bot, ctx, team1, team2):
         )
 
         counter_guess = await get_counter_guess(bot, ctx, team2)
-
         prev_score = team1.score
         result_text = await update_scores(team1, team2, answer, guess, counter_guess)
         await display(ctx, team1, team2, prompt, max_score, text=result_text)
-
         team1.rotate_psychic()
 
         # Per official Wavelength rules - if you score 4 you get to go again
@@ -180,7 +173,6 @@ async def display(ctx, team1, team2, prompt, max_score, text):
     embed.add_field(name=f"__{team1.name}__: {team1.score}", inline=False, value=team1.to_string())
     embed.add_field(name=f"__{team2.name}__: {team2.score}", inline=False, value=team2.to_string())
     embed.set_image(url=config["banner"])
-    # embed.set_thumbnail(url=config["thumbnail"])
     embed.set_footer(text=f"Score limit: {max_score}, {team1.name}'s turn")
 
     await ctx.send(embed=embed)
