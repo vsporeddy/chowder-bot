@@ -1,11 +1,16 @@
 {
-    "max_score": 5,
+    "max_score": 10,
     "timeout": 3,
     "wait_time": 10,
     "team_names": [
         ["TSM", "CLG"],
         ["Team Magma", "Team Aqua"],
-        ["Good guys", "Bad guys"]
+        ["Good guys", "Bad guys"],
+        ["Liberals", "Fascists"],
+        ["Terrorists", "Counter-Terrorists"],
+        ["Pink team", "Yellow team"],
+        ["Phantoms", "Vandals"],
+        ["Team Ray", "Team Chowder"]
     ],
     "banner": "https://media.discordapp.net/attachments/742901465042911284/745208334143193158/telewave4.png",
     "thumbnail": "https://cdn.discordapp.com/attachments/742901465042911284/745209541939167292/15977345961547467.png",
