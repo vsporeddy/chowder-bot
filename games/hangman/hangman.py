@@ -18,17 +18,19 @@ async def start(bot, ctx, players):
         await ctx.send(get_victory_message().format(word=word))
     else:
         await ctx.send(get_defeat_message().format(word=word))
-    return victory
+    return players if victory else []
 
 
 async def play(bot, ctx, players, word):
     wordset = set(word.replace(" ", ""))
     guesses = set()
     strikes = config["strikes"]
-    check = lambda m: "$stop" in m.content or "chowder pls stop" in m.content or \
-                      m.author in players and \
-                      (len(m.content) == 1 and m.content.isalpha()) or \
-                      m.content.upper() == word
+
+    def check(m):
+        return m.author in players and \
+               (len(m.content) == 1 and m.content.isalpha()) or \
+               m.content.upper() == word
+
     player_str = ', '.join([p.nick if p.nick else p.name for p in players])
     title = get_title()
     await display(ctx, word, guesses, strikes, player_str, title)
@@ -37,9 +39,6 @@ async def play(bot, ctx, players, word):
         guess = (await bot.wait_for("message", check=check)).content.upper()
         if guess == word:
             return True
-        # hack for now, TODO rework this trash
-        if "$STOP" in guess or "CHOWDER PLS STOP" in guess:
-            return False
         if guess in guesses:
             await ctx.send(f"You already guessed **{guess}**, {chowder.get_condescending_name()}")
             continue
