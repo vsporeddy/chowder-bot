@@ -82,9 +82,6 @@ async def roll(ctx, bet):
     new_bal = bal+diff
     bank.transfer(ctx.author.id, 1, diff)
     embed.add_field(name="Winnings", inline=True, value=diff)
-    if (diff > 0):
-        diff = "+" + str(diff)
-    embed.add_field(name="Balance", inline=True, value=f"{bal}({diff})")
     await ctx.send(embed=embed)
 
 """Checks to see what streaks showed up in a slot roll. Returned as a list of tuples.

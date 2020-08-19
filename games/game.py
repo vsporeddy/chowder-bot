@@ -12,6 +12,7 @@ from discord.ext import commands, tasks
 from chowder import chowder
 from games.hangman import hangman
 from games.telewave import telewave
+from games.slots import slots
 
 with open("games/game_config.json", "r") as read_file:
     config = json.load(read_file)
@@ -154,6 +155,17 @@ class Game(commands.Cog):
     async def flip(self, ctx):
         await ctx.send(random.choice([config["heads"], config["tails"]]))
 
+    @commands.command(name="slots", brief="Try your hand at the slots and get rich.")
+    async def slots(self, ctx, *args):
+        if (len(args) == 0):
+            bet = None
+        elif (len(args) != 1):
+            await ctx.send("Invalid input.")
+            return
+        else:
+            bet = args[0]
+        await slots.roll(ctx, bet)
+
     @tasks.loop(seconds=3600)
     async def update_status(self):
         if not self.in_game:
@@ -174,85 +186,6 @@ class Game(commands.Cog):
         self.current_game_name = game
         await self.bot.change_presence(activity=discord.Game(name=game))
 
-    @commands.group(name="slots", brief="Try your luck at the slots.")
-    async def slots(self, ctx, *args):
-        bal = chowder_cog.get_balance(ctx.author.id)
-        if (bal == None):
-            await ctx.send("You need an account to play slots, " + ctx.author.mention + ".")
-            return
-        game = config["games"]["slots"]
-        emotes = game["emotes"]
-        reels = game["reels"]
-        wildcard = game["wildcard"]
-        if (len(args) == 0):
-            embed = discord.Embed(
-                title = "help",
-                description = "$slots [bet number]"
-            )
-            embed.add_field(name="Payouts", inline=True, value=f"""
-                1 pair = **1.5x**
-                2 pair = **3x**
-                3 in a row = **5x**
-                4 in a row = **20x**
-                5 in a row = **50x**
-                Full House = **10x**
-                {emotes.get(str(wildcard))} wildcard counts as any symbol. Winnings are also doubled per wildcard.
-            """)
-            await ctx.send(embed=embed)
-            return
-        elif (len(args) != 1):
-            await ctx.send("Invalid input.")
-            return
-        bet = args[0]
-        if (isinstance(bet, str) and bet.lower() == "all" and bal > 0):
-            bet = bal
-        elif (bet.isdigit()):
-            bet = int(bet)
-            if (bet > bal):
-                await ctx.send("You don't have enough coin to play, " + \
-                                chowder_cog.get_condescending_name() + ".")
-                return
-        else:
-            await ctx.send("Invalid bet input.")
-            return
-        rolls = []
-        symbols = game["symbols"]
-        weight = game["weights"]
-        for i in range(reels):
-            roll = random.choices(symbols, weights=weight)[0]
-            rolls.append(roll)
-            if (game["scam"] and roll != wildcard):
-                weight[roll] *= game["scam_value"]
-        result = check_slots(rolls, game["wildcard"])
-        msg, mult = get_hand(result)
-        if (mult > 0):
-            winnings = ceil(bet*(1+mult))
-        else:
-            winnings = 0
-        roll_str = "**------------------------------**\n**| **"
-        for i in rolls:
-            roll_str += emotes.get(str(i))
-            roll_str += "** | **"
-        roll_str += "\n**------------------------------**"
-        roll_str += "\n" + msg
-        if (result[1] > 0):
-            multiplier =  pow(2, result[1])
-            roll_str += f"""\n **{result[1]} wildcards in your roll = {multiplier}x.**"""
-            winnings *= multiplier
-        embed = discord.Embed(
-            title = "Slots | Player: " + ctx.author.name + "#" + ctx.author.discriminator,
-            color = 4188997,
-            description = roll_str
-        )
-        diff = int(winnings-bet)
-        new_bal = bal+diff
-        chowder_cog.transfer(ctx.author.id, 1, diff)
-        embed.add_field(name="Winnings", inline=True, value=diff)
-        if (diff > 0):
-            diff = "+" + str(diff)
-        embed.add_field(name="Balance", inline=True, value=f"{bal}({diff})")
-        await ctx.send(embed=embed)
-
     async def set_new_status(self):
         activity = random.choice([
                 discord.Activity(name="hentai", type=discord.ActivityType.watching),
@@ -260,71 +193,6 @@ class Game(commands.Cog):
                 discord.Activity(type=discord.ActivityType.listening, name="a banger")
             ])
         await self.bot.change_presence(activity=activity)
-
-"""Checks to see what streaks showed up in a slot roll. Returned as a list of tuples.
-    Additional bonus field if there is a wildcard
-"""
-def check_slots(roll, wildcard=None):
-    prev = roll[0]
-    streak = 1
-    stats = []
-    prev_wildcard = False
-    bonus = 0
-    if (roll[0] == wildcard):
-        bonus += 1
-        roll[0] = roll[1]
-    if (roll[-1] == wildcard):
-        bonus += 1
-        roll[-1] = roll[-2]
-    for i in range(1, len(roll)):
-        if (roll[i] == wildcard):
-            bonus += 1
-        if (roll[i] == prev or roll[i] == wildcard or prev == wildcard):
-            streak += 1
-            if (prev == wildcard):
-                prev = roll[i]
-        else:
-            tup = [prev, streak]
-            stats.append(tup)
-            prev = roll[i]
-            streak = 1
-        if (i == (len(roll)-1)):
-            stats.append([roll[i], streak])
-    return [stats, bonus]
-
-def get_hand(result):
-    triple = False
-    pair = 0
-    mult = 0
-    msg = ""
-    for streak in result[0]:
-        if (streak[1] == 5):
-            mult = 50
-            msg = "**FIVE IN A ROW!!!**"
-        elif (streak[1] == 4):
-            mult = 20
-            msg = "**FOUR IN A ROW!!**"
-        elif (streak[1] == 3):
-            triple = True
-        elif (streak[1] == 2):
-            pair += 1
-    if (mult == 0):
-        if (triple):
-            if (pair == 1):
-                mult= 10
-                msg = "**FULL HOUSE!!**"
-            else:
-                mult = 5
-                msg = "**THREE IN A ROW!**"
-        elif (pair == 2):
-            mult = 3
-            msg = "**TWO PAIR**"
-        elif (pair == 1):
-            mult = 1.5
-            msg = "**YOU WON!**"
-        else:
-            msg = "**YOU LOST. TOO BAD**"
-    return [msg, mult]
 
 def setup(bot):
     bot.add_cog(Game(bot))

@@ -63,7 +63,6 @@ async def on_ready():
         f"{guild.name}(id: {guild.id})"
     )
 
-
 @bot.check
 async def check_commands(ctx):
     if ctx.channel.id not in channels or ctx.author == bot.user:

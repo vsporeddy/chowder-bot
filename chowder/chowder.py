@@ -11,6 +11,7 @@ import nltk
 from nltk.stem import WordNetLemmatizer
 from datetime import datetime
 from discord.ext import tasks, commands
+from bank import bank
 
 with open("chowder/chowder_config.json", "r") as read_file:
     config = json.load(read_file)
@@ -150,17 +151,17 @@ class Chowder(commands.Cog):
     """Chowder coin stuff"""
     @commands.command(name="balance", brief="Check current balance of Chowder coins.")
     async def balance(self, ctx):
-        bal = get_balance(ctx.author.id)
+        bal = bank.get_balance(ctx.author.id)
         if (bal == None):
             await ctx.send(ctx.author.mention + " has no account. Making a new one for you.")
-            new_account(ctx.author.id, ctx.author.name)
+            bank.new_account(ctx.author.id, ctx.author.name)
         else:
             await ctx.send(ctx.author.mention + f" currrently has {bal} coins.")
 
     @commands.command(name="give", brief="Transfer coins from one user to another.")
     async def give(self, ctx, *args):
         sender = ctx.author
-        if (get_balance(sender.id) == None):
+        if (bank.get_balance(sender.id) == None):
             await ctx.send(ctx.author.mention + " You don't have an account. Go make one first.")
             return
         mentions = ctx.message.mentions
@@ -180,7 +181,7 @@ class Chowder(commands.Cog):
                 await ctx.send(f"<@{sender.id}> has sent some coins to <@{rec}>")
         else:
             await ctx.send(response[1])
-
+    
     @commands.Cog.listener()
     async def on_member_join(self, member):
         channel = self.get_default_channel()
@@ -241,65 +242,21 @@ def getUserFromMention(self, mention):
             mention = mention[1:]
         return int(mention)
 
-"""Use this method to get the current balance of any user, based on id"""
-def get_balance(id):
-    conn = sqlite.connect(config["DATABASE"])
-    c = conn.cursor()
-    query = f"SELECT balance FROM accounts WHERE id = {id}"
-    bal = c.execute(query).fetchone()
-    conn.close()
-    if (bal == None):
-        return None
-    else:
-        return int(bal[0])
-
-def new_account(id, name, balance=0):
-    conn = sqlite.connect(config["DATABASE"])
-    c = conn.cursor()
-    c.execute(f"INSERT INTO accounts('id', 'name', 'balance') VALUES ('{id}', '{name}', 0)")
-    conn.commit()
-    conn.close()
-
 def give_checker(send_id, rec_id, amount):
     response = [-1, "Default error"]
     if (send_id == rec_id):
         response = [-1, "Sending money to yourself? That's sad."]
-    elif (get_balance(rec_id) == None):
+    elif (bank.get_balance(rec_id) == None):
         response = [-1, "You're sending coins to someone who doesn't have an account."]
     elif (amount.isdigit()):
         amount = int(amount)
         if (amount < 1):
             response = [-1, "Invalid amount of coins."]
-        elif (amount > get_balance(send_id)):
+        elif (amount > bank.get_balance(send_id)):
             response = [-1, "Looks like you don't have enough coins, " + get_condescending_name() + "."]
         else:
             response = [1, "Success"]
     return response
-
-"""Updates the balance of both sender and receiver and leaves a record in transactions."""
-def transfer(send_id, rec_id, amount):
-    if (rec_id == 1):
-        #transfer to and from nothing
-        update_balance(send_id, amount)
-    else:
-        update_balance(send_id, -1*amount)
-        update_balance(rec_id, amount)
-    conn = sqlite.connect(config["DATABASE"])
-    c = conn.cursor()
-    c.execute(f"INSERT INTO TRANSACTIONS (receiver_id, amount, sender_id) \
-                    VALUES ({rec_id}, {amount}, {send_id})")
-    conn.commit()
-    conn.close()
-    return 1
-
-"""Update user's balance by 'x' amount. 'x' can be positive or negative"""
-def update_balance(id, amount):
-    conn = sqlite.connect(config["DATABASE"])
-    c = conn.cursor()
-    new_bal = get_balance(id) + amount
-    c.execute(f"UPDATE accounts SET balance = {new_bal} where id = {id}")
-    conn.commit()
-    conn.close()
 
 def get_respectful_name():
     return random.choice(speech["respectful_names"])
