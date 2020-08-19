@@ -68,18 +68,16 @@ class Game(commands.Cog):
         if game_name == "hangman":
             winners = await hangman.start(self.bot, ctx, players)
         elif game_name == "telewave":
-            msg = await ctx.send(f"{initiator.mention} y'all tryna play `coop` or `vs`?")
-            game_mode = (await self.bot.wait_for(
-                "message",
-                check=lambda m: m.author == initiator and m.content.lower() in ["coop", "vs"] and m.channel == msg.channel
-            )).content.lower()
-            if game_mode == "vs" and len(players) < game_config["telewave"]["min_players_vs"]:
-                await ctx.send(
-                    f"Sorry {chowder.get_name(initiator)} you need at least "
-                    f"{game_config['telewave']['min_players_vs']} to play vs. mode"
-                )
-                return []
-            winners = await telewave.start(self.bot, ctx, players, game_mode)
+            if len(players) < game_config["telewave"]["min_players_vs"]:
+                game_mode = "coop"
+                winners = await telewave.start(self.bot, ctx, players, game_mode)
+            else:
+                msg = await ctx.send(f"{initiator.mention} y'all tryna play `coop` or `vs`?")
+                game_mode = (await self.bot.wait_for(
+                    "message",
+                    check=lambda m: m.author == initiator and m.content.lower() in ["coop", "vs"] and m.channel == msg.channel
+                )).content.lower()
+                winners = await telewave.start(self.bot, ctx, players, game_mode)
         return winners
 
     @commands.group(name="play", brief="Initiate a discord game", aliases=games)
