@@ -52,7 +52,6 @@ class Game(commands.Cog):
 
         message = await ctx.channel.fetch_message(message.id)
         reaction = discord.utils.find(lambda r: str(r.emoji) == emote, message.reactions)
-
         players = await reaction.users().flatten()
         players.remove(self.bot.user)
         if initiator not in players:
@@ -64,21 +63,28 @@ class Game(commands.Cog):
             return []
         return players
 
-    async def start_game(self, ctx, game_name, players):
+    async def start_game(self, ctx, game_name, players, initiator):
+        winners = []
         if game_name == "hangman":
-            self.current_game_task = asyncio.create_task(hangman.start(self.bot, ctx, players))
+            winners = await hangman.start(self.bot, ctx, players)
         elif game_name == "telewave":
-            self.current_game_task = asyncio.create_task(telewave.start(self.bot, ctx, players))
-        await self.current_game_task
-        winners = self.current_game_task.result()
-        # TODO call ChowderCoin stuff here with result
-        await ctx.send(f"Winners: {', '.join([w.mention for w in winners])} earn ChowderCoin™️ (coming soon)")
-        await self.clear_game_status()
+            msg = await ctx.send(f"{initiator.mention} y'all tryna play `coop` or `vs`?")
+            game_mode = (await self.bot.wait_for(
+                "message",
+                check=lambda m: m.author == initiator and m.content in ["coop", "vs"] and m.channel == msg.channel
+            )).content
+            if game_mode == "vs" and len(players) < game_config["telewave"]["min_players_vs"]:
+                await ctx.send(
+                    f"Sorry {chowder.get_name(initiator)} you need at least "
+                    f"{game_config['telewave']['min_players_vs']} to play vs. mode"
+                )
+                return []
+            winners = await telewave.start(self.bot, ctx, players, game_mode)
+        return winners
 
     @commands.group(name="play", brief="Initiate a discord game", aliases=games)
     async def play(self, ctx, game: str = None):
         name = chowder.get_name(ctx.author)
-
         if ctx.invoked_with in games:
             game = ctx.invoked_with
         elif not game:
@@ -90,7 +96,6 @@ class Game(commands.Cog):
                 f"If you're trying to rally people for an different game use *rally*, {name}."
             )
             return
-
         initiator = ctx.author
         start_req = game_config[game]["start_req"]
         if initiator.top_role.position < start_req:
@@ -101,15 +106,21 @@ class Game(commands.Cog):
         if self.in_game:
             await ctx.send(f"Sorry {name}, I'm in a game of {self.current_game_name} already")
             return
-
         players = await self.rally_helper(ctx, game, initiator)
         if players:
-            await self.start_game(ctx, game, players)
+            self.current_game_task = asyncio.create_task(self.start_game(ctx, game, players, initiator))
+            await self.current_game_task
+            winners = self.current_game_task.result()
+            # TODO call ChowderCoin stuff here with result
+            if winners:
+                await ctx.send(f"Winners: {', '.join([w.mention for w in winners])} earn ChowderCoin™️ (coming soon)")
+            else:
+                await ctx.send("No ChowderCoin™️ for losers.")
+            await self.clear_game_status()
 
     @commands.command(name="stop", brief="Stop in-progress game or rally")
     async def stop(self, ctx):
         name = chowder.get_name(ctx.author)
-
         if not self.in_game:
             await ctx.send(f"Stop what? I'm not doing anything {name}")
             return

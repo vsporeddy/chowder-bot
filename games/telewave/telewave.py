@@ -36,41 +36,88 @@ class TelewaveTeam:
         return [self.psychic] + list(self.guessers)
 
 
-async def start(bot, ctx, players):
-    await ctx.send(f"Starting a game of **telewave** with {', '.join([p.mention for p in players])}")
+async def start(bot, ctx, players, game_mode):
+    await ctx.send(f"Starting a {game_mode} game of **telewave** with {', '.join([p.mention for p in players])}")
     random.shuffle(players)
     team_names = get_team_names()
 
-    # Per official Wavelength rules - the team going second starts with a 1 point lead
-    team1 = TelewaveTeam(players[:len(players)//2], name=team_names[0], score=0)
-    team2 = TelewaveTeam(players[len(players)//2:], name=team_names[1], score=1)
-    winners = await play(bot, ctx, team1, team2)
+    if game_mode == "coop":
+        team = TelewaveTeam(players, name=team_names[0], score=0)
+        await play_coop(bot, ctx, team)
+        if team.score > config["max_score_coop"]:
+            await ctx.send(
+                f"Dang **{team.name}** you scored **{team.score}** points. Guess you're not as braindead as I thought."
+            )
+            return team.get_players()
+        else:
+            await ctx.send(f"Y'all only got **{team.score}** points? Pathetic.")
+            return []
+    else:
+        # Per official Wavelength rules - the team going second starts with a 1 point lead
+        team1 = TelewaveTeam(players[:len(players)//2], name=team_names[0], score=0)
+        team2 = TelewaveTeam(players[len(players)//2:], name=team_names[1], score=1)
+        await play_vs(bot, ctx, team1, team2)
+        if team1.score == team2.score:
+            await ctx.send(f"No winners today {chowder.get_collective_names()}, it's a tie.")
+            return []
+        else:
+            winners = max(team1, team2, key=lambda t: t.score)
+            await ctx.send(f"GG, **{winners.name}** wins")
+            return winners.get_players()
 
-    await ctx.send(f"GG, **{winners.name}** wins")
-    return winners.get_players()
 
-
-async def play(bot, ctx, team1, team2):
-    max_score = config["max_score"]
-    going_again = False
-    while team1.score < max_score and team2.score < max_score:
-        await wait(ctx, going_again, team1)
+async def play_coop(bot, ctx, team):
+    max_score = config["max_score_coop"]
+    turns = config["coop_turn_count"]
+    extra_turn = False
+    while turns and team.score < max_score:
+        await wait(ctx, team, extra_turn)
         prompt = get_prompt()
         answer = random.randint(0, 100)
         await display(
-            ctx, team1, team2, prompt, max_score,
+            ctx, team, None, prompt, max_score, turns,
+            text=f"\u200B\n\n\n**{team.psychic.mention}** is thinking of a clue"
+        )
+
+        clue = await get_clue(bot, team.psychic, prompt, answer)
+        await display(
+            ctx, team, None, prompt, max_score, turns,
+            text=f"\u200B\n\n\n**{team.psychic.mention}**'s clue: \"*{clue}*\""
+        )
+
+        guess = await get_guess(bot, ctx, team)
+        prev_score = team.score
+        result_text = await update_scores(team, None, answer, guess, None)
+        await display(ctx, team, None, prompt, max_score, turns, text=result_text)
+        team.rotate_psychic()
+
+        # Per official Wavelength rules - If you score in the red, you get an extra turn
+        extra_turn = team.score - prev_score == 4
+        if not extra_turn:
+            turns -= 1
+
+
+async def play_vs(bot, ctx, team1, team2):
+    max_score = config["max_score_vs"]
+    extra_turn = False
+    while team1.score < max_score and team2.score < max_score:
+        await wait(ctx, team1, extra_turn)
+        prompt = get_prompt()
+        answer = random.randint(0, 100)
+        await display(
+            ctx, team1, team2, prompt, max_score, 0,
             text=f"\u200B\n\n\n**{team1.psychic.mention}** is thinking of a clue"
         )
 
         clue = await get_clue(bot, team1.psychic, prompt, answer)
         await display(
-            ctx, team1, team2, prompt, max_score,
+            ctx, team1, team2, prompt, max_score, 0,
             text=f"\u200B\n\n\n**{team1.psychic.mention}**'s clue: \"*{clue}*\""
         )
 
         guess = await get_guess(bot, ctx, team1)
         await display(
-            ctx, team1, team2, prompt, max_score,
+            ctx, team1, team2, prompt, max_score, 0,
             text=f"\u200B\n\n\n**{team1.psychic.mention}**'s clue: \"*{clue}*\"\n"
                  f"**{team1.name}**'s guess: **{guess}**"
         )
@@ -78,15 +125,13 @@ async def play(bot, ctx, team1, team2):
         counter_guess = await get_counter_guess(bot, ctx, team2)
         prev_score = team1.score
         result_text = await update_scores(team1, team2, answer, guess, counter_guess)
-        await display(ctx, team1, team2, prompt, max_score, text=result_text)
+        await display(ctx, team1, team2, prompt, max_score, 0, text=result_text)
         team1.rotate_psychic()
 
-        # Per official Wavelength rules - if you're losing and score 4 you get to go again
-        going_again = team1.score - prev_score == 4 and team1.score < team2.score
-        if not going_again:
+        # Per official Wavelength rules - if you score 4 and you're still losing, you go again
+        extra_turn = team1.score - prev_score == 4 and team1.score < team2.score
+        if not extra_turn:
             team1, team2 = team2, team1
-
-    return team1 if team1.score > team2.score else team2
 
 
 async def get_clue(bot, psychic, prompt, answer):
@@ -138,31 +183,31 @@ async def update_scores(team1, team2, answer, guess, counter_guess):
     result_text = "\u200B\n\n\n"
     if delta <= 2:
         team1.score += 4
-        result_text += f"DANG **{team1.name}** y'all were on the MONEY."
+        result_text += f"{config['red_zone_emote']} DANG **{team1.name}** y'all were on the MONEY."
     elif 2 < delta <= 6:
         team1.score += 3
-        result_text += f"Not bad **{team1.name}**, in the green."
+        result_text += f"{config['green_zone_emote']} Not bad **{team1.name}**, in the green."
     elif 6 < delta <= 10:
         team1.score += 2
-        result_text += f"Uhh at least you get points I guess, **{team1.name}**."
+        result_text += f"{config['yellow_zone_emote']} Uhh at least you get points I guess, **{team1.name}**."
     else:
-        result_text += f"Not on the same wavelength today, huh **{team1.name}**?"
+        result_text += f"{config['miss_emote']} Not on the same wavelength today, huh **{team1.name}**?"
     result_text += f"\nAnswer was **{answer}** and you guessed **{guess}**."
 
-    if delta > 2 and counter_guess(answer, guess):
+    if team2 and delta > 2 and counter_guess(answer, guess):
         team2.score += 1
         result_text += f"\n**{team2.name}** get a point for being right."
     return result_text
 
 
-async def wait(ctx, going_again, team):
+async def wait(ctx, team, extra_turn):
     await ctx.send(f"Round boutta start in **{config['wait_time']}** seconds...")
-    if going_again:
-        await ctx.send(f"{team.name} gets to go again because they hit the red zone.")
+    if extra_turn:
+        await ctx.send(f"{team.name} gets an extra turn because they hit the red zone.")
     await asyncio.sleep(config["wait_time"])
 
 
-async def display(ctx, team1, team2, prompt, max_score, text):
+async def display(ctx, team1, team2, prompt, max_score, turns, text):
     embed = discord.Embed(
             title=f"{prompt[0]}  ⟵  0\n vs.\n{prompt[1]}  ⟶  100",
             description=text,
@@ -171,9 +216,13 @@ async def display(ctx, team1, team2, prompt, max_score, text):
 
     embed.add_field(name="\u200B", value="\u200B")
     embed.add_field(name=f"__{team1.name}__: {team1.score}", inline=False, value=team1.to_string())
-    embed.add_field(name=f"__{team2.name}__: {team2.score}", inline=False, value=team2.to_string())
+    if team2:
+        embed.add_field(name=f"__{team2.name}__: {team2.score}", inline=False, value=team2.to_string())
     embed.set_image(url=config["banner"])
-    embed.set_footer(text=f"Score limit: {max_score}, {team1.name}'s turn")
+    if turns:
+        embed.set_footer(text=f"Winning score: {max_score}, {turns} turns left")
+    else:
+        embed.set_footer(text=f"Winning score: {max_score}, {team1.name}'s turn")
 
     await ctx.send(embed=embed)
 

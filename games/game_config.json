@@ -12,8 +12,9 @@
         },
         "telewave": {
             "emote": "<:ZalteoNani:550595879585841153>",
-            "min_players": 4,
-            "wait_time": 20,
+            "min_players": 2,
+            "min_players_vs": 4,
+            "wait_time": 30,
             "start_req": 12,
             "stop_req": 12
         }

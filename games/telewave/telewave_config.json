@@ -1,5 +1,7 @@
 {
-    "max_score": 10,
+    "max_score_vs": 10,
+    "max_score_coop": 20,
+    "coop_turn_count": 7,
     "timeout": 3,
     "wait_time": 10,
     "team_names": [
@@ -14,6 +16,10 @@
     ],
     "banner": "https://media.discordapp.net/attachments/742901465042911284/745208334143193158/telewave4.png",
     "thumbnail": "https://cdn.discordapp.com/attachments/742901465042911284/745209541939167292/15977345961547467.png",
+    "red_zone_emote": "<:ChowderHappy:511436641844461579>",
+    "green_zone_emote": "<:ChowderSmile:664313737255321632>",
+    "yellow_zone_emote": "<:DanteTears:549492738249195521>",
+    "miss_emote": "<:ChowderWut:541707580662349856>",
     "prompts": [
         ["Bad","Good"],
         ["Mildly addictive","Highly addictive"],
