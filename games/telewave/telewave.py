@@ -81,8 +81,8 @@ async def play(bot, ctx, team1, team2):
         await display(ctx, team1, team2, prompt, max_score, text=result_text)
         team1.rotate_psychic()
 
-        # Per official Wavelength rules - if you score 4 you get to go again
-        going_again = team1.score - prev_score == 4
+        # Per official Wavelength rules - if you're losing and score 4 you get to go again
+        going_again = team1.score - prev_score == 4 and team1.score < team2.score
         if not going_again:
             team1, team2 = team2, team1
 
