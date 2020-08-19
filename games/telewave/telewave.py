@@ -76,19 +76,22 @@ async def play_coop(bot, ctx, team):
         answer = random.randint(0, 100)
         await display(
             ctx, team, None, prompt, max_score, turns,
-            text=f"\u200B\n**{team.psychic.mention}** is thinking of a clue..."
+            text=f"\u200B\n**{team.psychic.mention}** is thinking of a clue...\n",
+            thumbnail=str(team.psychic.avatar_url)
         )
 
-        clue = await get_clue(bot, team.psychic, prompt, answer)
+        clue = await get_clue(bot, ctx, team.psychic, prompt, answer)
         await display(
             ctx, team, None, prompt, max_score, turns,
-            text=f"Clue: ```{clue}```"
+            text=f"Clue: ```{clue}```",
+            thumbnail=str(team.psychic.avatar_url)
         )
 
         guess = await get_guess(bot, ctx, team)
         prev_score = team.score
         result_text = await update_scores(team, None, answer, guess, None)
-        await display(ctx, team, None, prompt, max_score, turns, text=result_text)
+        result_image = config["result_images"][str(team.score - prev_score)]
+        await display(ctx, team, None, prompt, max_score, turns, text=result_text, thumbnail=result_image)
         team.rotate_psychic()
 
         # Per official Wavelength rules - If you score in the red, you get an extra turn
@@ -106,26 +109,30 @@ async def play_vs(bot, ctx, team1, team2):
         answer = random.randint(0, 100)
         await display(
             ctx, team1, team2, prompt, max_score, 0,
-            text=f"\u200B\n**{team1.psychic.mention}** is thinking of a clue..."
+            text=f"\u200B\n**{team1.psychic.mention}** is thinking of a clue...\n",
+            thumbnail=str(team1.psychic.avatar_url)
         )
 
-        clue = await get_clue(bot, team1.psychic, prompt, answer)
+        clue = await get_clue(bot, ctx, team1.psychic, prompt, answer)
         await display(
             ctx, team1, team2, prompt, max_score, 0,
-            text=f"Clue: ```{clue}```"
+            text=f"Clue: ```{clue}```",
+            thumbnail=str(team1.psychic.avatar_url)
         )
 
         guess = await get_guess(bot, ctx, team1)
         await display(
             ctx, team1, team2, prompt, max_score, 0,
             text=f"Clue: ```{clue}```"
-                 f"{team1.name}'s guess: ```{guess}```"
+                 f"{team1.name}'s guess: ```{guess}```",
+            thumbnail=str(team1.psychic.avatar_url)
         )
 
         counter_guess = await get_counter_guess(bot, ctx, team2)
         prev_score = team1.score
         result_text = await update_scores(team1, team2, answer, guess, counter_guess)
-        await display(ctx, team1, team2, prompt, max_score, 0, text=result_text)
+        result_image = config["result_images"][str(team1.score - prev_score)]
+        await display(ctx, team1, team2, prompt, max_score, 0, text=result_text, thumbnail=result_image)
         team1.rotate_psychic()
 
         # Per official Wavelength rules - if you score 4 and you're still losing, you go again
@@ -134,13 +141,18 @@ async def play_vs(bot, ctx, team1, team2):
             team1, team2 = team2, team1
 
 
-async def get_clue(bot, psychic, prompt, answer):
+async def get_clue(bot, ctx, psychic, prompt, answer):
     greeting = chowder.get_greeting().format(name=chowder.get_name(psychic))
     dm = await psychic.send(
         f"{greeting}, you're the psychic - here's your prompt: **{prompt[0]} ⟵ {answer} ⟶ {prompt[1]}**\n"
         f"you got {config['timeout']} minutes to respond with your clue"
     )
-    return (await bot.wait_for("message",  check=lambda m: m.author == psychic and m.channel == dm.channel)).content
+
+    def check(m):
+        return m.author == psychic and \
+               m.channel == dm.channel or \
+               m.channel == ctx.channel
+    return (await bot.wait_for("message",  check=check)).content
 
 
 async def get_guess(bot, ctx, team):
@@ -210,9 +222,9 @@ async def wait(ctx, team, extra_turn):
     await asyncio.sleep(config["wait_time"])
 
 
-async def display(ctx, team1, team2, prompt, max_score, turns, text):
+async def display(ctx, team1, team2, prompt, max_score, turns, text, thumbnail):
     embed = discord.Embed(
-            title=f"{prompt[0]}  ⟵  0\n  vs.\n{prompt[1]}  ⟶  100",
+            title=f"__{prompt[0]}__  ⟵  0\n vs.\n__{prompt[1]}__  ⟶  100",
             description=text,
             color=team1.psychic.color
         )
@@ -224,7 +236,7 @@ async def display(ctx, team1, team2, prompt, max_score, turns, text):
 
     footer = f"Winning score: {max_score}, " + (f"{turns - 1} turns left" if turns else f"{team1.name}'s turn")
     embed.set_footer(text=footer, icon_url=config["thumbnail"])
-    embed.set_thumbnail(url=str(team1.psychic.avatar_url))
+    embed.set_thumbnail(url=thumbnail)
     await ctx.send(embed=embed)
 
 
