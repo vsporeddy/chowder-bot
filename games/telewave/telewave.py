@@ -184,7 +184,7 @@ async def get_counter_guess(bot, ctx, team):
     def check_counter_guess(guess):
         return guess.author == team.psychic and \
                guess.channel == msg.channel and \
-               (guess.content.lower() == "higher" or guess.content.lower() == "lower")
+               guess.content.lower() in ["higher", "lower"]
     counter_guess = (await bot.wait_for("message", check=check_counter_guess)).content.lower()
     return lambda answer, guess: answer > guess if counter_guess == "higher" else answer < guess
 
