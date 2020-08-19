@@ -329,5 +329,9 @@ def get_caps_response():
     return random.choice(speech["caps_responses"])
 
 
+def get_greeting():
+    return random.choice(speech["responses"]["greeting"])
+
+
 def setup(bot):
     bot.add_cog(Chowder(bot))

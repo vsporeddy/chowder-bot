@@ -11,6 +11,7 @@ from math import ceil, pow
 from discord.ext import commands, tasks
 from chowder import chowder
 from games.hangman import hangman
+from games.telewave import telewave
 
 with open("games/game_config.json", "r") as read_file:
     config = json.load(read_file)
@@ -23,8 +24,9 @@ class Game(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.in_game = False
-        self.current_game = None
+        self.current_game_name = None
         self.update_status.start()
+        self.current_game_task = None
 
     def cog_unload(self):
         self.update_status.cancel()
@@ -66,10 +68,13 @@ class Game(commands.Cog):
 
     async def start_game(self, ctx, game_name, players):
         if game_name == "hangman":
-            result = await hangman.start(self.bot, ctx, players)
-            # TODO call ChowderCoin stuff here with result
+            self.current_game_task = asyncio.create_task(hangman.start(self.bot, ctx, players))
         elif game_name == "telewave":
-            await ctx.send("Telewave is coming soon™️")
+            self.current_game_task = asyncio.create_task(telewave.start(self.bot, ctx, players))
+        await self.current_game_task
+        winners = self.current_game_task.result()
+        # TODO call ChowderCoin stuff here with result
+        await ctx.send(f"Winners: {', '.join([w.mention for w in winners])} earn ChowderCoin™️ (coming soon)")
         await self.clear_game_status()
 
     @commands.group(name="play", brief="Initiate a discord game", aliases=games)
@@ -96,11 +101,12 @@ class Game(commands.Cog):
             )
             return
         if self.in_game:
-            await ctx.send(f"Sorry {name}, I'm in a game of {self.current_game} already")
+            await ctx.send(f"Sorry {name}, I'm in a game of {self.current_game_name} already")
             return
 
         players = await self.rally_helper(ctx, game, initiator)
-        await self.start_game(ctx, game, players)
+        if players:
+            await self.start_game(ctx, game, players)
 
     @commands.command(name="stop", brief="Stop in-progress game or rally")
     async def stop(self, ctx):
@@ -109,13 +115,14 @@ class Game(commands.Cog):
         if not self.in_game:
             await ctx.send(f"Stop what? I'm not doing anything {name}")
             return
-        game = self.current_game
+        game = self.current_game_name
         if game in games and ctx.author.top_role.position < game_config[game]["stop_req"]:
             await ctx.send(
                 f"Sorry {name}, you're not high enough rank to stop a game of {game}. Try getting promoted."
             )
             return
-
+        if self.current_game_task:
+            self.current_game_task.cancel()
         await ctx.send(f"Rip {game}")
         await self.clear_game_status()
 
@@ -158,12 +165,13 @@ class Game(commands.Cog):
 
     async def clear_game_status(self):
         self.in_game = False
-        self.current_game = None
+        self.current_game_name = None
+        self.current_game_task = None
         await self.set_new_status()
 
     async def set_game_status(self, game):
         self.in_game = True
-        self.current_game = game
+        self.current_game_name = game
         await self.bot.change_presence(activity=discord.Game(name=game))
 
     @commands.group(name="slots", brief="Try your luck at the slots.")
