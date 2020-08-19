@@ -263,6 +263,14 @@
         ["Expected","Unexpected"],
         ["Person you could beat up","Person who'd beat you up"],
         ["Unreasonable phobia","Reasonable phobia"],
-        ["Underrated game","Overrated game"]
+        ["Underrated game","Overrated game"],
+        ["Chris thing to do", "Connor thing to do"],
+        ["Frat house", "Frat manor"],
+        ["Autochess", "TFT"],
+        ["Being a TSM fan", "Being a Cloud9 fan"],
+        ["LCS", "LEC"],
+        ["4chan", "Tumblr"],
+        ["Something Chowder would do", "Something Chowder wouldn't do"],
+        ["Anime", "Netflix adaptation"]
     ]
 }
