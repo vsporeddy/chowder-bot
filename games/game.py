@@ -71,8 +71,8 @@ class Game(commands.Cog):
             msg = await ctx.send(f"{initiator.mention} y'all tryna play `coop` or `vs`?")
             game_mode = (await self.bot.wait_for(
                 "message",
-                check=lambda m: m.author == initiator and m.content in ["coop", "vs"] and m.channel == msg.channel
-            )).content
+                check=lambda m: m.author == initiator and m.content.lower() in ["coop", "vs"] and m.channel == msg.channel
+            )).content.lower()
             if game_mode == "vs" and len(players) < game_config["telewave"]["min_players_vs"]:
                 await ctx.send(
                     f"Sorry {chowder.get_name(initiator)} you need at least "
