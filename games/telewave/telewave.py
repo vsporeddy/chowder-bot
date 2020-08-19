@@ -42,7 +42,7 @@ async def start(bot, ctx, players, game_mode):
     team_names = get_team_names()
 
     if game_mode == "coop":
-        team = TelewaveTeam(players, name=random.choice(team_names[0], team_names[1]), score=0)
+        team = TelewaveTeam(players, name=random.choice(team_names), score=0)
         await play_coop(bot, ctx, team)
         if team.score > config["max_score_coop"]:
             await ctx.send(
