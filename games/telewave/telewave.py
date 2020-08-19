@@ -76,13 +76,13 @@ async def play_coop(bot, ctx, team):
         answer = random.randint(0, 100)
         await display(
             ctx, team, None, prompt, max_score, turns,
-            text=f"\u200B\n\n\n**{team.psychic.mention}** is thinking of a clue"
+            text=f"\u200B\n**{team.psychic.mention}** is thinking of a clue"
         )
 
         clue = await get_clue(bot, team.psychic, prompt, answer)
         await display(
             ctx, team, None, prompt, max_score, turns,
-            text=f"\u200B\n\n\n**{team.psychic.mention}**'s clue: \"*{clue}*\""
+            text=f"\u200B\n**{team.psychic.mention}**'s clue: \"*{clue}*\""
         )
 
         guess = await get_guess(bot, ctx, team)
@@ -181,7 +181,7 @@ async def get_counter_guess(bot, ctx, team):
 async def update_scores(team1, team2, answer, guess, counter_guess):
     delta = abs(answer - guess)
     prev_score = team1.score
-    result_text = "\u200B\n\n\n"
+    result_text = "\n"
     if delta <= 2:
         team1.score += 4
         result_text += f"{config['red_zone_emote']} DANG **{team1.name}** y'all were on the MONEY."
@@ -190,15 +190,15 @@ async def update_scores(team1, team2, answer, guess, counter_guess):
         result_text += f"{config['green_zone_emote']} Not bad **{team1.name}**, in the green."
     elif 6 < delta <= 10:
         team1.score += 2
-        result_text += f"{config['yellow_zone_emote']} Uhh at least you get points I guess, **{team1.name}**."
+        result_text += f"{config['yellow_zone_emote']} Uhh at least you get points, **{team1.name}**."
     else:
-        result_text += f"{config['miss_emote']} Not on the same wavelength today, huh **{team1.name}**?"
+        result_text += f"{config['miss_emote']} Not on the same wavelength, eh **{team1.name}**?"
     result_text += f"\nAnswer: **{answer}**\nGuess: **{guess}**"
     result_text += f"\n**{team1.name}** earn {team1.score - prev_score} points"
 
     if team2 and delta > 2 and counter_guess(answer, guess):
         team2.score += 1
-        result_text += f"\n**{team2.name}** get 1 point for counter-guessing correctly"
+        result_text += f"\n**{team2.name}** get 1 point for counter-guessing"
     return result_text
 
 
@@ -217,7 +217,7 @@ async def display(ctx, team1, team2, prompt, max_score, turns, text):
         )
 
     # embed.add_field(name="\u200B", value="\u200B")
-    embed.add_field(name=f"__{team1.name}__: {team1.score}", inline=False, value=team1.to_string())
+    embed.add_field(name=f"\n__{team1.name}__: {team1.score}", inline=False, value=team1.to_string())
     if team2:
         embed.add_field(name=f"__{team2.name}__: {team2.score}", inline=False, value=team2.to_string())
     embed.set_image(url=config["banner"])
