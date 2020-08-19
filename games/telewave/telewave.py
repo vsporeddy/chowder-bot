@@ -106,19 +106,19 @@ async def play_vs(bot, ctx, team1, team2):
         answer = random.randint(0, 100)
         await display(
             ctx, team1, team2, prompt, max_score, 0,
-            text=f"\u200B\n\n\n**{team1.psychic.mention}** is thinking of a clue"
+            text=f"\u200B\n**{team1.psychic.mention}** is thinking of a clue"
         )
 
         clue = await get_clue(bot, team1.psychic, prompt, answer)
         await display(
             ctx, team1, team2, prompt, max_score, 0,
-            text=f"\u200B\n\n\n**{team1.psychic.mention}**'s clue: \"*{clue}*\""
+            text=f"\u200B\n**{team1.psychic.mention}**'s clue: \"*{clue}*\""
         )
 
         guess = await get_guess(bot, ctx, team1)
         await display(
             ctx, team1, team2, prompt, max_score, 0,
-            text=f"\u200B\n\n\n**{team1.psychic.mention}**'s clue: \"*{clue}*\"\n"
+            text=f"\u200B\n**{team1.psychic.mention}**'s clue: \"*{clue}*\"\n"
                  f"**{team1.name}**'s guess: **{guess}**"
         )
 
@@ -173,13 +173,14 @@ async def get_counter_guess(bot, ctx, team):
     def check_counter_guess(guess):
         return guess.author == team.psychic and \
                 guess.channel == msg.channel and \
-                guess.content == "higher" or guess.content == "lower"
-    counter_guess = (await bot.wait_for("message", check=check_counter_guess)).content
+                guess.content.lower() == "higher" or guess.content == "lower"
+    counter_guess = (await bot.wait_for("message", check=check_counter_guess)).content.lower()
     return lambda answer, guess: answer > guess if counter_guess == "higher" else answer < guess
 
 
 async def update_scores(team1, team2, answer, guess, counter_guess):
     delta = abs(answer - guess)
+    prev_score = team1.score
     result_text = "\u200B\n\n\n"
     if delta <= 2:
         team1.score += 4
@@ -192,18 +193,19 @@ async def update_scores(team1, team2, answer, guess, counter_guess):
         result_text += f"{config['yellow_zone_emote']} Uhh at least you get points I guess, **{team1.name}**."
     else:
         result_text += f"{config['miss_emote']} Not on the same wavelength today, huh **{team1.name}**?"
-    result_text += f"\nAnswer was **{answer}** and you guessed **{guess}**."
+    result_text += f"\nAnswer: **{answer}**\nGuess: **{guess}**"
+    result_text += f"\n**{team1.name}** earn {team1.score - prev_score} points"
 
     if team2 and delta > 2 and counter_guess(answer, guess):
         team2.score += 1
-        result_text += f"\n**{team2.name}** get a point for being right."
+        result_text += f"\n**{team2.name}** get 1 point for counter-guessing correctly"
     return result_text
 
 
 async def wait(ctx, team, extra_turn):
     await ctx.send(f"Round boutta start in **{config['wait_time']}** seconds...")
     if extra_turn:
-        await ctx.send(f"{team.name} gets an extra turn because they hit the red zone.")
+        await ctx.send(f"{team.name} get an extra turn because they hit the red zone.")
     await asyncio.sleep(config["wait_time"])
 
 
@@ -214,15 +216,16 @@ async def display(ctx, team1, team2, prompt, max_score, turns, text):
             color=discord.Colour.dark_gold()
         )
 
-    embed.add_field(name="\u200B", value="\u200B")
+    # embed.add_field(name="\u200B", value="\u200B")
     embed.add_field(name=f"__{team1.name}__: {team1.score}", inline=False, value=team1.to_string())
     if team2:
         embed.add_field(name=f"__{team2.name}__: {team2.score}", inline=False, value=team2.to_string())
     embed.set_image(url=config["banner"])
     if turns:
-        embed.set_footer(text=f"Winning score: {max_score}, {turns} turns left")
+        embed.set_footer(text=f"Winning score: {max_score}, {turns - 1} turns left")
     else:
         embed.set_footer(text=f"Winning score: {max_score}, {team1.name}'s turn")
+    embed.set_thumbnail(url=config["thumbnail"])
 
     await ctx.send(embed=embed)
 
