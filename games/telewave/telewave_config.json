@@ -20,6 +20,12 @@
     "green_zone_emote": "<:ChowderSmile:664313737255321632>",
     "yellow_zone_emote": "<:DanteTears:549492738249195521>",
     "miss_emote": "<:ChowderWut:541707580662349856>",
+    "result_images": {
+        "4": "https://cdn.discordapp.com/attachments/744644246883270659/745567473843044466/SpatikaTsm.png",
+        "3": "https://cdn.discordapp.com/attachments/744644246883270659/745565911712530432/SpatikaTsm.png",
+        "2": "https://cdn.discordapp.com/attachments/744644246883270659/745567437973356604/SpatikaClutch.png",
+        "0": "https://cdn.discordapp.com/attachments/744644246883270659/745567394730344498/unknown.png"
+    },
     "prompts": [
         ["Bad","Good"],
         ["Mildly addictive","Highly addictive"],
@@ -215,7 +221,6 @@
         ["Talent","Skill"],
         ["Worst era to time travel","Best era to time travel"],
         ["The worst","The best"],
-        ["Small number","Large number"],
         ["Old fashioned","Avant garde"],
         ["Ugly word","Beautiful word"],
         ["Small","Tiny"],
