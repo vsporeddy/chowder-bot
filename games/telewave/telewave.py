@@ -150,8 +150,7 @@ async def get_clue(bot, ctx, psychic, prompt, answer):
 
     def check(m):
         return m.author == psychic and \
-               m.channel == dm.channel or \
-               m.channel == ctx.channel
+               (m.channel == dm.channel or m.channel == ctx.channel)
     return (await bot.wait_for("message",  check=check)).content
 
 
@@ -184,8 +183,8 @@ async def get_counter_guess(bot, ctx, team):
 
     def check_counter_guess(guess):
         return guess.author == team.psychic and \
-                guess.channel == msg.channel and \
-                guess.content.lower() == "higher" or guess.content == "lower"
+               guess.channel == msg.channel and \
+               (guess.content.lower() == "higher" or guess.content.lower() == "lower")
     counter_guess = (await bot.wait_for("message", check=check_counter_guess)).content.lower()
     return lambda answer, guess: answer > guess if counter_guess == "higher" else answer < guess
 
