@@ -68,8 +68,9 @@ class Cgr(commands.Cog):
     @commands.command(name="cgr", brief="Get your Chowder game ratings")
     async def display_ratings(self, ctx):
         cgrs = await self.get_all_game_ratings(ctx.author)
-        text = '\n'.join([f"{cgr.game.capitalize()}: `{cgr.rating}`" for cgr in cgrs]) if cgrs \
-               else f"Sorry {chowder.get_name(ctx.author)} you don't have any ratings yet. Play some games."
+        text = '\n'.join(
+            [f"{cgr.game.capitalize()}: `{cgr.rating}` CGR | `{cgr.games_played}` games played" for cgr in cgrs]) \
+            if cgrs else f"Sorry {chowder.get_name(ctx.author)} you don't have any ratings yet. Play some games."
         embed = discord.Embed(
             title=f"{ctx.author.display_name}'s CGRs:",
             description=text,
