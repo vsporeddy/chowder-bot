@@ -154,10 +154,8 @@ async def play_vs(bot, ctx, team1, team2):
 
 
 async def get_clue(bot, ctx, psychic, prompt, answer):
-    greeting = chowder.get_greeting().format(name=chowder.get_name(psychic))
     dm = await psychic.send(
-        f"{greeting}, you're the psychic - here's your prompt: **{prompt[0]} ⟵ {answer} ⟶ {prompt[1]}**\n"
-        f"you got {config['timeout']} minutes to respond with your clue"
+        f"**{prompt[0]} ⟵ {answer} ⟶ {prompt[1]}**"
     )
 
     def check(m):
