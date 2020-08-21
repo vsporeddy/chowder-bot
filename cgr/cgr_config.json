@@ -6,7 +6,7 @@
     },
     "telewave": {
         "base_rating": 1000,
-        "ai_rating": 1500,
+        "ai_rating": 1300,
         "k_factor": 60000 ,
         "max_score": 20
     }
