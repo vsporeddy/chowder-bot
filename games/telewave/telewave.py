@@ -49,7 +49,7 @@ async def start(bot, ctx, players, game_mode):
         )
         await play_coop(bot, ctx, team)
         await cgr.update_ratings_coop(team)
-        if team.score > config["max_score_coop"]:
+        if team.score >= config["max_score_coop"]:
             await ctx.send(
                 f"Dang **{team.name}** you scored **{team.score}** points. Guess you're not as braindead as I thought."
             )
