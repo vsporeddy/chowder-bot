@@ -27,7 +27,7 @@ class Cgr(commands.Cog):
     async def update_ratings_vs(self, team1: TelewaveTeam, team2: TelewaveTeam):
         r2 = math.pow(10, team2.cgr/400)
         s = 1 if team1.score > team2.score else 0 if team2.score > team1.score else 0.5
-        await self.telewave_ratings_helper(team1.get_players(), r2, s, "telewave")
+        await self.update_ratings_helper(team1.get_players(), r2, s, "telewave")
         r2 = math.pow(10, team1.cgr/400)
         s = 1 - s
         await self.update_ratings_helper(team2.get_players(), r2, s, "telewave")
