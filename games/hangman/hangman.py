@@ -13,7 +13,9 @@ with open("games/hangman/hangman_config.json", "r") as read_file:
 async def start(bot, ctx, players):
     await ctx.send(f"Starting a game of **hangman** with {', '.join([p.mention for p in players])}")
     word = get_word()
+    cgr = bot.get_cog("Cgr")
     victory = await play(bot, ctx, players, word)
+    await cgr.update_ratings_hangman(players, victory)
     if victory:
         await ctx.send(get_victory_message().format(word=word))
     else:
@@ -31,7 +33,7 @@ async def play(bot, ctx, players, word):
                (len(m.content) == 1 and m.content.isalpha()) or \
                m.content.upper() == word
 
-    player_str = ', '.join([p.nick if p.nick else p.name for p in players])
+    player_str = ', '.join([p.display_name for p in players])
     title = get_title()
     await display(ctx, word, guesses, strikes, player_str, title)
 

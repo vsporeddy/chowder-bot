@@ -6,19 +6,20 @@ import discord
 import asyncio
 import json
 import random
+
 from discord.ext import commands, tasks
 from chowder import chowder
 from games.hangman import hangman
 from games.telewave import telewave
 
-with open("games/game_config.json", "r") as read_file:
+with open("games/games_config.json", "r") as read_file:
     config = json.load(read_file)
     game_config = config["games"]
 
 games = list(game_config.keys())
 
 
-class Game(commands.Cog):
+class Games(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.in_game = False
@@ -148,19 +149,6 @@ class Game(commands.Cog):
             await ctx.send(f"Aite {', '.join([p.mention for p in players])}, time to play some **{game}**")
         await self.clear_game_status()
 
-    @commands.command(name="roll", brief="Woll dat shit", aliases=["woll", "wolldatshit"])
-    async def roll(self, ctx, max_roll: int = 6):
-        name = chowder.get_name(ctx.author)
-        roll_value = random.randint(1, max_roll)
-        if roll_value >= max_roll / 2:
-            await ctx.send(f"Not bad {name}, you rolled a **{roll_value}**")
-        else:
-            await ctx.send(f"Get rekt {name}, you rolled a **{roll_value}**")
-
-    @commands.command(name="flip", brief="Flip a coin", aliases=["coin", "flipdatshit"])
-    async def flip(self, ctx):
-        await ctx.send(random.choice([config["heads"], config["tails"]]))
-
     @tasks.loop(seconds=3600)
     async def update_status(self):
         if not self.in_game:
@@ -191,4 +179,4 @@ class Game(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Game(bot))
+    bot.add_cog(Games(bot))

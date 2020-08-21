@@ -13,14 +13,15 @@ with open("games/telewave/telewave_config.json", "r") as read_file:
 
 
 class TelewaveTeam:
-    def __init__(self, players, name, score):
+    def __init__(self, players, name, score, cgr):
         self.guessers = deque(players)
         self.psychic = self.guessers.popleft()
         self.score = score
         self.name = name
+        self.cgr = cgr
 
-    def to_string(self):
-        return f"{self.psychic.name}, {', '.join([g.name for g in self.guessers])}"
+    def __str__(self):
+        return f"{self.psychic.display_name}, {', '.join([g.display_name for g in self.guessers])}"
 
     def mention_guessers(self):
         return f"{', '.join([g.mention for g in self.guessers])}"
@@ -40,10 +41,14 @@ async def start(bot, ctx, players, game_mode):
     await ctx.send(f"Starting a {game_mode} game of **telewave** with {', '.join([p.mention for p in players])}")
     random.shuffle(players)
     team_names = get_team_names()
+    cgr = bot.get_cog("Cgr")
 
     if game_mode == "coop":
-        team = TelewaveTeam(players, name=random.choice(team_names), score=0)
+        team = TelewaveTeam(
+            players, name=random.choice(team_names), score=0, cgr=await cgr.get_average_rating(players, "telewave")
+        )
         await play_coop(bot, ctx, team)
+        await cgr.update_ratings_coop(team)
         if team.score > config["max_score_coop"]:
             await ctx.send(
                 f"Dang **{team.name}** you scored **{team.score}** points. Guess you're not as braindead as I thought."
@@ -54,9 +59,16 @@ async def start(bot, ctx, players, game_mode):
             return []
     else:
         # Per official Wavelength rules - the team going second starts with a 1 point lead
-        team1 = TelewaveTeam(players[:len(players)//2], name=team_names[0], score=0)
-        team2 = TelewaveTeam(players[len(players)//2:], name=team_names[1], score=1)
+        players1 = players[:len(players)//2]
+        players2 = players[len(players)//2:]
+        team1 = TelewaveTeam(
+            players1, name=team_names[0], score=0, cgr=await cgr.get_average_rating(players1, "telewave")
+        )
+        team2 = TelewaveTeam(
+            players2, name=team_names[1], score=1, cgr=await cgr.get_average_rating(players2, "telewave")
+        )
         await play_vs(bot, ctx, team1, team2)
+        await cgr.update_ratings_vs(team1, team2)
         if team1.score == team2.score:
             await ctx.send(f"No winners today {chowder.get_collective_names()}, it's a tie.")
             return []
@@ -228,9 +240,13 @@ async def display(ctx, team1, team2, prompt, max_score, turns, text, thumbnail):
             color=team1.psychic.color
         )
 
-    embed.add_field(name=f"\n__{team1.name}__", inline=False, value=f"`{team1.to_string()}` |  {team1.score} points")
+    embed.add_field(
+        name=f"\n__{team1.name}__ ({team1.cgr} CGR)", inline=False, value=f"`{str(team1)}` |  {team1.score} points"
+    )
     if team2:
-        embed.add_field(name=f"__{team2.name}__", inline=False, value=f"`{team2.to_string()}` |  {team2.score} points")
+        embed.add_field(
+            name=f"__{team2.name}__ ({team2.cgr} CGR)", inline=False, value=f"`{str(team2)}` |  {team2.score} points"
+        )
     embed.set_image(url=config["banner"])
 
     footer = f"Winning score: {max_score}, " + (f"{turns - 1} turns left" if turns else f"{team1.name}'s turn")
