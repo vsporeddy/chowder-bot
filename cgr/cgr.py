@@ -63,7 +63,7 @@ class Cgr(commands.Cog):
         avg_rating = 0
         for player in players:
             avg_rating += (await self.get_rating(player, game)).rating
-        return avg_rating / len(players)
+        return avg_rating // len(players)
 
     @commands.command(name="cgr", brief="Get your Chowder game ratings")
     async def display_ratings(self, ctx):
