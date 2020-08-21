@@ -72,13 +72,14 @@ class Cgr(commands.Cog):
             [f"{cgr.game.capitalize()}: `{cgr.rating}` CGR | `{cgr.games_played}` games played" for cgr in cgrs]) \
             if cgrs else f"Sorry {chowder.get_name(ctx.author)} you don't have any ratings yet. Play some games."
         embed = discord.Embed(
-            title=f"{ctx.author.display_name}'s CGRs:",
+            title=f"{ctx.author.display_name}'s CGR:",
             description=text,
             color=ctx.author.color
         )
         embed.set_thumbnail(url=ctx.author.avatar_url)
         embed.set_footer(
-            text="CGR is an experimental rating system optimized for asymmetrical games with elements of luck."
+            text="CGR (Chowder Game Rating) is an experimental rating system \n" +
+                 "optimized for asymmetrical games with elements of luck."
         )
         await ctx.send(embed=embed)
 
