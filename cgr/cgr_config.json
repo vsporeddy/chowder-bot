@@ -1,0 +1,13 @@
+{
+    "hangman": {
+        "base_rating": 1000,
+        "ai_rating": 1200,
+        "k_factor": 50000 
+    },
+    "telewave": {
+        "base_rating": 1000,
+        "ai_rating": 1500,
+        "k_factor": 60000 ,
+        "max_score": 20
+    }
+}
