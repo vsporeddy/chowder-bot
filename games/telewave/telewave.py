@@ -160,7 +160,7 @@ async def get_clue(bot, ctx, psychic, prompt, answer):
 
     def check(m):
         return m.author == psychic and \
-               (m.channel == dm.channel or (m.channel == ctx.channel and m.content.startswith("clue")))
+               (m.channel == dm.channel or (m.channel == ctx.channel and m.content.startswith("clue ")))
     clue = (await bot.wait_for("message",  check=check)).content
     return clue[5:] if clue.startswith("clue ") else clue
 
