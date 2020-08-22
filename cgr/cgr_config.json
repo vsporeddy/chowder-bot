@@ -9,5 +9,14 @@
         "ai_rating": 1300,
         "k_factor": 60000 ,
         "max_score": 20
+    },
+    "ranks": {
+        "Provisional": "https://cdn.discordapp.com/attachments/744644246883270659/746567279512387614/provisional.png",
+        "Bronze": "https://cdn.discordapp.com/attachments/744644246883270659/746567279478571008/bronze.png",
+        "Silver": "https://cdn.discordapp.com/attachments/744644246883270659/746567894325788704/silver.png",
+        "Gold": "https://cdn.discordapp.com/attachments/744644246883270659/746567279935750155/gold.png",
+        "Platinum": "https://cdn.discordapp.com/attachments/744644246883270659/746567279961047110/platinum.png",
+        "Diamond": "https://cdn.discordapp.com/attachments/744644246883270659/746567280015572992/diamond.png",
+        "Challenger": "https://cdn.discordapp.com/attachments/744644246883270659/746567279562457118/challenger.png"
     }
 }

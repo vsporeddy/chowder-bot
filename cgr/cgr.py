@@ -65,18 +65,36 @@ class Cgr(commands.Cog):
             avg_rating += (await self.get_rating(player, game)).rating
         return avg_rating // len(players)
 
+    def get_rank(self, cgr):
+        if cgr.games_played < 5:
+            return "Provisional"
+        if cgr.rating < 1100:
+            return "Bronze"
+        if cgr.rating < 1400:
+            return "Silver"
+        if cgr.rating < 1700:
+            return "Gold"
+        if cgr.rating < 2000:
+            return "Platinum"
+        if cgr.rating < 2300:
+            return "Diamond"
+        return "Challenger"
+
     @commands.command(name="cgr", brief="Get your Chowder game ratings")
     async def display_ratings(self, ctx):
-        cgrs = await self.get_all_game_ratings(ctx.author)
+        player = ctx.message.mentions[0] if ctx.message.mentions else ctx.author
+        cgrs = await self.get_all_game_ratings(player)
         text = '\n'.join(
-            [f"{cgr.game.capitalize()}: `{cgr.rating}` CGR | `{cgr.games_played}` games played" for cgr in cgrs]) \
-            if cgrs else f"Sorry {chowder.get_name(ctx.author)} you don't have any ratings yet. Play some games."
+            [f"{cgr.game.capitalize()}: `{cgr.rating}` CGR | **{self.get_rank(cgr)}** | `{cgr.games_played}` games played" for cgr in cgrs]) \
+            if cgrs else f"Sorry {chowder.get_name(player)} you don't have any ratings yet. Play some games."
         embed = discord.Embed(
-            title=f"{ctx.author.display_name}'s CGR:",
+            title=f"{player.display_name}'s CGR:",
             description=text,
-            color=ctx.author.color
+            color=player.color
         )
-        embed.set_thumbnail(url=ctx.author.avatar_url)
+        best_rank = self.get_rank(max(cgrs, key=lambda c: c.rating))
+        embed.set_thumbnail(url=player.avatar_url)
+        embed.set_image(url=config["ranks"][best_rank])
         embed.set_footer(
             text="CGR (Chowder Game Rating) is an experimental rating system \n" +
                  "optimized for asymmetrical games with elements of luck."
