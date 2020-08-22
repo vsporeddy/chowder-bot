@@ -92,13 +92,12 @@ class Cgr(commands.Cog):
             [f"{cgr.game.capitalize()}: `{cgr.rating}` CGR | **{self.get_rank(cgr)}** | `{cgr.games_played}` games played" for cgr in cgrs]) \
             if cgrs else f"Sorry {chowder.get_name(player)} you don't have any ratings yet. Play some games."
         embed = discord.Embed(
-            title=f"{player.display_name}'s CGR:",
             description=text,
             color=player.color
         )
-        best_rank = self.get_rank(max(cgrs, key=lambda c: c.rating))
-        embed.set_thumbnail(url=player.avatar_url)
-        embed.set_image(url=config["ranks"][best_rank])
+        best_rank = self.get_rank(max(cgrs, key=lambda c: c.rating)) if cgrs else "Provisional"
+        embed.set_thumbnail(url=config["ranks"][best_rank])
+        embed.set_author(name=f"{player.display_name}'s CGR:", icon_url=player.avatar_url)
         embed.set_footer(
             text="CGR (Chowder Game Rating) is an experimental rating system \n" +
                  "optimized for asymmetrical games with elements of luck."
