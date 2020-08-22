@@ -19,31 +19,35 @@ class Cgr(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def update_ratings_coop(self, team: TelewaveTeam):
+    async def update_ratings_coop(self, ctx, team: TelewaveTeam):
         r2 = math.pow(10, config["telewave"]["ai_rating"]/400)
         s = team.score / config["telewave"]["max_score"]
-        await self.update_ratings_helper(team.get_players(), r2, s, "telewave")
+        await self.update_ratings_helper(ctx, team.get_players(), r2, s, "telewave")
 
-    async def update_ratings_vs(self, team1: TelewaveTeam, team2: TelewaveTeam):
+    async def update_ratings_vs(self, ctx, team1: TelewaveTeam, team2: TelewaveTeam):
         r2 = math.pow(10, team2.cgr/400)
         s = 1 if team1.score > team2.score else 0 if team2.score > team1.score else 0.5
-        await self.update_ratings_helper(team1.get_players(), r2, s, "telewave")
+        await self.update_ratings_helper(ctx, team1.get_players(), r2, s, "telewave")
         r2 = math.pow(10, team1.cgr/400)
         s = 1 - s
-        await self.update_ratings_helper(team2.get_players(), r2, s, "telewave")
+        await self.update_ratings_helper(ctx, team2.get_players(), r2, s, "telewave")
 
-    async def update_ratings_hangman(self, players, won):
+    async def update_ratings_hangman(self, ctx, players, won):
         r2 = math.pow(10, config["hangman"]["ai_rating"]/400)
         s = 1 if won else 0
-        await self.update_ratings_helper(players, r2, s, "hangman")
+        await self.update_ratings_helper(ctx, players, r2, s, "hangman")
 
-    async def update_ratings_helper(self, team, r2, s, game):
+    async def update_ratings_helper(self, ctx, team, r2, s, game):
         for player in team:
             cgr = await self.get_rating(player, game)
             r1 = math.pow(10, cgr.rating/400)
             e1 = r1 / (r1 + r2)
             k = config[game]["k_factor"] / cgr.rating
+            prev_rank = self.get_rank(cgr)
             await cgr.update(rating=cgr.rating + k * (s - e1), games_played=cgr.games_played+1).apply()
+            new_rank = self.get_rank(cgr)
+            if prev_rank != new_rank:
+                await ctx.send(f"Dang {player.mention} just ranked up to **{new_rank}**")
 
     async def get_rating(self, player, game):
         cgr = await persistence.Rating.get({"id": player.id, "game": game})

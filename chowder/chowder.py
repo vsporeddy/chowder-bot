@@ -163,7 +163,7 @@ class Chowder(commands.Cog):
 
         prev_message = (await message.channel.history(limit=1, before=message).flatten())
         addressing_chowder = prev_message and prev_message[0].author == self.bot.user \
-            or ("chowder" in comment and "pls" not in comment)
+            or (self.bot.user.mention in comment or "chowder" in comment and "pls" not in comment)
         if addressing_chowder:
             if message.content.isupper():
                 await message.channel.send(get_caps_response().format(name=name))
