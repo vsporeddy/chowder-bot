@@ -1,5 +1,5 @@
 """
-    Handles promotions, etc.
+    Roll your life away
 """
 
 import json
