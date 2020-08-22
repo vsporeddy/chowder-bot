@@ -39,7 +39,7 @@ class ChowderCoin(commands.Cog):
         await cc.update(balance=cc.balance - Decimal(amount)).apply()
         return True
 
-    @commands.command(name="balance", brief="Show your ChowderCoin™️ balance")
+    @commands.command(name="balance", brief="Check your ChowderCoin™️ balance")
     async def display_balance(self, ctx):
         cc = await self.get_balance(ctx.author)
         embed = discord.Embed(
@@ -52,6 +52,14 @@ class ChowderCoin(commands.Cog):
             text="Play games against Chowdertron to earn ChowderCoin™️.\nWager ChowderCoin™️ against other players in vs. games."
         )
         await ctx.send(embed=embed)
+
+    @commands.command(name="store", brief="Browse the ChowderCoin™️ store")
+    async def store(self, ctx):
+        await ctx.send("Store coming soon")
+
+    @commands.command(name="buy", brief="Make a purchase with ChowderCoin™️")
+    async def buy(self, ctx):
+        await ctx.send("Store coming soon")
 
 
 def setup(bot):
