@@ -66,20 +66,55 @@ class Games(commands.Cog):
 
     async def start_game(self, ctx, game_name, players, initiator):
         winners = []
+        cc_cog = self.bot.get_cog("ChowderCoin")
+        pot = 0.0
+
         if game_name == "hangman":
+            pot = game_config[game_name]["ai_win_reward"] * len(players)
             winners = await hangman.start(self.bot, ctx, players)
         elif game_name == "telewave":
             if len(players) < game_config["telewave"]["min_players_vs"]:
                 game_mode = "coop"
-                winners = await telewave.start(self.bot, ctx, players, game_mode)
             else:
                 msg = await ctx.send(f"{initiator.mention} y'all tryna play `coop` or `vs`?")
                 game_mode = (await self.bot.wait_for(
                     "message",
                     check=lambda m: m.author == initiator and m.content.lower() in ["coop", "vs"] and m.channel == msg.channel
                 )).content.lower()
-                winners = await telewave.start(self.bot, ctx, players, game_mode)
+            if game_mode == "vs":
+                buyin = await self.get_buyin(ctx, cc_cog, initiator, players)
+                for player in players:
+                    await cc_cog.subtract_coin(player, buyin)
+                    pot += buyin
+            else:
+                pot = game_config[game_name]["ai_win_reward"] * len(players)
+            winners = await telewave.start(self.bot, ctx, players, game_mode)
+
+        winnings = pot / len(winners) if winners else 0
+        for winner in winners:
+            await ctx.send(f"{winner.mention} wins {winnings} {config['coin_emote']}")
+            await cc_cog.add_coin(winner, winnings)
+        if not winners:
+            await ctx.send(f"No {config['coin_emote']} for losers.")
         return winners
+
+    async def get_buyin(self, ctx, cc_cog, initiator, players):
+        done = False
+        max_buyin = min([(await cc_cog.get_balance(p)).balance for p in players])
+        buyin = 0
+        await ctx.send(f"{initiator.mention}, what is the buy-in {config['coin_emote']} for this game?")
+
+        def check(m):
+            return m.author == initiator and \
+                m.channel == ctx.channel and \
+                m.content.replace('.', '', 1).isdigit()
+        while not done:
+            buyin = float((await self.bot.wait_for("message",  check=check)).content)
+            if buyin > max_buyin or buyin < 0:
+                await ctx.send(f"Sorry, the buy-in must be between 0 and {max_buyin:.2f} {config['coin_emote']}")
+            else:
+                done = True
+        return buyin
 
     @commands.group(name="play", brief="Initiate a discord game", aliases=games)
     async def play(self, ctx, game: str = None):
@@ -110,11 +145,6 @@ class Games(commands.Cog):
             self.current_game_task = asyncio.create_task(self.start_game(ctx, game, players, initiator))
             await self.current_game_task
             winners = self.current_game_task.result()
-            # TODO call ChowderCoin stuff here with result
-            if winners:
-                await ctx.send(f"Winners: {', '.join([w.mention for w in winners])} earn ChowderCoin™️ (coming soon)")
-            else:
-                await ctx.send("No ChowderCoin™️ for losers.")
             await self.clear_game_status()
 
     @commands.command(name="stop", brief="Stop in-progress game or rally")
