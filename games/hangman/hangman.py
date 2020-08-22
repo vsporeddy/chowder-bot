@@ -15,7 +15,7 @@ async def start(bot, ctx, players):
     word = get_word()
     cgr = bot.get_cog("Cgr")
     victory = await play(bot, ctx, players, word)
-    await cgr.update_ratings_hangman(players, victory)
+    await cgr.update_ratings_hangman(ctx, players, victory)
     if victory:
         await ctx.send(get_victory_message().format(word=word))
     else:

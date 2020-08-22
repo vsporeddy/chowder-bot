@@ -48,7 +48,7 @@ async def start(bot, ctx, players, game_mode):
             players, name=random.choice(team_names), score=0, cgr=await cgr.get_average_rating(players, "telewave")
         )
         await play_coop(bot, ctx, team)
-        await cgr.update_ratings_coop(team)
+        await cgr.update_ratings_coop(ctx, team)
         if team.score >= config["max_score_coop"]:
             await ctx.send(
                 f"Dang **{team.name}** you scored **{team.score}** points. Guess you're not as braindead as I thought."
@@ -68,7 +68,7 @@ async def start(bot, ctx, players, game_mode):
             players2, name=team_names[1], score=1, cgr=await cgr.get_average_rating(players2, "telewave")
         )
         await play_vs(bot, ctx, team1, team2)
-        await cgr.update_ratings_vs(team1, team2)
+        await cgr.update_ratings_vs(ctx, team1, team2)
         if team1.score == team2.score:
             await ctx.send(f"No winners today {chowder.get_collective_names()}, it's a tie.")
             return []
