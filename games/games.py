@@ -11,6 +11,7 @@ from discord.ext import commands, tasks
 from chowder import chowder
 from games.hangman import hangman
 from games.telewave import telewave
+from games.blackjack import blackjack
 
 with open("games/games_config.json", "r") as read_file:
     config = json.load(read_file)
@@ -89,6 +90,8 @@ class Games(commands.Cog):
             else:
                 pot = game_config[game_name]["ai_win_reward"] * len(players)
             winners = await telewave.start(self.bot, ctx, players, game_mode)
+        elif game_name == "blackjack":
+            winners = await blackjack.start(self.bot, ctx, players)
 
         winnings = pot / len(winners) if winners else 0
         for winner in winners:
