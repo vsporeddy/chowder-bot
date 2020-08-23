@@ -11,6 +11,7 @@ from discord.ext import commands, tasks
 from chowder import chowder
 from games.hangman import hangman
 from games.telewave import telewave
+from games.blackjack import blackjack
 
 with open("games/games_config.json", "r") as read_file:
     config = json.load(read_file)
@@ -79,6 +80,8 @@ class Games(commands.Cog):
                     check=lambda m: m.author == initiator and m.content.lower() in ["coop", "vs"] and m.channel == msg.channel
                 )).content.lower()
                 winners = await telewave.start(self.bot, ctx, players, game_mode)
+        elif game_name == "blackjack":
+            winners = await blackjack.start(self.bot, ctx, players)
         return winners
 
     @commands.group(name="play", brief="Initiate a discord game", aliases=games)

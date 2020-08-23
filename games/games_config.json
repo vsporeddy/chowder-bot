@@ -15,6 +15,13 @@
             "wait_time": 30,
             "start_req": 12,
             "stop_req": 12
+        },
+        "blackjack": {
+            "emote": "<:DanteTears:549492738249195521>",
+            "min_players": 1,
+            "wait_time": 15,
+            "start_req": 12,
+            "stop_req": 12
         }
     }
 }
