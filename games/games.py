@@ -147,6 +147,13 @@ class Games(commands.Cog):
             winners = self.current_game_task.result()
             await self.clear_game_status()
 
+    @commands.command(name="profile", brief="Display your profile")
+    async def profile(self, ctx):
+        cc_cog = self.bot.get_cog("ChowderCoin")
+        cgr_cog = self.bot.get_cog("Cgr")
+        await cc_cog.display_balance(ctx)
+        await cgr_cog.display_ratings(ctx)
+
     @commands.command(name="stop", brief="Stop in-progress game or rally")
     async def stop(self, ctx):
         name = chowder.get_name(ctx.author)
