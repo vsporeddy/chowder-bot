@@ -1,5 +1,5 @@
 """
-    Hang Chowder from a rope
+    Let's play black jack with Chowder
 """
 import random
 
@@ -9,16 +9,16 @@ class Card:
         self.value = val
 
     def show(self):
-        new_string = self.value
-        if(new_string == 1):
-            new_string = "Ace"
-        elif(new_string == 11):
-            new_string = "Jack"
-        elif(new_string == 12):
-            new_string = "Queen"
-        elif(new_string == 13):
-            new_string = "King"
-        return "{} of {}".format(new_string, self.suit)
+        suit_string = self.value
+        if(suit_string == 1):
+            suit_string = "Ace"
+        elif(suit_string == 11):
+            suit_string = "Jack"
+        elif(suit_string == 12):
+            suit_string = "Queen"
+        elif(suit_string == 13):
+            suit_string = "King"
+        return F"{suit_string} of {self.suit}"
 
 class Deck:
     def __init__(self):
@@ -83,11 +83,11 @@ async def play(bot, ctx, players):
         gamers.append(Player(p))
 
     dealer_card = dealer.draw(deck)
-    await ctx.send("ChowderTron drew " + dealer_card.show())
+    await ctx.send(F"ChowderTron drew {dealer_card.show()}")
 
     for g in gamers:
         the_card = g.draw(deck)
-        await ctx.send(g.player.display_name + " drew " + the_card.show())
+        await ctx.send(F"{g.player.display_name} drew {the_card.show()}")
  
     while players_cant_draw < len(gamers):
         deal_message = (await bot.wait_for("message", check=check))
@@ -96,16 +96,16 @@ async def play(bot, ctx, players):
             the_card = player_getting_card.draw(deck)
             
             if the_card is not None:
-                await ctx.send(player_getting_card.player.display_name + " drew " + the_card.show())
+                await ctx.send(F"{player_getting_card.player.display_name} drew {the_card.show()}")
                 bust = get_total_point(player_getting_card)
-                await ctx.send(player_getting_card.player.display_name + " has " + str(bust))
+                await ctx.send(F"{player_getting_card.player.display_name} has {bust}")
 
                 if bust > 21:
-                    await ctx.send(player_getting_card.player.display_name + " is busted")
+                    await ctx.send(F"{player_getting_card.player.display_name} is busted")
                     player_getting_card.set_cant_draw()
                     players_cant_draw += 1
                 elif (bust == 21):
-                    await ctx.send("Nice! " + player_getting_card.player.display_name + " hit Black Jack")
+                    await ctx.send(F"Nice! {player_getting_card.player.display_name} hit Black Jack")
                     player_getting_card.set_cant_draw()
                     players_cant_draw += 1
 
@@ -118,17 +118,17 @@ async def play(bot, ctx, players):
 
     while get_total_point(dealer) < 17:
         dealer_card = dealer.draw(deck)
-        await ctx.send("ChowderTron drew " + dealer_card.show())
+        await ctx.send(F"ChowderTron drew {dealer_card.show()}")
     
     dealer_point = get_total_point(dealer)
-    await ctx.send("ChowderTron has " + str(dealer_point))
+    await ctx.send(F"ChowderTron has {dealer_point}")
 
     winner = []
     dealer_point = get_total_point(dealer)
     for g in gamers:
         gamer_point = get_total_point(g)
-        if (gamer_point < 22 and dealer_point < gamer_point):
-            await ctx.send("DANG" + g.player.display_name + ", you beat Chowder")
+        if ((gamer_point < 22 and dealer_point < gamer_point) or (dealer_point > 21 and gamer_point <= 21)):
+            await ctx.send(F"DANG {g.player.display_name}, you beat Chowder")
             winner.append(g.player)
 
     return winner
