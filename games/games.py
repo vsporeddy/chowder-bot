@@ -95,7 +95,7 @@ class Games(commands.Cog):
 
         winnings = pot / len(winners) if winners else 0
         for winner in winners:
-            await ctx.send(f"{winner.mention} wins {winnings} {config['coin_emote']}")
+            await ctx.send(f"{winner.mention} wins {winnings - pot / len(players):.2f} {config['coin_emote']}")
             await cc_cog.add_coin(winner, winnings)
         if not winners:
             await ctx.send(f"No {config['coin_emote']} for losers.")
