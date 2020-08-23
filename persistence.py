@@ -19,6 +19,12 @@ class Rating(db.Model):
     _pk = db.PrimaryKeyConstraint("id", "game")
 
 
+class Coin(db.Model):
+    __tablename__ = "coin"
+    id = db.Column(db.BigInteger, primary_key=True)
+    balance = db.Column(db.Numeric)
+
+
 async def initialize():
     await db.set_bind(DATABASE_URL)
     await db.gino.create_all()

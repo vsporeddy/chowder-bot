@@ -42,7 +42,7 @@ class Cgr(commands.Cog):
             cgr = await self.get_rating(player, game)
             r1 = math.pow(10, cgr.rating/400)
             e1 = r1 / (r1 + r2)
-            k = config[game]["k_factor"] / cgr.rating
+            k = self.get_k_factor(cgr, game)
             prev_rank = self.get_rank(cgr)
             await cgr.update(rating=cgr.rating + k * (s - e1), games_played=cgr.games_played+1).apply()
             new_rank = self.get_rank(cgr)
@@ -83,6 +83,11 @@ class Cgr(commands.Cog):
         if cgr.rating < 2300:
             return "Diamond"
         return "Challenger"
+
+    def get_k_factor(self, cgr, game):
+        if cgr.games_played <= 10:
+            return 100 - 3 * cgr.games_played
+        return config[game]["k_factor"] / cgr.rating
 
     @commands.command(name="cgr", brief="Get your Chowder game ratings")
     async def display_ratings(self, ctx):

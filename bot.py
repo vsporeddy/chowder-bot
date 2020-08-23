@@ -30,7 +30,7 @@ async def on_command_error(ctx, error):
         return
     raise error
 
-extensions = ["games.games", "chowder.chowder", "governance.governance", "gamble.gamble", "cgr.cgr"]
+extensions = ["games.games", "chowder.chowder", "governance.governance", "gamble.gamble", "cgr.cgr", "coin.coin"]
 
 if __name__ == "__main__":
     for extension in extensions:
