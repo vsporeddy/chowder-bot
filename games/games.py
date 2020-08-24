@@ -191,7 +191,7 @@ class Games(commands.Cog):
         user = self.bot.get_user(cc.id)
         if user:
             embed.add_field(
-                name="Most ChowderCoin™️", value=f"{user.mention}: `{cc.balance}` {config['coin_emote']}", inline=False
+                name="Most ChowderCoin™️", value=f"{user.mention}: `{cc.balance:.2f}` {config['coin_emote']}", inline=False
             )
         await ctx.send(embed=embed)
 
