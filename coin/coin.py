@@ -46,13 +46,14 @@ class ChowderCoin(commands.Cog):
 
     @commands.command(name="balance", brief="Check your ChowderCoin™️ balance")
     async def display_balance(self, ctx):
-        cc = await self.get_balance(ctx.author)
+        player = ctx.message.mentions[0] if ctx.message.mentions else ctx.author
+        cc = await self.get_balance(player)
         embed = discord.Embed(
             title=f"  {cc.balance:.2f}",
-            color=ctx.author.color
+            color=player.color
         )
         embed.set_thumbnail(url=config["image"])
-        embed.set_author(name=f"{ctx.author.display_name}'s ChowderCoin™️:", icon_url=ctx.author.avatar_url)
+        embed.set_author(name=f"{player.display_name}'s ChowderCoin™️:", icon_url=player.avatar_url)
         embed.set_footer(
             text="Play games against Chowdertron to earn ChowderCoin™️.\nWager ChowderCoin™️ against other players in vs. games."
         )
