@@ -66,4 +66,3 @@ async def check_commands(ctx):
     return True
 
 bot.run(TOKEN, bot=True, reconnect=True)
-    

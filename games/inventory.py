@@ -1,5 +1,5 @@
 """
-    ChowderCoin makes the world go round
+    Handles items
 """
 
 import discord
