@@ -39,7 +39,11 @@ class Inventory(commands.Cog):
         for i in items:
             item = item_config[i.item]
             description += f"{item['emote']} **{item['name']}**\n"
-        embed = discord.Embed(title=f"{ctx.author.display_name}'s items", description=description)
+        embed = discord.Embed(
+            title=f"{ctx.author.display_name}'s items",
+            description=description,
+            color=ctx.author.color
+        )
         embed.set_thumbnail(url=ctx.author.avatar_url)
         await ctx.send(embed=embed)
 

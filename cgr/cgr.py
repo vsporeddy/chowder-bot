@@ -13,6 +13,9 @@ from games.telewave.telewave import TelewaveTeam
 
 with open("cgr/cgr_config.json", "r") as read_file:
     config = json.load(read_file)
+    game_config = config["games"]
+
+games = list(game_config.keys())
 
 
 class Cgr(commands.Cog):
@@ -20,8 +23,8 @@ class Cgr(commands.Cog):
         self.bot = bot
 
     async def update_ratings_coop(self, ctx, team: TelewaveTeam):
-        r2 = math.pow(10, config["telewave"]["ai_rating"]/400)
-        s = team.score / config["telewave"]["max_score"]
+        r2 = math.pow(10, game_config["telewave"]["ai_rating"]/400)
+        s = team.score / game_config["telewave"]["max_score"]
         await self.update_ratings_helper(ctx, team.get_players(), r2, s, "telewave")
 
     async def update_ratings_vs(self, ctx, team1: TelewaveTeam, team2: TelewaveTeam):
@@ -33,7 +36,7 @@ class Cgr(commands.Cog):
         await self.update_ratings_helper(ctx, team2.get_players(), r2, s, "telewave")
 
     async def update_ratings_ai(self, ctx, players, won, game):
-        r2 = math.pow(10, config[game]["ai_rating"]/400)
+        r2 = math.pow(10, game_config[game]["ai_rating"]/400)
         s = 1 if won else 0
         await self.update_ratings_helper(ctx, players, r2, s, game)
 
@@ -56,7 +59,7 @@ class Cgr(commands.Cog):
         return await self.create_new_rating(player.id, game)
 
     async def create_new_rating(self, id, game):
-        cgr = await persistence.Rating.create(id=id, game=game, rating=config[game]["base_rating"], games_played=0)
+        cgr = await persistence.Rating.create(id=id, game=game, rating=game_config[game]["base_rating"], games_played=0)
         return cgr
 
     async def get_all_game_ratings(self, player):
@@ -68,6 +71,15 @@ class Cgr(commands.Cog):
         for player in players:
             avg_rating += (await self.get_rating(player, game)).rating
         return avg_rating // len(players)
+
+    async def get_top_players(self):
+        ids = {}
+        for game in games:
+            cgr = await persistence.db.all(
+                persistence.Rating.query.where(persistence.Rating.game == game).order_by(persistence.Rating.rating.desc())
+            )
+            ids[game] = cgr[0].id
+        return ids
 
     def get_rank(self, cgr):
         if cgr.games_played < 5:
@@ -87,7 +99,7 @@ class Cgr(commands.Cog):
     def get_k_factor(self, cgr, game):
         if cgr.games_played <= 10:
             return 100 - 3 * cgr.games_played
-        return config[game]["k_factor"] / cgr.rating
+        return game_config[game]["k_factor"] / cgr.rating
 
     @commands.command(name="cgr", brief="Get your Chowder game ratings")
     async def display_ratings(self, ctx):
