@@ -100,12 +100,13 @@ class Games(commands.Cog):
 
         winnings = pot / len(winners) if winners else 0
         for winner in winners:
+            if game_mode == "coop":
+                await self.update_ai_limit(winner)
             if game_mode == "coop" and self.ai_games[winner.id] > config["ai_game_limit"]:
                 await ctx.send(f"{winner.mention}'s been playing too much co-op, no {config['coin_emote']}")
                 continue
             await ctx.send(f"{winner.mention} wins {winnings:.2f} {config['coin_emote']}")
             await cc_cog.add_coin(winner, winnings)
-            await self.update_ai_limit(winner)
         if not winners:
             await ctx.send(f"No {config['coin_emote']} for losers.")
         return winners
