@@ -27,6 +27,7 @@ class Games(commands.Cog):
         self.current_game_name = None
         self.update_status.start()
         self.current_game_task = None
+        self.ai_games = {}
 
     def cog_unload(self):
         self.update_status.cancel()
@@ -69,9 +70,11 @@ class Games(commands.Cog):
         winners = []
         cc_cog = self.bot.get_cog("ChowderCoin")
         pot = 0.0
+        game_mode = ""
 
         if game_name == "hangman":
             pot = game_config[game_name]["ai_win_reward"] * len(players)
+            game_mode = "coop"
             winners = await hangman.start(self.bot, ctx, players)
         elif game_name == "telewave":
             if len(players) < game_config["telewave"]["min_players_vs"]:
@@ -92,14 +95,26 @@ class Games(commands.Cog):
             winners = await telewave.start(self.bot, ctx, players, game_mode)
         elif game_name == "blackjack":
             winners = await blackjack.start(self.bot, ctx, players)
+        elif game_name == "chowderfight":
+            winners = []
 
         winnings = pot / len(winners) if winners else 0
         for winner in winners:
-            await ctx.send(f"{winner.mention} wins {winnings} {config['coin_emote']}")
+            if game_mode == "coop" and self.ai_games[winner.id] > config["ai_game_limit"]:
+                await ctx.send(f"{winner.mention}'s been playing too much co-op, no {config['coin_emote']}")
+                continue
+            await ctx.send(f"{winner.mention} wins {winnings:.2f} {config['coin_emote']}")
             await cc_cog.add_coin(winner, winnings)
+            await self.update_ai_limit(winner)
         if not winners:
             await ctx.send(f"No {config['coin_emote']} for losers.")
         return winners
+
+    async def update_ai_limit(self, player):
+        if player.id not in self.ai_games:
+            self.ai_games[player.id] = 1
+        else:
+            self.ai_games[player.id] += 1
 
     async def get_buyin(self, ctx, cc_cog, initiator, players):
         done = False

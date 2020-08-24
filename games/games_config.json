@@ -1,6 +1,7 @@
 {
     "default_emote": "<:ChowderGaming:511432684971491328>",
     "coin_emote": "<:ChowderCoin:746800434873761955>",
+    "ai_game_limit": 5,
     "games": {
         "hangman": {
             "emote": "<:kms:714385140763066378>",
@@ -23,6 +24,14 @@
             "emote": "<:DanteTears:549492738249195521>",
             "min_players": 1,
             "wait_time": 15,
+            "start_req": 12,
+            "stop_req": 12,
+            "ai_win_reward": 0.1
+        },
+        "chowderfight": {
+            "emote": "<:ChowderPin:681038135320379394>",
+            "min_players": 1,
+            "min_players_vs": 2,
             "start_req": 12,
             "stop_req": 12,
             "ai_win_reward": 0.1

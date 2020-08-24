@@ -30,7 +30,15 @@ async def on_command_error(ctx, error):
         return
     raise error
 
-extensions = ["games.games", "chowder.chowder", "governance.governance", "gamble.gamble", "cgr.cgr", "coin.coin"]
+extensions = [
+    "games.games",
+    "chowder.chowder",
+    "governance.governance",
+    "games.gamble.gamble",
+    "cgr.cgr",
+    "coin.coin",
+    "games.inventory"
+]
 
 if __name__ == "__main__":
     for extension in extensions:
@@ -58,3 +66,4 @@ async def check_commands(ctx):
     return True
 
 bot.run(TOKEN, bot=True, reconnect=True)
+    

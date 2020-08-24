@@ -82,7 +82,7 @@ async def play_coop(bot, ctx, team):
     max_score = config["max_score_coop"]
     turns = config["coop_turn_count"]
     extra_turn = False
-    while turns and team.score < max_score:
+    while turns:
         await wait(ctx, team, extra_turn)
         prompt = get_prompt()
         answer = random.randint(0, 100)

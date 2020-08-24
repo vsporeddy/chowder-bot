@@ -25,6 +25,13 @@ class Coin(db.Model):
     balance = db.Column(db.Numeric)
 
 
+class Items(db.Model):
+    __tablename__ = "items"
+    id = db.Column(db.BigInteger)
+    item = db.Column(db.String)
+    _pk = db.PrimaryKeyConstraint("id", "item")
+
+
 async def initialize():
     await db.set_bind(DATABASE_URL)
     await db.gino.create_all()

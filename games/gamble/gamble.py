@@ -7,7 +7,7 @@ import random
 from chowder import chowder
 from discord.ext import commands
 
-with open("gamble/gamble_config.json", "r") as read_file:
+with open("games/gamble/gamble_config.json", "r") as read_file:
     config = json.load(read_file)
 
 
