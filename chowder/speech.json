@@ -21,7 +21,6 @@
         "hunting": "happy",
         "mod": "happy",
         "gambling": "happy",
-        "scotch": "happy",
         "poker": "happy",
         "carlo": "happy",
 
@@ -75,9 +74,7 @@
         "how": "query",
         "when": "query",
         "?": "query",
-        "are": "query",
         "where": "query",
-        "is": "query",
 
         "wtf": "confusion",
         "???": "confusion",
