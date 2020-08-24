@@ -46,7 +46,7 @@ class ChowderCoin(commands.Cog):
 
     async def get_richest_user(self):
         cc = await persistence.db.all(persistence.Coin.query.order_by(persistence.Coin.balance.desc()))
-        return cc[0].id
+        return cc[0]
 
     @commands.command(name="balance", brief="Check your ChowderCoin™️ balance")
     async def display_balance(self, ctx):

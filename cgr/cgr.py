@@ -73,13 +73,13 @@ class Cgr(commands.Cog):
         return avg_rating // len(players)
 
     async def get_top_players(self):
-        ids = {}
+        cgrs = {}
         for game in games:
             cgr = await persistence.db.all(
                 persistence.Rating.query.where(persistence.Rating.game == game).order_by(persistence.Rating.rating.desc())
             )
-            ids[game] = cgr[0].id
-        return ids
+            cgrs[game] = cgr[0]
+        return cgrs
 
     def get_rank(self, cgr):
         if cgr.games_played < 5:
