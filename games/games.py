@@ -178,18 +178,21 @@ class Games(commands.Cog):
     async def leaderboard(self, ctx):
         embed = discord.Embed(title="Dark Times leaderboard")
         cgr_cog = self.bot.get_cog("Cgr")
-        cgr_ids = await cgr_cog.get_top_players()
-        for game in cgr_ids.keys():
+        cgrs = await cgr_cog.get_top_players()
+        for game in cgrs.keys():
             embed.add_field(
                 name=f"Top {game.capitalize()} player",
-                value=f"{self.bot.get_user(cgr_ids[game]).mention}",
+                value=f"{self.bot.get_user(cgrs[game].id).mention}: `{cgrs[game].rating}` CGR",
                 inline=False
             )
 
         cc_cog = self.bot.get_cog("ChowderCoin")
-        richest = self.bot.get_user(await cc_cog.get_richest_user())
-        if richest:
-            embed.add_field(name="Most ChowderCoin™️", value=richest.mention, inline=False)
+        cc = await cc_cog.get_richest_user()
+        user = self.bot.get_user(cc.id)
+        if user:
+            embed.add_field(
+                name="Most ChowderCoin™️", value=f"{user.mention}: `{cc.balance}` {config['coin_emote']}", inline=False
+            )
         await ctx.send(embed=embed)
 
     @commands.command(name="stop", brief="Stop in-progress game or rally")
