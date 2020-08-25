@@ -172,21 +172,19 @@ async def get_guess(bot, ctx, team):
     )
 
     def check_guess(guess):
-        return guess.author in waiting_for_guess and \
+        return guess.author in team.guessers and \
                 guess.channel == msg.channel and \
                 guess.content.isnumeric()
 
-    waiting_for_guess = team.guessers.copy()
-    avg_guess = 0.0
-    while waiting_for_guess:
+    guesses = {}
+    while len(guesses) < len(team.guessers):
         guess = await bot.wait_for("message", check=check_guess)
         guess_val = float(guess.content)
         if guess_val > 100 or guess_val < 0:
             await ctx.send(f"{guess.author.mention} it's gotta be an integer between 0 and 100 (inclusive), ya dick")
         else:
-            avg_guess += guess_val
-            waiting_for_guess.remove(guess.author)
-    return round(avg_guess/len(team.guessers), 2)
+            guesses[guess.author.id] = guess_val
+    return round(sum(guesses.values())/len(guesses), 2)
 
 
 async def get_counter_guess(bot, ctx, team):
