@@ -32,13 +32,17 @@ class Inventory(commands.Cog):
     async def remove_item(self, player, item_id):
         await persistence.Items.delete.where(id=player.id, item=item_id)
 
-    @commands.command(name="items", brief="Check your inventory")
-    async def display_items(self, ctx):
-        items = await self.get_items(ctx.author)
-        description = f"You don't have any items yet, {chowder.get_name(ctx.author)}" if not items else ""
+    async def get_display_text(self, player):
+        items = await self.get_items(player)
+        description = f"You don't have any items yet, {chowder.get_name(player)}" if not items else ""
         for i in items:
             item = item_config[i.item]
             description += f"{item['emote']} **{item['name']}**\n"
+        return description
+
+    @commands.command(name="items", brief="Check your inventory")
+    async def display_items(self, ctx):
+        description = await self.get_display_text(ctx.author)
         embed = discord.Embed(
             title=f"{ctx.author.display_name}'s items",
             description=description,

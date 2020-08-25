@@ -168,12 +168,20 @@ class Games(commands.Cog):
 
     @commands.command(name="profile", brief="Display your profile")
     async def profile(self, ctx):
-        cc_cog = self.bot.get_cog("ChowderCoin")
-        cgr_cog = self.bot.get_cog("Cgr")
+        player = ctx.message.mentions[0] if ctx.message.mentions else ctx.author
+        embed = discord.Embed(color=player.color, title=f"{player.display_name}'s profile")
+
         inv_cog = self.bot.get_cog("Inventory")
-        await cc_cog.display_balance(ctx)
-        await cgr_cog.display_ratings(ctx)
-        await inv_cog.display_items(ctx)
+        embed.add_field(name="__Items__", value=await inv_cog.get_display_text(player))
+        cc_cog = self.bot.get_cog("ChowderCoin")
+        embed.add_field(
+            name="__ChowderCoin™️__",
+            value=f"{(await cc_cog.get_balance(player)).balance:.2f} {config['coin_emote']}"
+        )
+        cgr_cog = self.bot.get_cog("Cgr")
+        embed.add_field(name="__CGR__", value=await cgr_cog.get_display_text(player), inline=False)
+        embed.set_thumbnail(url=player.avatar_url)
+        await ctx.send(embed=embed)
 
     @commands.command(name="leaderboard", brief="Display leaderboard")
     async def leaderboard(self, ctx):
