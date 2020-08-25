@@ -101,13 +101,18 @@ class Cgr(commands.Cog):
             return 100 - 3 * cgr.games_played
         return game_config[game]["k_factor"] / cgr.rating
 
+    async def get_display_text(self, player):
+        cgrs = await self.get_all_game_ratings(player)
+        text = '\n'.join(
+            [f"{cgr.game.capitalize()}: `{cgr.rating}` CGR | **{self.get_rank(cgr)}** | `{cgr.games_played}` games" for cgr in cgrs]) \
+            if cgrs else f"Sorry {chowder.get_name(player)} you don't have any ratings yet. Play some games."
+        return text
+
     @commands.command(name="cgr", brief="Get your Chowder game ratings")
     async def display_ratings(self, ctx):
         player = ctx.message.mentions[0] if ctx.message.mentions else ctx.author
         cgrs = await self.get_all_game_ratings(player)
-        text = '\n'.join(
-            [f"{cgr.game.capitalize()}: `{cgr.rating}` CGR | **{self.get_rank(cgr)}** | `{cgr.games_played}` games played" for cgr in cgrs]) \
-            if cgrs else f"Sorry {chowder.get_name(player)} you don't have any ratings yet. Play some games."
+        text = await self.get_display_text(player)
         embed = discord.Embed(
             description=text,
             color=player.color

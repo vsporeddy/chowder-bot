@@ -105,8 +105,12 @@ class ChowderCoin(commands.Cog):
             return
         inv_cog = self.bot.get_cog("Inventory")
         item = item_config[item_id]
-        if await inv_cog.check_if_owns(ctx.author, item_id):
+        owned_items = await inv_cog.get_items(ctx.author)
+        if any(i.item == item_id for i in owned_items):
             await ctx.send(f"You already have a **{item['name']}**, {chowder.get_name(ctx.author)}")
+            return
+        if len(owned_items) >= config["item_cap"]:
+            await ctx.send(f"You're at the item cap, {chowder.get_name(ctx.author)}")
             return
         cc = await self.get_balance(ctx.author)
         if item["price"] > cc.balance:
