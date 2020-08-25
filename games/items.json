@@ -221,8 +221,8 @@
     },
     "golf_ball": {
         "name": "Golf Ball",
-        "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239013747916800/golf_ball.png",
-        "emote": "<:golf_ball:747247374073724938>",
+        "image": "https://cdn.discordapp.com/attachments/747197021420519537/747716463120613376/golf_ball.png",
+        "emote": "<:golf_ball:747715964186918922>",
         "price": 0.2,
         "for_sale": true
     }
