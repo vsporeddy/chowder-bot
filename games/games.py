@@ -129,8 +129,8 @@ class Games(commands.Cog):
                 m.content.replace('.', '', 1).isdigit()
         while not done:
             buyin = float((await self.bot.wait_for("message",  check=check)).content)
-            if buyin > max_buyin or buyin < 0:
-                await ctx.send(f"Sorry, the buy-in must be between 0 and {max_buyin:.2f} {config['coin_emote']}")
+            if buyin > max_buyin or buyin < 0.01:
+                await ctx.send(f"Sorry, the buy-in must be between 0.01 and {max_buyin:.2f} {config['coin_emote']}")
             else:
                 done = True
         return buyin

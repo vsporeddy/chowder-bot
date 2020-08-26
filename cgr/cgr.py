@@ -46,11 +46,14 @@ class Cgr(commands.Cog):
             r1 = math.pow(10, cgr.rating/400)
             e1 = r1 / (r1 + r2)
             k = self.get_k_factor(cgr, game)
-            prev_rank = self.get_rank(cgr)
+            prev_rank, prev_rating = self.get_rank(cgr), cgr.rating
             await cgr.update(rating=cgr.rating + k * (s - e1), games_played=cgr.games_played+1).apply()
             new_rank = self.get_rank(cgr)
             if prev_rank != new_rank:
-                await ctx.send(f"Dang {player.mention} just ranked up to **{new_rank}**")
+                if prev_rating > cgr.rating:
+                    await ctx.send(f"Yikes, {player.mention} just deranked to **{new_rank}**")
+                else:
+                    await ctx.send(f"Dang {player.mention} just ranked up to **{new_rank}**")
 
     async def get_rating(self, player, game):
         cgr = await persistence.Rating.get({"id": player.id, "game": game})
