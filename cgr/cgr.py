@@ -89,13 +89,13 @@ class Cgr(commands.Cog):
             return "Provisional"
         if cgr.rating < 1100:
             return "Bronze"
-        if cgr.rating < 1400:
+        if cgr.rating < 1300:
             return "Silver"
-        if cgr.rating < 1700:
+        if cgr.rating < 1500:
             return "Gold"
-        if cgr.rating < 2000:
+        if cgr.rating < 1700:
             return "Platinum"
-        if cgr.rating < 2300:
+        if cgr.rating < 2000:
             return "Diamond"
         return "Challenger"
 
