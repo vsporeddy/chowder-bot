@@ -1,4 +1,6 @@
 {
+    "thinking_time": 30,
+    "wait_time": 5,
     "max_score": 5,
     "categories": {
         "Colors": [
