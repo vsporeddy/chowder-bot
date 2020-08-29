@@ -56,7 +56,7 @@ async def play_insane(bot, ctx, players, strikes):
 
         remaining_words = await get_remaining_words(guess, words)
         if len(remaining_words) <= 1:
-           if guess not in word:
+            if guess not in word:
                 await ctx.send(get_strike_message().format(guess=guess))
                 strikes -= 1
             return await play(bot, ctx, players, strikes, guesses)
