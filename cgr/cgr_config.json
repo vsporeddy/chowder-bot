@@ -2,12 +2,11 @@
     "games": {
         "hangman": {
             "base_rating": 1000,
-            "ai_rating": 1000,
             "k_factor": 50000 
         },
         "telewave": {
             "base_rating": 1000,
-            "ai_rating": 1300,
+            "ai_rating": 1400,
             "k_factor": 60000 ,
             "max_score": 20
         }

@@ -35,8 +35,8 @@ class Cgr(commands.Cog):
         s = 1 - s
         await self.update_ratings_helper(ctx, team2.get_players(), r2, s, "telewave")
 
-    async def update_ratings_ai(self, ctx, players, won, game):
-        r2 = math.pow(10, game_config[game]["ai_rating"]/400)
+    async def update_ratings_ai(self, ctx, players, won, game, ai_rating):
+        r2 = math.pow(10, ai_rating/400)
         s = 1 if won else 0
         await self.update_ratings_helper(ctx, players, r2, s, game)
 

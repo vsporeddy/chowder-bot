@@ -73,9 +73,28 @@ class Games(commands.Cog):
         game_mode = ""
 
         if game_name == "hangman":
-            pot = game_config[game_name]["ai_win_reward"] * len(players)
+            msg = await ctx.send(
+                f"{initiator.mention} y'all tryna play `normal` or `insane`?\n"
+                f"`normal` is free to play and rewards you `{game_config[game_name]['ai_win_reward']}` {config['coin_emote']} for winning. "
+                f"`insane` costs `{game_config[game_name]['insane_cost']}` but rewards `{game_config[game_name]['insane_win_reward']:.2f}` "
+                f"{config['coin_emote']}"
+            )
+            difficulty = (await self.bot.wait_for(
+                "message",
+                check=lambda m: m.author == initiator and m.content.lower() in ["normal", "insane"] and m.channel == msg.channel
+            )).content.lower()
+            if difficulty == "normal":
+                pot = game_config[game_name]["ai_win_reward"] * len(players)
+            elif difficulty == "insane":
+                if await self.check_entry_fee(ctx, players, cc_cog, game_config[game_name]["insane_cost"]):
+                    pot = game_config[game_name]["insane_win_reward"] * len(players)
+                    for player in players:
+                        await cc_cog.subtract_coin(player, game_config[game_name]["insane_cost"])
+                else:
+                    return
             game_mode = "coop"
-            winners = await hangman.start(self.bot, ctx, players)
+            winners = await hangman.start(self.bot, ctx, players, difficulty)
+
         elif game_name == "telewave":
             if len(players) < game_config["telewave"]["min_players_vs"]:
                 game_mode = "coop"
@@ -93,8 +112,10 @@ class Games(commands.Cog):
             else:
                 pot = game_config[game_name]["ai_win_reward"] * len(players)
             winners = await telewave.start(self.bot, ctx, players, game_mode)
+
         elif game_name == "blackjack":
             winners = await blackjack.start(self.bot, ctx, players)
+
         elif game_name == "chowderfight":
             winners = []
 
@@ -116,6 +137,13 @@ class Games(commands.Cog):
             self.ai_games[player.id] = 1
         else:
             self.ai_games[player.id] += 1
+
+    async def check_entry_fee(self, ctx, players, cc_cog, fee):
+        for player in players:
+            if (await cc_cog.get_balance(player)).balance < fee:
+                await ctx.send(f"Sorry, {player.mention} doesn't have enough {config['coin_emote']} to play.'")
+                return False
+        return True
 
     async def get_buyin(self, ctx, cc_cog, initiator, players):
         done = False

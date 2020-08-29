@@ -9,13 +9,28 @@ from chowder import chowder
 with open("games/hangman/hangman_config.json", "r") as read_file:
     config = json.load(read_file)
 
+global word
+global player_str
+global title
 
-async def start(bot, ctx, players):
+
+async def start(bot, ctx, players, difficulty):
+    global player_str
+    global title
+    player_str = ', '.join([p.display_name for p in players])
+    title = random.choice(config["titles"])
+
     await ctx.send(f"Starting a game of **hangman** with {', '.join([p.mention for p in players])}")
-    word = get_word()
     cgr = bot.get_cog("Cgr")
-    victory = await play(bot, ctx, players, word)
-    await cgr.update_ratings_ai(ctx, players, victory, "hangman")
+
+    if difficulty == "normal":
+        global word
+        word = random.choice(config["words"] + config["insane_words"])
+        victory = await play(bot, ctx, players, config["strikes"], set())
+        await cgr.update_ratings_ai(ctx, players, victory, "hangman", config["normal_rating"])
+    else:
+        victory = await play_insane(bot, ctx, players, config["insane_strikes"])
+        await cgr.update_ratings_ai(ctx, players, victory, "hangman", config["insane_rating"])
     if victory:
         await ctx.send(get_victory_message().format(word=word))
     else:
@@ -23,24 +38,43 @@ async def start(bot, ctx, players):
     return players if victory else []
 
 
-async def play(bot, ctx, players, word):
-    wordset = set(word.replace(" ", ""))
+async def play_insane(bot, ctx, players, strikes):
+    global word
+    word_length = random.randint(4, 10)
+    words = list(filter(lambda w: len(w) == word_length, config["insane_words"]))
+    word = random.choice(words)
     guesses = set()
-    strikes = config["strikes"]
 
-    def check(m):
-        return m.author in players and \
-               (len(m.content) == 1 and m.content.isalpha()) or \
-               m.content.upper() == word
-
-    player_str = ', '.join([p.display_name for p in players])
-    title = get_title()
     await display(ctx, word, guesses, strikes, player_str, title)
 
     while strikes:
-        guess = (await bot.wait_for("message", check=check)).content.upper()
-        if guess == word:
-            return True
+        guess = await get_guess(bot, players)
+        if guess in guesses:
+            await ctx.send(f"You already guessed **{guess}**, {chowder.get_condescending_name()}")
+            continue
+        guesses.add(guess)
+
+        remaining_words = await get_remaining_words(guess, words)
+        if len(remaining_words) <= 1:
+            return await play(bot, ctx, players, strikes, guesses)
+        words = remaining_words
+        word = random.choice(words)
+
+        if guess not in word:
+            await ctx.send(get_strike_message().format(guess=guess))
+            strikes -= 1
+        await display(ctx, word, guesses, strikes, player_str, title)
+
+    return False
+
+
+async def play(bot, ctx, players, strikes, guesses):
+    wordset = set(word.replace(" ", ""))
+
+    await display(ctx, word, guesses, strikes, player_str, title)
+
+    while strikes:
+        guess = await get_guess(bot, players)
         if guess in guesses:
             await ctx.send(f"You already guessed **{guess}**, {chowder.get_condescending_name()}")
             continue
@@ -53,6 +87,35 @@ async def play(bot, ctx, players, word):
         await display(ctx, word, guesses, strikes, player_str, title)
 
     return False
+
+
+async def get_remaining_words(guess, words):
+    families = {}
+
+    for word in words:
+        family = get_family(word, guess)
+        families[family] = families[family] + [word] if family in families else [word]
+
+    return families[max(families, key=lambda k: len(families[k]))]
+
+
+async def get_guess(bot, players):
+    def check(m):
+        return m.author in players and \
+            (len(m.content) == 1 and m.content.isalpha())
+
+    guess = (await bot.wait_for("message", check=check)).content.upper()
+    return guess
+
+
+def get_family(word, guess):
+    family = ""
+    for letter in word:
+        if(letter == guess):
+            family += guess
+        else:
+            family += "-"
+    return family
 
 
 def get_display_word(word, guesses):
@@ -79,14 +142,6 @@ async def display(ctx, word, guesses, strikes, players, title):
     embed.add_field(name="Strikes left", inline=True, value=strikes)
     embed.set_footer(text=f"Players: {players}")
     await ctx.send(embed=embed)
-
-
-def get_word():
-    return random.choice(config["words"])
-
-
-def get_title():
-    return random.choice(config["titles"])
 
 
 def get_victory_message():
