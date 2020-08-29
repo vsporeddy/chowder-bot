@@ -40,10 +40,10 @@
         },
         "chameleon": {
             "emote": "<:DudemanEZ:541700377398083613>",
-            "min_players": 2,
-            "wait_time": 8,
-            "start_req": 1,
-            "stop_req": 1
+            "min_players": 3,
+            "wait_time": 30,
+            "start_req": 12,
+            "stop_req": 12
         }
     }
 }
