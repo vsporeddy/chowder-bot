@@ -41,14 +41,14 @@ class Cgr(commands.Cog):
         await self.update_ratings_helper(ctx, players, r2, s, game)
 
     async def update_ratings_chameleon(self, ctx, players, winner):
-        players_copy = players.copy()
+        players.remove(winner)
+        loser_rating = await self.get_average_rating(players, "chameleon")
+        winner_rating = await self.get_average_rating([winner], "chameleon")
+        r2 = math.pow(10, loser_rating/400)
+        await self.update_ratings_helper(ctx, [winner], r2, 1.6, "chameleon")
+        r2 = math.pow(10, winner_rating/400)
         for player in players:
-            players_copy.remove(player)
-            avg_rating = await self.get_average_rating(players_copy, "chameleon")
-            r2 = math.pow(10, avg_rating/400)
-            s = 1 if player == winner else 0
-            await self.update_ratings_helper(ctx, [player], r2, s, "chameleon")
-            players_copy.append(player)
+            await self.update_ratings_helper(ctx, [player], r2, 0.4, "chameleon")
 
     async def update_ratings_helper(self, ctx, team, r2, s, game):
         for player in team:
