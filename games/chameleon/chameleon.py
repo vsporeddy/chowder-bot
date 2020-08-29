@@ -29,7 +29,7 @@ async def play(bot, ctx, players):
     while top_score < config["max_score"]:
         await ctx.send(f"Round boutta start in **{config['wait_time']}** seconds")
         await asyncio.sleep(config["wait_time"])
-        category = random.choice(list(config["categories"].keys()))
+        category = get_category()
         words = config["categories"][category]
         word = random.choice(words)
         chameleon = random.choice(players)
@@ -64,6 +64,7 @@ async def play(bot, ctx, players):
         top_score = scores[leader]
         dealer = players.popleft()
         players.append(dealer)
+        del config["categories"][category]
     return leader
 
 
@@ -126,3 +127,11 @@ async def get_guess(bot, ctx, chameleon, num_guesses, word):
             return True
         num_guesses -= 1
     return False
+
+
+def get_category():
+    global config
+    if not config["categories"]:
+        with open("games/chameleon/chameleon_config.json", "r") as read_file:
+            config = json.load(read_file)
+    return random.choice(list(config["categories"].keys()))
