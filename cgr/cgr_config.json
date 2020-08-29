@@ -9,6 +9,10 @@
             "ai_rating": 1400,
             "k_factor": 60000 ,
             "max_score": 20
+        },
+        "chameleon": {
+            "base_rating": 1000,
+            "k_factor": 60000
         }
     },
     "ranks": {

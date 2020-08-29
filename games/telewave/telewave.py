@@ -155,7 +155,7 @@ async def play_vs(bot, ctx, team1, team2):
 
 async def get_clue(bot, ctx, psychic, prompt, answer):
     dm = await psychic.send(
-        f"**{prompt[0]} ⟵ {answer} ⟶ {prompt[1]}**"
+        f"**{prompt[0]}**{'-' * answer} **{answer}** {'-' * (100 - answer)}**{prompt[1]}**"
     )
 
     def check(m):
