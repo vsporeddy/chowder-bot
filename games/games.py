@@ -93,7 +93,7 @@ class Games(commands.Cog):
                         await cc_cog.subtract_coin(player, game_config[game_name]["insane_cost"])
                 else:
                     return
-            game_mode = "coop"
+            game_mode = "coop" if difficulty == "normal" else "vs"
             winners = await hangman.start(self.bot, ctx, players, difficulty)
 
         elif game_name == "telewave":

@@ -24,6 +24,7 @@ async def start(bot, ctx, players):
 async def play(bot, ctx, players):
     players = deque(players)
     scores = {player: 0 for player in players}
+    numbers = {n: players[n] for n in range(len(players))}
     top_score = 0
     num_guesses = 1 if len(players) > 3 else 2
     while top_score < config["max_score"]:
@@ -39,9 +40,10 @@ async def play(bot, ctx, players):
         await send_clues(players, chameleon, word)
         await ctx.send(f"Y'all got **{config['thinking_time']}** seconds to think")
         await asyncio.sleep(config["thinking_time"])
-        await get_responses(bot, ctx, players, responses)
-        await display(ctx, category, words, scores, responses)
-        target = await get_target(bot, ctx, players)
+        for player in players:
+            await get_response(bot, ctx, player, responses)
+            await display(ctx, category, words, scores, responses)
+        target = await get_target(bot, ctx, numbers)
 
         if target != chameleon:
             await ctx.send(
@@ -60,11 +62,26 @@ async def play(bot, ctx, players):
                     if player != chameleon:
                         scores[player] += 2
 
-        leader = max(scores, key=scores.get)
-        top_score = scores[leader]
+        leader = await get_leader(ctx, scores)
+        top_score = scores[leader] if leader else 0
         dealer = players.popleft()
         players.append(dealer)
         del config["categories"][category]
+    return leader
+
+
+async def get_leader(ctx, scores):
+    top = 0
+    leader = None
+    for player, score in scores.items():
+        if score > top:
+            top = score
+            leader = player
+        elif score == top:
+            top = 0
+            leader = None
+    if scores[max(scores, key=scores.get)] >= config["max_score"] and top == 0:
+        await ctx.send(f"Can't end on a tie {chowder.get_collective_name()}, the game goes on...")
     return leader
 
 
@@ -76,11 +93,11 @@ async def send_clues(players, chameleon, word):
             await player.send(f"Word: **{word}**")
 
 
-async def get_responses(bot, ctx, players, responses):
-    for player in players:
-        await ctx.send(f"{player.mention}: type `$say [word]` {chowder.get_name(player)}")
-        m = await bot.wait_for("message", check=lambda m: m.author == player and m.channel == ctx.channel and m.content.startswith("$say "))
-        responses[player] = m.content[5:]
+async def get_response(bot, ctx, player, responses):
+    await ctx.send(f"{player.mention} is thinking of a clue...")
+    dm = await player.send(f"What's your clue {chowder.get_name(player)}?")
+    m = await bot.wait_for("message", check=lambda m: m.author == player and m.channel == dm.channel)
+    responses[player] = m.content
 
 
 async def display(ctx, category, words, scores, clues=None):
@@ -89,28 +106,27 @@ async def display(ctx, category, words, scores, clues=None):
         description=f"Words: ```{', '.join(word for word in words)}```"
     )
     for player in scores.keys():
-        text = f"`{scores[player]}` points"
-        if clues:
-            text += f" | word: `{clues[player]}`"
+        text = f"score: `{scores[player]}`"
+        if clues and player in clues:
+            text += f" | clue: `{clues[player]}`"
         embed.add_field(name=player.display_name, value=text)
     await ctx.send(embed=embed)
 
 
-async def get_target(bot, ctx, players):
+async def get_target(bot, ctx, numbers):
     await ctx.send(f"Time to vote on the chameleon {chowder.get_collective_name()}, respond to the DM with a number (can't vote for yourself)")
-    numbers = {n: players[n] for n in range(len(players))}
     channels = set()
     text = ""
     for n in numbers:
         text += f"`{n}` `{numbers[n]}`\n"
-    for player in players:
+    for player in numbers.values():
         m = await player.send(text)
         channels.add(m.channel)
 
     def check(m):
-        return m.content.isnumeric() and m.author in players and m.channel in channels and numbers[int(m.content)] != m.author
+        return m.content.isnumeric() and m.author in numbers.values() and m.channel in channels and numbers[int(m.content)] != m.author
     votes = {}
-    while len(votes) < len(players):
+    while len(votes) < len(numbers):
         m = await bot.wait_for("message", check=check)
         votes[m.author.id] = numbers[int(m.content)]
     results = {}
@@ -120,7 +136,7 @@ async def get_target(bot, ctx, players):
 
 
 async def get_guess(bot, ctx, chameleon, num_guesses, word):
-    await ctx.send(f"You get {num_guesses} chances to guess the right word")
+    await ctx.send(f"You got {num_guesses} chance(s) to guess the right word")
     while num_guesses > 0:
         m = await bot.wait_for("message", check=lambda m: m.author == chameleon and m.channel == ctx.channel)
         if m.content.strip().lower() == word.strip().lower():
