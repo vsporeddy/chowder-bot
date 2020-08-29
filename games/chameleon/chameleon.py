@@ -4,7 +4,7 @@
 import discord
 import json
 import random
-
+from collections import deque
 from chowder import chowder
 
 with open("games/chameleon/chameleon_config.json", "r") as read_file:
@@ -21,11 +21,11 @@ async def start(bot, ctx, players):
 
 
 async def play(bot, ctx, players):
+    players = deque(players)
     scores = {player: 0 for player in players}
     top_score = 0
     num_guesses = 1 if len(players) > 3 else 2
     while top_score < config["max_score"]:
-        random.shuffle(players)
         category = random.choice(list(config["categories"].keys()))
         words = config["categories"][category]
         word = random.choice(words)
@@ -51,10 +51,12 @@ async def play(bot, ctx, players):
                 await ctx.send(f"Sorry {chowder.get_name(chameleon)} the word was **{word}**")
                 for player in scores.keys():
                     if player != chameleon:
-                        scores[player] += 1
+                        scores[player] += 2
 
         leader = max(scores, key=scores.get)
         top_score = scores[leader]
+        dealer = players.popleft()
+        players.append(dealer)
     return leader
 
 
@@ -86,7 +88,7 @@ async def get_target(bot, ctx, players):
     await ctx.send(f"Time to vote on the chameleon {chowder.get_collective_name()}. Take your time, ties are resolved RANDOMLY")
 
     def check(m):
-        return len(m.mentions) >= 1 and m.mentions[0] in players and m.author in players and m.channel == ctx.channel
+        return len(m.mentions) >= 1 and m.mentions[0] in players and m.author in players and m.channel == ctx.channel and m.mentions[0] != m.author
     votes = {}
     while len(votes) < len(players):
         m = await bot.wait_for("message", check=check)
