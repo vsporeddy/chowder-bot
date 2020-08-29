@@ -6,10 +6,10 @@
         "hangman": {
             "emote": "<:kms:714385140763066378>",
             "min_players": 1,
-            "wait_time": 15,
+            "wait_time": 5,
             "start_req": 12,
             "stop_req": 12,
-            "ai_win_reward": 0.03,
+            "ai_win_reward": 0.02,
             "insane_cost": 0.01,
             "insane_win_reward": 0.5
         },
