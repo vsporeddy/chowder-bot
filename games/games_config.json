@@ -34,8 +34,8 @@
             "emote": "<:ChowderPin:681038135320379394>",
             "min_players": 1,
             "min_players_vs": 2,
-            "start_req": 12,
-            "stop_req": 12,
+            "start_req": 20,
+            "stop_req": 20,
             "ai_win_reward": 0.1
         },
         "chameleon": {
