@@ -12,6 +12,7 @@ from chowder import chowder
 from games.hangman import hangman
 from games.telewave import telewave
 from games.blackjack import blackjack
+from games.chameleon import chameleon
 
 with open("games/games_config.json", "r") as read_file:
     config = json.load(read_file)
@@ -118,6 +119,13 @@ class Games(commands.Cog):
 
         elif game_name == "chowderfight":
             winners = []
+
+        elif game_name == "chameleon":
+            buyin = await self.get_buyin(ctx, cc_cog, initiator, players)
+            for player in players:
+                await cc_cog.subtract_coin(player, buyin)
+                pot += buyin
+            winners = await chameleon.start(self.bot, ctx, players)
 
         winnings = pot / len(winners) if winners else 0
         for winner in winners:
