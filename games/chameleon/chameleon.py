@@ -1,6 +1,7 @@
 """
     Sneaky sneaky
 """
+import asyncio
 import discord
 import json
 import random
@@ -26,20 +27,26 @@ async def play(bot, ctx, players):
     top_score = 0
     num_guesses = 1 if len(players) > 3 else 2
     while top_score < config["max_score"]:
+        await ctx.send(f"Round boutta start in **{config['wait_time']}** seconds")
+        await asyncio.sleep(config["wait_time"])
         category = random.choice(list(config["categories"].keys()))
         words = config["categories"][category]
         word = random.choice(words)
         chameleon = random.choice(players)
+        responses = {}
 
         await display(ctx, category, words, scores)
         await send_clues(players, chameleon, word)
-        await get_responses(bot, ctx, players)
+        await ctx.send(f"Y'all got **{config['thinking_time']}** seconds to think")
+        await asyncio.sleep(config["thinking_time"])
+        await get_responses(bot, ctx, players, responses)
+        await display(ctx, category, words, scores, responses)
         target = await get_target(bot, ctx, players)
 
         if target != chameleon:
             await ctx.send(
                 f"Get rekt, y'all voted for {target.mention} but the chameleon was {chameleon.mention}!\n"
-                f"{chameleon.mention} gets 2 points"
+                f"{chameleon.mention} gets 2 points. Also the word was **{word}** lol"
             )
             scores[chameleon] += 2
         else:
@@ -63,36 +70,48 @@ async def play(bot, ctx, players):
 async def send_clues(players, chameleon, word):
     for player in players:
         if player == chameleon:
-            await player.send(f"You're the chameleon {chowder.get_name(player)}")
+            await player.send(f"You're the **chameleon** {chowder.get_name(player)}")
         else:
             await player.send(f"Word: **{word}**")
 
 
-async def get_responses(bot, ctx, players):
+async def get_responses(bot, ctx, players, responses):
     for player in players:
-        await ctx.send(f"{player.mention}: say a related word {chowder.get_name(player)}")
-        await bot.wait_for("message", check=lambda m: m.author == player and m.channel == ctx.channel)
+        await ctx.send(f"{player.mention}: type `$say [word]` {chowder.get_name(player)}")
+        m = await bot.wait_for("message", check=lambda m: m.author == player and m.channel == ctx.channel and m.content.startswith("$say "))
+        responses[player] = m.content[5:]
 
 
-async def display(ctx, category, words, scores):
+async def display(ctx, category, words, scores, clues=None):
     embed = discord.Embed(
         title=f"Category: {category}",
         description=f"Words: ```{', '.join(word for word in words)}```"
     )
-    for score in scores.keys():
-        embed.add_field(name=score.display_name, value=f"{scores[score]} points")
+    for player in scores.keys():
+        text = f"`{scores[player]}` points"
+        if clues:
+            text += f" | word: `{clues[player]}`"
+        embed.add_field(name=player.display_name, value=text)
     await ctx.send(embed=embed)
 
 
 async def get_target(bot, ctx, players):
-    await ctx.send(f"Time to vote on the chameleon {chowder.get_collective_name()}. Take your time, ties are resolved RANDOMLY")
+    await ctx.send(f"Time to vote on the chameleon {chowder.get_collective_name()}, respond to the DM with a number (can't vote for yourself)")
+    numbers = {n: players[n] for n in range(len(players))}
+    channels = set()
+    text = ""
+    for n in numbers:
+        text += f"`{n}` `{numbers[n]}`\n"
+    for player in players:
+        m = await player.send(text)
+        channels.add(m.channel)
 
     def check(m):
-        return len(m.mentions) >= 1 and m.mentions[0] in players and m.author in players and m.channel == ctx.channel and m.mentions[0] != m.author
+        return m.content.isnumeric() and m.author in players and m.channel in channels and numbers[int(m.content)] != m.author
     votes = {}
     while len(votes) < len(players):
         m = await bot.wait_for("message", check=check)
-        votes[m.author.id] = m.mentions[0]
+        votes[m.author.id] = numbers[int(m.content)]
     results = {}
     for vote in votes.values():
         results[vote] = results[vote] + 1 if vote in results else 1
