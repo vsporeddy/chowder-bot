@@ -3,7 +3,7 @@
         "emote": "<:pin:747247373956284528>",
         "image": "https://cdn.discordapp.com/attachments/747197021420519537/747247218909642879/pin.png",
         "name": "Pin",
-        "price": 0.75,
+        "price": 0.95,
         "for_sale": true,
         "stats": {
             "gaming": -2,
@@ -20,7 +20,7 @@
         "name": "Dip",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239009956134952/dip.png",
         "emote": "<:dip:747247373897695383>",
-        "price": 0.5,
+        "price": 0.65,
         "for_sale": true,
         "stats": {
             "gaming": 1,
@@ -47,7 +47,7 @@
         "name": "Addy",
         "image": "https://cdn.discordapp.com/attachments/747197021420519537/747281792758972526/addy.png",
         "emote": "<:addy:747304569826050128>",
-        "price": 8,
+        "price": 8.5,
         "for_sale": false,
         "stats": {
             "gaming": 5,
@@ -64,7 +64,7 @@
         "name": "Beanie",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747238994810634391/beanie.png",
         "emote": "<:beanie:747247373830324224>",
-        "price": 1.25,
+        "price": 2.25,
         "for_sale": true,
         "stats": {
             "gaming": 1,
@@ -87,14 +87,14 @@
         "name": "Ram Skull",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239043548315648/ram_skull.png",
         "emote": "<:ram_skull:747247373935181874>",
-        "price": 7,
-        "for_sale": false
+        "price": 11,
+        "for_sale": true
     },
     "scotch": {
         "name": "Scotch",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239047725842452/scotch.png",
         "emote": "<:scotch:747247374165999696>",
-        "price": 2.5,
+        "price": 3.5,
         "for_sale": true,
         "stats": {
             "chilling": 4,
@@ -111,7 +111,7 @@
         "name": "Doritos",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239011424272384/doritos.png",
         "emote": "<:doritos:747247373830324345>",
-        "price": 0.35,
+        "price": 0.50,
         "for_sale": true,
         "stats": {
             "gaming": 1,
@@ -122,15 +122,15 @@
         "name": "Gummy Bears",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239015631159386/gummy_bears.png",
         "emote": "<:gummy_bears:747247373536723005>",
-        "price": 0.25,
+        "price": 0.45,
         "for_sale": true
     },
     "saw": {
         "name": "SAW",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239045469438023/saw.png",
         "emote": "<:saw:747247373960478751>",
-        "price": 4,
-        "for_sale": false
+        "price": 7.5,
+        "for_sale": true
     },
     "headset": {
         "name": "Headset",
@@ -143,14 +143,14 @@
         "name": "Energy Drink",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239012791746670/energy_drink.png",
         "emote": "<:energy_drink:747247373905821756>",
-        "price": 1,
+        "price": 1.1,
         "for_sale": true
     },
     "switch": {
         "name": "Switch",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239051186274444/switch.png",
         "emote": "<:switch:747247374061010968>",
-        "price": 3.5,
+        "price": 5.5,
         "for_sale": true
     },
     "katana": {
@@ -164,28 +164,28 @@
         "name": "Pool Cue",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239041207894126/pool_cue.png",
         "emote": "<:pool_cue:747247373922861167>",
-        "price": 2.5,
+        "price": 3.65,
         "for_sale": true
     },
     "hockey_stick": {
         "name": "Hockey Stick",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239326689001563/hockey_stick.png",
         "emote": "<:hockey_stick:747247373926793326>",
-        "price": 1.75,
+        "price": 2.75,
         "for_sale": true
     },
     "paddles": {
         "name": "Paddles",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239037173104680/paddles.png",
         "emote": "<:paddles:747247373964673104>",
-        "price": 1.25,
+        "price": 1.65,
         "for_sale": true
     },
     "wrist_brace": {
         "name": "Wrist Brace",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239055091302441/wrist_brace.png",
         "emote": "<:wrist_brace:747247373624934471>",
-        "price": 0.85,
+        "price": 1.05,
         "for_sale": true
     },
     "talking_rain": {
@@ -209,7 +209,7 @@
         "name": "Snowboard",
         "image": "https://cdn.discordapp.com/attachments/744644246883270659/747239049265152040/snowboard.png",
         "emote": "<:snowboard:747247373775929428>",
-        "price": 3.5,
+        "price": 4.15,
         "for_sale": true
     },
     "boxing_gloves": {
@@ -223,7 +223,7 @@
         "name": "Golf Ball",
         "image": "https://cdn.discordapp.com/attachments/747197021420519537/747716463120613376/golf_ball.png",
         "emote": "<:golf_ball:747715964186918922>",
-        "price": 0.2,
+        "price": 0.25,
         "for_sale": true
     }
 }
