@@ -43,7 +43,7 @@ async def play_insane(bot, ctx, players, strikes):
     global word
     word_length = random.randint(4, 10)
     wordlist = filter(lambda w: len(w) == word_length, words.words())
-    wordlist = [w.upper() for w in wordlist]
+    wordlist = [w.upper() for w in wordlist] + config["insane_words"]
     word = random.choice(wordlist)
     guesses = set()
 

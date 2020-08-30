@@ -43,19 +43,14 @@
         "hate": "abuse",
         "dumb": "abuse",
         "dumbass": "abuse",
-        "retard": "abuse",
-        "retarded": "abuse",
         "stupid": "abuse",
-        "kys": "abuse",
         "shit": "abuse",
         "trash": "abuse",
         "stfu": "abuse",
         "shut": "abuse",
 
-        "suicide": "suicide",
-        "kms": "suicide",
-        "rope": "suicide",
-        "714385140763066378": "suicide",
+        "rope": "rope",
+        "714385140763066378": "rope",
 
         "please": "please",
 
@@ -107,11 +102,11 @@
         "abuse": [
             "fuck you too {name}",
             "fuck off {name}",
-            "you mad {name}?"
+            "you mad {name}?",
+            "lol"
         ],
-        "suicide": [
-            "Great deal on rope here https://www.amazon.com/T-W-Evans-Cordage-23-410-100-Feet/dp/B00DKA3OGO/ref=sr_1_5?dchild=1&keywords=rope&qid=1596673550&sr=8-5",
-            "Help is available, {name}. Call the suicide hotline today: 1-800-273-8255"
+        "rope": [
+            "Great deal on rope here https://www.amazon.com/T-W-Evans-Cordage-23-410-100-Feet/dp/B00DKA3OGO/ref=sr_1_5?dchild=1&keywords=rope&qid=1596673550&sr=8-5"
         ],
         "silence": [
             "freedom of speech, {name}"
@@ -194,7 +189,6 @@
         "Uhhhhhhh hellooooo????",
         "Whoa, I just stood up too fast",
         "Brb, going to the gas station",
-        "This server's deader than aids",
         "🎵 There's a she-wolf in the closet... 🎵",
         "I think I just shit my pants",
         "Yo who took my dip?",
