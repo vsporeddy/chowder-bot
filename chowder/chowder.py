@@ -20,6 +20,7 @@ with open("chowder/speech.json", "r") as read_file:
 channels = config["channels"]
 
 nltk.download("wordnet")
+nltk.download("words")
 tokenizer = nltk.tokenize.RegexpTokenizer(r"\w+")
 lemmatizer = WordNetLemmatizer()
 

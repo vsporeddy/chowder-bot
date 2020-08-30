@@ -10,8 +10,8 @@
             "start_req": 12,
             "stop_req": 12,
             "ai_win_reward": 0.02,
-            "insane_cost": 0.02,
-            "insane_win_reward": 0.25
+            "insane_cost": 0.01,
+            "insane_win_reward": 1
         },
         "telewave": {
             "emote": "<:ZalteoNani:550595879585841153>",

@@ -95,8 +95,8 @@ async def send_clues(players, chameleon, word):
 
 async def get_response(bot, ctx, player, responses):
     await ctx.send(f"{player.mention} is thinking of a clue...")
-    dm = await player.send(f"What's your clue {chowder.get_name(player)}?")
-    m = await bot.wait_for("message", check=lambda m: m.author == player and m.channel == dm.channel)
+    await player.send(f"What's your clue {chowder.get_name(player)}?")
+    m = await bot.wait_for("message", check=lambda m: m.author == player)
     responses[player] = m.content
 
 
@@ -138,7 +138,7 @@ async def get_target(bot, ctx, numbers):
 async def get_guess(bot, ctx, chameleon, num_guesses, word):
     await ctx.send(f"You got {num_guesses} chance(s) to guess the right word")
     while num_guesses > 0:
-        m = await bot.wait_for("message", check=lambda m: m.author == chameleon and m.channel == ctx.channel)
+        m = await bot.wait_for("message", check=lambda m: m.author == chameleon)
         if m.content.strip().lower() == word.strip().lower():
             return True
         num_guesses -= 1

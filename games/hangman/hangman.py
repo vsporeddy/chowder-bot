@@ -5,6 +5,7 @@ import json
 import random
 import discord
 from chowder import chowder
+from nltk.corpus import words
 
 with open("games/hangman/hangman_config.json", "r") as read_file:
     config = json.load(read_file)
@@ -20,7 +21,7 @@ async def start(bot, ctx, players, difficulty):
     player_str = ', '.join([p.display_name for p in players])
     title = random.choice(config["titles"])
 
-    await ctx.send(f"Starting a game of **hangman** with {', '.join([p.mention for p in players])}")
+    await ctx.send(f"Starting a game of **{difficulty} hangman** with {', '.join([p.mention for p in players])}")
     cgr = bot.get_cog("Cgr")
 
     if difficulty == "normal":
@@ -40,9 +41,10 @@ async def start(bot, ctx, players, difficulty):
 
 async def play_insane(bot, ctx, players, strikes):
     global word
-    word_length = random.randint(4, 9)
-    words = list(filter(lambda w: len(w) == word_length, config["insane_words"]))
-    word = random.choice(words)
+    word_length = random.randint(4, 10)
+    wordlist = filter(lambda w: len(w) == word_length, words.words())
+    wordlist = [w.upper() for w in wordlist]
+    word = random.choice(wordlist)
     guesses = set()
 
     await display(ctx, word, guesses, strikes, player_str, title)
@@ -54,14 +56,14 @@ async def play_insane(bot, ctx, players, strikes):
             continue
         guesses.add(guess)
 
-        remaining_words = await get_remaining_words(guess, words)
+        remaining_words = await get_remaining_words(guess, wordlist)
         if len(remaining_words) <= 1:
             if guess not in word:
                 await ctx.send(get_strike_message().format(guess=guess))
                 strikes -= 1
             return await play(bot, ctx, players, strikes, guesses)
-        words = remaining_words
-        word = random.choice(words)
+        wordlist = remaining_words
+        word = random.choice(wordlist)
 
         if guess not in word:
             await ctx.send(get_strike_message().format(guess=guess))
