@@ -30,7 +30,7 @@ async def start(bot, ctx, players, difficulty):
         victory = await play(bot, ctx, players, config["strikes"], set())
         await cgr.update_ratings_ai(ctx, players, victory, "hangman", config["normal_rating"])
     else:
-        victory = await play_insane(bot, ctx, players, config["insane_strikes"])
+        victory = await play_insane(bot, ctx, players)
         await cgr.update_ratings_ai(ctx, players, victory, "hangman", config["insane_rating"])
     if victory:
         await ctx.send(get_victory_message().format(word=word))
@@ -39,9 +39,10 @@ async def start(bot, ctx, players, difficulty):
     return players if victory else []
 
 
-async def play_insane(bot, ctx, players, strikes):
+async def play_insane(bot, ctx, players):
     global word
     word_length = random.randint(4, 10)
+    strikes = config["insane_strikes"] if word_length >= 8 else config["strikes"]
     wordlist = filter(lambda w: len(w) == word_length, words.words())
     wordlist = [w.upper() for w in wordlist] + config["insane_words"]
     word = random.choice(wordlist)

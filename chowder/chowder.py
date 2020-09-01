@@ -86,11 +86,11 @@ class Chowder(commands.Cog):
 
         await channel.send(f"It's decided, {names}. {winner.mention} is the best at {activity}! (on paper)")
         await channel.send(
-            f"{winner.mention} wins 0.50 ChowderCoin™️ and. {loser.mention} is deducted 0.10 ChowderCoin™️."
+            f"{winner.mention} wins 0.10 ChowderCoin™️ and. {loser.mention} is deducted 0.05 ChowderCoin™️."
         )
         cc_cog = self.bot.get_cog("ChowderCoin")
-        await cc_cog.add_coin(winner, 0.5)
-        await cc_cog.subtract_coin(loser, 0.1)
+        await cc_cog.add_coin(winner, 0.1)
+        await cc_cog.subtract_coin(loser, 0.05)
         if tie:
             await channel.send(tie)
 
