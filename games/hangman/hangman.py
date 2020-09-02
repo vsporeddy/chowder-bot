@@ -41,7 +41,7 @@ async def start(bot, ctx, players, difficulty):
 
 async def play_insane(bot, ctx, players):
     global word
-    word_length = random.randint(4, 10)
+    word_length = random.randint(4, 8)
     strikes = config["insane_strikes"] if word_length >= 8 else config["strikes"]
     wordlist = filter(lambda w: len(w) == word_length, words.words())
     wordlist = [w.upper() for w in wordlist] + config["insane_words"]
