@@ -4,7 +4,7 @@
     "symbols": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     "weights": [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000],
     "wildcard_weight": 100,
-    "wildcard_emote": "<:ChowderPalmers:743812492551127062>",
+    "wildcard_emote": "<:ChowderPalmers:541700042407280650>",
     "min_bet": 0.01,
     "scam": 0.4,
     "scam_threshold": 0.2,
@@ -24,7 +24,7 @@
     "winning_hands": {
       "A": {
         "label": "One pair", 
-        "payout": 2, 
+        "payout": 3, 
         "message": "```ini\nNot bad, skipper.```", 
         "color": 15790335 
       },
@@ -36,25 +36,25 @@
       },
       "C": {
         "label": "Three in a row", 
-        "payout": 20, 
+        "payout": 200, 
         "message": "```ldif\nTHREE IN A ROW!```", 
         "color": 4188997
       },
       "D": {
         "label": "Four in a row", 
-        "payout": 50, 
+        "payout": 500, 
         "message": "```ldif\nFOUR IN A ROW!!```", 
         "color": 16743168 
       },
       "E": {
         "label": "Five in a row", 
-        "payout": 100, 
+        "payout": 1000, 
         "message": "```ldif\nFIVE IN A ROW!!!```", 
         "color": 65314
       },
       "F": {
         "label": "Full House", 
-        "payout": 35, 
+        "payout": 350, 
         "message": "```ldif\nFULL HOUSE!!```", 
         "color": 16776960 
       },
@@ -65,7 +65,7 @@
         "color": 10717577 
       }
     },
-    "rip_emote": "<:ChowderRIP:744794804948435014>",
+    "rip_emote": "<:ChowderRIP:589966977188102161>",
     "nbad_emote": "<:SpatikaClutch:609867523155951621>",
-    "coin_emote": "<:ChowderCoin:750409427483492501>"
+    "coin_emote": "<:ChowderCoin:746800434873761955>"
 }

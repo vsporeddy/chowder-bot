@@ -30,14 +30,7 @@ class Gamble(commands.Cog):
         await ctx.send(random.choice([config["heads"], config["tails"]]))
 
     @commands.command(name="slots", brief="Try your hand at the slots and get rich.")
-    async def slots(self, ctx, *args):
-        if (len(args) == 0):
-            bet = None
-        elif (len(args) != 1):
-            await ctx.send("Invalid input.")
-            return
-        else:
-            bet = args[0]
+    async def slots(self, ctx, bet=None):
         await slots.roll(self, ctx, bet)
 
 

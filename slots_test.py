@@ -3,9 +3,6 @@ import unittest
 
 class TestSlots(unittest.TestCase):
 
-
-
-
     test_cases = [
         [1, 2, 3, 4, 5], #no win
         [1, 1, 2, 3, 4], #1 pair

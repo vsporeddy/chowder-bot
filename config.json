@@ -1,5 +1,5 @@
 {
-    "guild": "chowderbot test", 
+    "guild": "Dark Times", 
     "prefixes": ["chowder pls ", "$", "Chowder pls ", "$chowder "],
     "channels": [125101913518768128, 742906298257113199, 689297802823860225, 454492770682404877, 565381938022449152, 744644246883270659, 493580256565919745],
     "insubordination_rate": 0.069,
