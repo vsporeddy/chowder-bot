@@ -1,0 +1,71 @@
+{
+    "reels": 5,
+    "wildcard": null,
+    "symbols": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+    "weights": [1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000, 1000],
+    "wildcard_weight": 100,
+    "wildcard_emote": "<:ChowderPalmers:541700042407280650>",
+    "min_bet": 0.01,
+    "scam": 0.4,
+    "scam_threshold": 0.2,
+    "admin_roles": [748438052493459546],
+    "emotes": {
+      "1": "<:strawberry:743743346681446442>",
+      "2": "<:apple:743734648252792942>",
+      "3": "<:tangerine:743734648252792942>",
+      "4": "<:lemon:743734648252792942>",
+      "5": "<:watermelon:743734648252792942>",
+      "6": "<:peach:743734648252792942>",
+      "7": "<:cherries:743734648252792942>",
+      "8": "<:pineapple:743734648252792942>",
+      "9": "<:grapes:743734648252792942>",
+      "10": "<:crown:743734648252792942>"
+    },
+    "winning_hands": {
+      "A": {
+        "label": "One pair", 
+        "payout": 3, 
+        "message": "```ini\nNot bad, skipper.```", 
+        "color": 15790335 
+      },
+      "B": {
+        "label": "Two pair", 
+        "payout": 10, 
+        "message": "```ldif\nTwo pair.\nNow we're getting somewhere.```",
+        "color": 255 
+      },
+      "C": {
+        "label": "Three in a row", 
+        "payout": 200, 
+        "message": "```ldif\nTHREE IN A ROW!```", 
+        "color": 4188997
+      },
+      "D": {
+        "label": "Four in a row", 
+        "payout": 500, 
+        "message": "```ldif\nFOUR IN A ROW!!```", 
+        "color": 16743168 
+      },
+      "E": {
+        "label": "Five in a row", 
+        "payout": 1000, 
+        "message": "```ldif\nFIVE IN A ROW!!!```", 
+        "color": 65314
+      },
+      "F": {
+        "label": "Full House", 
+        "payout": 350, 
+        "message": "```ldif\nFULL HOUSE!!```", 
+        "color": 16776960 
+      },
+      "RIP": {
+        "label": "Nothing", 
+        "payout": 0, 
+        "message": "```css\nYou hate to see that...```", 
+        "color": 10717577 
+      }
+    },
+    "rip_emote": "<:ChowderRIP:589966977188102161>",
+    "nbad_emote": "<:SpatikaClutch:609867523155951621>",
+    "coin_emote": "<:ChowderCoin:746800434873761955>"
+}
