@@ -37,7 +37,7 @@ class Chowder(commands.Cog):
         self.revive.cancel()
         self.fomo.cancel()
 
-    @tasks.loop(seconds=random.randrange(config["spam_cooldown"]))
+    @tasks.loop(seconds=config["spam_cooldown"])
     async def spam(self):
         """Chowder bot can't contain himself"""
         channel = self.get_default_channel()
