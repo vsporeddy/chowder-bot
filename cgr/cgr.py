@@ -100,7 +100,7 @@ class Cgr(commands.Cog):
         cgrs = {}
         for game in games:
             cgr = await persistence.db.all(
-                persistence.Rating.query.where(persistence.Rating.game == game and persistence.Rating.id != bot_id).order_by(persistence.Rating.rating.desc())
+                persistence.Rating.query.where(persistence.Rating.game == game, persistence.Rating.id != bot_id).order_by(persistence.Rating.rating.desc())
             )
             cgrs[game] = cgr[0]
         return cgrs
