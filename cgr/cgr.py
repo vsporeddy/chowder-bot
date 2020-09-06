@@ -17,6 +17,7 @@ with open("cgr/cgr_config.json", "r") as read_file:
 
 games = list(game_config.keys())
 
+bot_id = 742188146879496262
 
 class Cgr(commands.Cog):
     def __init__(self, bot):
@@ -99,7 +100,7 @@ class Cgr(commands.Cog):
         cgrs = {}
         for game in games:
             cgr = await persistence.db.all(
-                persistence.Rating.query.where(persistence.Rating.game == game).order_by(persistence.Rating.rating.desc())
+                persistence.Rating.query.where(persistence.Rating.game == game and persistence.Rating.id != bot_id).order_by(persistence.Rating.rating.desc())
             )
             cgrs[game] = cgr[0]
         return cgrs
