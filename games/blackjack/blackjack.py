@@ -63,7 +63,9 @@ class Player:
 
 async def start(bot, ctx, players):
     await ctx.send(f"Starting a game of **blackjack** with {', '.join([p.mention for p in players])}")
+    cgr = bot.get_cog("Cgr")
     winners = await play(bot, ctx, players)
+    await cgr.update_ratings_blackjack(ctx, players, winners)
     return winners
 
 async def play(bot, ctx, players):
@@ -77,7 +79,7 @@ async def play(bot, ctx, players):
     def check(m):
         return m.author in players and \
                (m.content.upper() == "HIT" or \
-               m.content.upper() == "STOP")
+               m.content.upper() == "STAY")
 
     for p in players:
         gamers.append(Player(p))
@@ -109,7 +111,7 @@ async def play(bot, ctx, players):
                     player_getting_card.set_cant_draw()
                     players_cant_draw += 1
 
-        elif(deal_message.content.upper() == "STOP"):
+        elif(deal_message.content.upper() == "STAY"):
             player_stop = get_player(deal_message.author, gamers)
 
             if (player_stop.can_draw == True):
