@@ -54,10 +54,10 @@ class Cgr(commands.Cog):
         losers = set(players) - set(winners)
         # r2 represents other team's rating. For Blackjack, it will be chowdertron
         r2 = math.pow(10, game_config["blackjack"]["ai_rating"]/400)
-        if (losers):
+        if losers:
             await self.update_ratings_helper(ctx, losers, r2, 0, "blackjack")
 
-        if (winners):
+        if winners:
             await self.update_ratings_helper(ctx, winners, r2, 1, "blackjack")
 
     async def update_ratings_helper(self, ctx, team, r2, s, game):
