@@ -50,6 +50,16 @@ class Cgr(commands.Cog):
         for player in players:
             await self.update_ratings_helper(ctx, [player], r2, 0.4, "chameleon")
 
+    async def update_ratings_blackjack(self, ctx, players, winners):
+        losers = set(players) - set(winners)
+        # r2 represents other team's rating. For Blackjack, it will be chowdertron
+        r2 = math.pow(10, game_config["blackjack"]["ai_rating"]/400)
+        if (losers):
+            await self.update_ratings_helper(ctx, losers, r2, 0, "blackjack")
+
+        if (winners):
+            await self.update_ratings_helper(ctx, winners, r2, 1, "blackjack")
+
     async def update_ratings_helper(self, ctx, team, r2, s, game):
         for player in team:
             cgr = await self.get_rating(player, game)
