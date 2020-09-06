@@ -115,6 +115,12 @@ class Games(commands.Cog):
             winners = await telewave.start(self.bot, ctx, players, game_mode)
 
         elif game_name == "blackjack":
+            buyin = await self.get_buyin(ctx, cc_cog, initiator, players)
+            for player in players:
+                await cc_cog.subtract_coin(player, buyin)
+                pot += buyin
+                # winning against chowder bot gives you 1.5X
+                pot *= 1.5
             winners = await blackjack.start(self.bot, ctx, players)
 
         elif game_name == "chowderfight":

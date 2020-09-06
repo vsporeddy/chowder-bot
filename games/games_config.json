@@ -25,7 +25,7 @@
         "blackjack": {
             "emote": "<:DanteTears:549492738249195521>",
             "min_players": 1,
-            "wait_time": 15,
+            "wait_time": 5,
             "start_req": 12,
             "stop_req": 12,
             "ai_win_reward": 0.1
