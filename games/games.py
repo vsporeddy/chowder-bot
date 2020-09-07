@@ -120,7 +120,7 @@ class Games(commands.Cog):
                 await cc_cog.subtract_coin(player, buyin)
                 pot += buyin
                 # winning against chowder bot gives you 1.5X
-                pot *= 1.5
+            pot *= 1.5
             winners = await blackjack.start(self.bot, ctx, players)
 
         elif game_name == "chowderfight":
