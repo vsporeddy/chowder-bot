@@ -52,8 +52,12 @@ class ChowderCoin(commands.Cog):
     async def display_balance(self, ctx):
         player = ctx.message.mentions[0] if ctx.message.mentions else ctx.author
         cc = await self.get_balance(player)
+        if (cc.balance < .01):
+            bal_text = f"  {cc.balance:.3f}"
+        else:
+            bal_text = f"  {cc.balance:.2f}"
         embed = discord.Embed(
-            title=f"  {cc.balance:.2f}",
+            title=bal_text,
             color=player.color
         )
         embed.set_thumbnail(url=config["image"])
