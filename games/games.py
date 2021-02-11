@@ -231,11 +231,13 @@ class Games(commands.Cog):
         cgr_cog = self.bot.get_cog("Cgr")
         cgrs = await cgr_cog.get_top_players()
         for game in cgrs.keys():
-            embed.add_field(
-                name=f"Top {game.capitalize()} player",
-                value=f"{self.bot.get_user(cgrs[game].id).mention}: `{cgrs[game].rating}` CGR",
-                inline=False
-            )
+            player = self.bot.get_user(cgrs[game].id)
+            if player:
+                embed.add_field(
+                    name=f"Top {game.capitalize()} player",
+                    value=f"{player.mention}: `{cgrs[game].rating}` CGR",
+                    inline=False
+                )
 
         cc_cog = self.bot.get_cog("ChowderCoin")
         cc = await cc_cog.get_richest_user()
