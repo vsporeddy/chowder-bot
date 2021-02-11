@@ -55,7 +55,7 @@ class Chowder(commands.Cog):
         if not last_message or (datetime.utcnow() - channel.last_message.created_at).seconds < config["revive_cooldown"]:
             return
         boys = [user for user in channel.members if user.status == discord.Status.online
-                and user.top_role.position >= config["role_req"]]
+                and user.roles[-1].position >= config["role_req"]]
         if len(boys) < config["min_revival_users"]:
             return
 
@@ -188,7 +188,7 @@ class Chowder(commands.Cog):
 
 
 def get_name(author):
-    name = get_respectful_name() if author.top_role.position >= config["respect_req"] else get_condescending_name()
+    name = get_respectful_name() if author.roles[-1].position >= config["respect_req"] else get_condescending_name()
     return name
 
 
