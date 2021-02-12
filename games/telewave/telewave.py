@@ -83,21 +83,26 @@ async def play_coop(bot, ctx, team):
     turns = config["coop_turn_count"]
     extra_turn = False
     while turns:
-        await wait(ctx, team, extra_turn)
-        prompt = get_prompt()
-        answer = random.randint(0, 100)
-        await display(
-            ctx, team, None, prompt, max_score, turns,
-            text=f"\u200B\n**{team.psychic.mention}** is thinking of a clue...\n",
-            thumbnail=str(team.psychic.avatar_url)
-        )
+        while true:
+            await wait(ctx, team, extra_turn)
+            prompt = get_prompt()
+            answer = random.randint(0, 100)
+            await display(
+                ctx, team, None, prompt, max_score, turns,
+                text=f"\u200B\n**{team.psychic.mention}** is thinking of a clue...\n",
+                thumbnail=str(team.psychic.avatar_url)
+            )
 
-        clue = await get_clue(bot, ctx, team.psychic, prompt, answer)
-        await display(
-            ctx, team, None, prompt, max_score, turns,
-            text=f"Clue: ```{clue}```",
-            thumbnail=str(team.psychic.avatar_url)
-        )
+            clue = await get_clue(bot, ctx, team.psychic, prompt, answer)
+            if (clue == "__###_reroll_me_##__"):
+                continue
+
+            await display(
+                ctx, team, None, prompt, max_score, turns,
+                text=f"Clue: ```{clue}```",
+                thumbnail=str(team.psychic.avatar_url)
+            )
+            break
 
         guess = await get_guess(bot, ctx, team)
         prev_score = team.score
@@ -162,6 +167,8 @@ async def get_clue(bot, ctx, psychic, prompt, answer):
         return m.author == psychic and \
                (m.channel == dm.channel or (m.channel == ctx.channel and m.content.startswith("$clue ")))
     clue = (await bot.wait_for("message",  check=check)).content
+    if clue.startswith("$reroll "):
+        clue = "__###_reroll_me_##__"
     return clue[6:] if clue.startswith("$clue ") else clue
 
 
