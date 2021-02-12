@@ -83,7 +83,8 @@ async def play_coop(bot, ctx, team):
     turns = config["coop_turn_count"]
     extra_turn = False
     while turns:
-        while true:
+        rerolls = 1
+        while True:
             await wait(ctx, team, extra_turn)
             prompt = get_prompt()
             answer = random.randint(0, 100)
@@ -94,8 +95,11 @@ async def play_coop(bot, ctx, team):
             )
 
             clue = await get_clue(bot, ctx, team.psychic, prompt, answer)
-            if (clue == "__###_reroll_me_##__"):
+            if clue == "__###_reroll_me_##__" and rerolls == 1:
+                rerolls -= 1
                 continue
+            elif clue == "__###_reroll_me_##__" and rerolls == 0:
+                clue = f"```{team1.psychic.mention}``` was an diot tried to reroll again... Good luck"
 
             await display(
                 ctx, team, None, prompt, max_score, turns,
@@ -121,21 +125,30 @@ async def play_vs(bot, ctx, team1, team2):
     max_score = config["max_score_vs"]
     extra_turn = False
     while team1.score < max_score and team2.score < max_score:
-        await wait(ctx, team1, extra_turn)
-        prompt = get_prompt()
-        answer = random.randint(0, 100)
-        await display(
-            ctx, team1, team2, prompt, max_score, 0,
-            text=f"\u200B\n**{team1.psychic.mention}** is thinking of a clue...\n",
-            thumbnail=str(team1.psychic.avatar_url)
-        )
+        rerolls = 1
+        while True:
+            await wait(ctx, team1, extra_turn)
+            prompt = get_prompt()
+            answer = random.randint(0, 100)
+            await display(
+                ctx, team1, team2, prompt, max_score, 0,
+                text=f"\u200B\n**{team1.psychic.mention}** is thinking of a clue...\n",
+                thumbnail=str(team1.psychic.avatar_url)
+            )
 
-        clue = await get_clue(bot, ctx, team1.psychic, prompt, answer)
-        await display(
-            ctx, team1, team2, prompt, max_score, 0,
-            text=f"Clue: ```{clue}```",
-            thumbnail=str(team1.psychic.avatar_url)
-        )
+            clue = await get_clue(bot, ctx, team1.psychic, prompt, answer)
+            if clue == "__###_reroll_me_##__" and rerolls == 1:
+                rerolls -= 1
+                continue
+            else if clue == "__###_reroll_me_##__" and rerolls == 0:
+                clue = f"```{team1.psychic.mention}``` was an diot tried to reroll again... Good luck"
+
+            await display(
+                ctx, team1, team2, prompt, max_score, 0,
+                text=f"Clue: ```{clue}```",
+                thumbnail=str(team1.psychic.avatar_url)
+            )
+            break
 
         guess = await get_guess(bot, ctx, team1)
         await display(
