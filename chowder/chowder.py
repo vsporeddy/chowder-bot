@@ -30,12 +30,10 @@ class Chowder(commands.Cog):
         self.bot = bot
         self.spam.start()
         self.revive.start()
-        self.fomo.start()
 
     def cog_unload(self):
         self.spam.cancel()
         self.revive.cancel()
-        self.fomo.cancel()
 
     @tasks.loop(seconds=config["spam_cooldown"])
     async def spam(self):
@@ -94,7 +92,6 @@ class Chowder(commands.Cog):
         if tie:
             await channel.send(tie)
 
-    @tasks.loop(seconds=60)
     async def fomo(self):
         """Chowder bot doesn't want to miss out on the fun"""
         guild = self.get_default_guild()
