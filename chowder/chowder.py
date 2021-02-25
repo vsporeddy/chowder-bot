@@ -126,7 +126,6 @@ class Chowder(commands.Cog):
 
     @spam.before_loop
     @revive.before_loop
-    @fomo.before_loop
     async def before_spam(self):
         print('waiting...')
         await self.bot.wait_until_ready()
