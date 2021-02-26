@@ -112,6 +112,9 @@ class Chowder(commands.Cog):
         if voice_channel and voice and voice.channel == voice_channel:
             return
         elif voice_channel and voice and voice.is_connected():
+            #If current voice channel has same amount of members do not switch
+            if len(voice.channel.members) == len(voice_channel.members):
+                return
             print(f"Moving from {voice.channel.name} to {voice_channel.name}")
             await voice.disconnect()
             voice = await voice_channel.connect()
