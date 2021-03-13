@@ -144,6 +144,13 @@ class Chowder(commands.Cog):
     async def on_message_edit(self, before, after):
         if before.channel.id not in channels or before.author == self.bot.user:
             return
+
+        #Stop spamming when someone posts a link
+        #Only send message if edited 5 seconds or more after original 
+        time_cutoff = before.created_at + datetime.timedelta(seconds = 5)
+        if before.edited_at and before.edited_at <= time_cutoff:
+            return
+            
         name = get_name(before.author)
         await before.channel.send(f"Whoa {before.author.mention} why you editing messages {name}? Sketch")
 
