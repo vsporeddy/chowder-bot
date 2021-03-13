@@ -7,8 +7,8 @@
             "emote": "<:kms:714385140763066378>",
             "min_players": 1,
             "wait_time": 5,
-            "start_req": 12,
-            "stop_req": 12,
+            "start_req": 0,
+            "stop_req": 0,
             "ai_win_reward": 0.02,
             "insane_cost": 0.01,
             "insane_win_reward": 1
@@ -18,16 +18,16 @@
             "min_players": 2,
             "min_players_vs": 4,
             "wait_time": 30,
-            "start_req": 12,
-            "stop_req": 12,
+            "start_req": 11,
+            "stop_req": 11,
             "ai_win_reward": 0.2
         },
         "blackjack": {
             "emote": "<:DanteTears:549492738249195521>",
             "min_players": 1,
             "wait_time": 5,
-            "start_req": 12,
-            "stop_req": 12,
+            "start_req": 10,
+            "stop_req": 10,
             "ai_win_reward": 0.1
         },
         "chowderfight": {
@@ -42,8 +42,8 @@
             "emote": "<:DudemanEZ:541700377398083613>",
             "min_players": 3,
             "wait_time": 30,
-            "start_req": 12,
-            "stop_req": 12
+            "start_req": 11,
+            "stop_req": 11
         }
     }
 }
