@@ -148,7 +148,7 @@ class Chowder(commands.Cog):
         #Stop spamming when someone posts a link
         #Only send message if edited 5 seconds or more after original 
         time_cutoff = before.created_at + datetime.timedelta(seconds = 5)
-        if after.created_at <= time_cutoff:
+        if before.edited_at and before.edited_at <= time_cutoff:
             return
             
         name = get_name(before.author)
