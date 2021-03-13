@@ -8,7 +8,7 @@ import asyncio
 import discord
 import nltk
 from nltk.stem import WordNetLemmatizer
-from datetime import datetime
+from datetime import datetime, timedelta
 from discord.ext import tasks, commands
 
 with open("chowder/chowder_config.json", "r") as read_file:
@@ -147,7 +147,7 @@ class Chowder(commands.Cog):
 
         #Stop spamming when someone posts a link
         #Only send message if edited 5 seconds or more after original 
-        time_cutoff = before.created_at + datetime.timedelta(seconds = 5)
+        time_cutoff = before.created_at + timedelta(seconds = 5)
         if before.edited_at and before.edited_at <= time_cutoff:
             return
             
