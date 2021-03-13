@@ -8,7 +8,7 @@ import asyncio
 import discord
 import nltk
 from nltk.stem import WordNetLemmatizer
-from datetime import datetime
+from datetime import datetime, timedelta
 from discord.ext import tasks, commands
 
 with open("chowder/chowder_config.json", "r") as read_file:
