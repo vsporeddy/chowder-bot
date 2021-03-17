@@ -13,12 +13,13 @@ with open("games/telewave/telewave_config.json", "r") as read_file:
 
 
 class TelewaveTeam:
-    def __init__(self, players, name, score, cgr):
+    def __init__(self, players, name, score, cgr, rerolls):
         self.guessers = deque(players)
         self.psychic = self.guessers.popleft()
         self.score = score
         self.name = name
         self.cgr = cgr
+        self.rerolls = rerolls
 
     def __str__(self):
         return f"{self.psychic.display_name}, {', '.join([g.display_name for g in self.guessers])}"
@@ -45,7 +46,7 @@ async def start(bot, ctx, players, game_mode):
 
     if game_mode == "coop":
         team = TelewaveTeam(
-            players, name=random.choice(team_names), score=0, cgr=await cgr.get_average_rating(players, "telewave")
+            players, name=random.choice(team_names), score=0, cgr=await cgr.get_average_rating(players, "telewave"), rerolls=2
         )
         await play_coop(bot, ctx, team)
         await cgr.update_ratings_coop(ctx, team)
@@ -62,10 +63,10 @@ async def start(bot, ctx, players, game_mode):
         players1 = players[:len(players)//2]
         players2 = players[len(players)//2:]
         team1 = TelewaveTeam(
-            players1, name=team_names[0], score=0, cgr=await cgr.get_average_rating(players1, "telewave")
+            players1, name=team_names[0], score=0, cgr=await cgr.get_average_rating(players1, "telewave"), rerolls=2
         )
         team2 = TelewaveTeam(
-            players2, name=team_names[1], score=1, cgr=await cgr.get_average_rating(players2, "telewave")
+            players2, name=team_names[1], score=1, cgr=await cgr.get_average_rating(players2, "telewave"), rerolls=2
         )
         await play_vs(bot, ctx, team1, team2)
         await cgr.update_ratings_vs(ctx, team1, team2)
@@ -83,30 +84,43 @@ async def play_coop(bot, ctx, team):
     turns = config["coop_turn_count"]
     extra_turn = False
     while turns:
-        rerolls = 1
-        while True:
-            await wait(ctx, team, extra_turn)
+        await wait(ctx, team, extra_turn)
+        turn_in_progress = True
+        while turn_in_progress:
             prompt = get_prompt()
             answer = random.randint(0, 100)
-            await display(
-                ctx, team, None, prompt, max_score, turns,
-                text=f"\u200B\n**{team.psychic.mention}** is thinking of a clue...\n",
-                thumbnail=str(team.psychic.avatar_url)
-            )
+            await display_thinking(ctx, team, None, prompt, max_score, turns)
 
             clue = await get_clue(bot, ctx, team.psychic, prompt, answer)
-            if clue == "__###_reroll_me_##__" and rerolls == 1:
-                rerolls -= 1
+            handle_reroll = True if clue.startswith("$reroll") else False
+            has_rerolled = False
+
+            while handle_reroll:
+                if team.rerolls <= 0:
+                    await team.psychic.send(f"Sorry your team is out of rerolls!")
+
+                    clue = await get_clue(bot, ctx, team.psychic, prompt, answer)
+                    handle_reroll = True if clue.startswith("$reroll") else False
+                else:
+                    team.rerolls = team.rerolls - 1
+                    await display(
+                        ctx, team, None, None, max_score, turns,
+                        text=f"\u200B\n**{team.psychic.mention}** has rerolled. Your team has **{team.rerolls}** remaining...\n",
+                        thumbnail=str(team.psychic.avatar_url)
+                    )
+                    handle_reroll = False
+                    has_rerolled = True
+
+            # If rerolled occurred then restart the turn
+            if has_rerolled:
                 continue
-            elif clue == "__###_reroll_me_##__" and rerolls == 0:
-                clue = f"```{team1.psychic.mention}``` was an diot tried to reroll again... Good luck"
 
             await display(
                 ctx, team, None, prompt, max_score, turns,
                 text=f"Clue: ```{clue}```",
                 thumbnail=str(team.psychic.avatar_url)
             )
-            break
+            turn_in_progress = False
 
         guess = await get_guess(bot, ctx, team)
         prev_score = team.score
@@ -125,30 +139,44 @@ async def play_vs(bot, ctx, team1, team2):
     max_score = config["max_score_vs"]
     extra_turn = False
     while team1.score < max_score and team2.score < max_score:
-        rerolls = 1
-        while True:
-            await wait(ctx, team1, extra_turn)
+        await wait(ctx, team1, extra_turn)
+
+        turn_in_progress = True
+        while turn_in_progress:
             prompt = get_prompt()
             answer = random.randint(0, 100)
-            await display(
-                ctx, team1, team2, prompt, max_score, 0,
-                text=f"\u200B\n**{team1.psychic.mention}** is thinking of a clue...\n",
-                thumbnail=str(team1.psychic.avatar_url)
-            )
+            await display_thinking(ctx, team1, team2, prompt, max_score, 0)
 
             clue = await get_clue(bot, ctx, team1.psychic, prompt, answer)
-            if clue == "__###_reroll_me_##__" and rerolls == 1:
-                rerolls -= 1
+            handle_reroll = True if clue.startswith("$reroll") else False
+            has_rerolled = False
+
+            while handle_reroll:
+                if team1.rerolls <= 0:
+                    await team1.psychic.send(f"Sorry your team is out of rerolls!")
+
+                    clue = await get_clue(bot, ctx, team1.psychic, prompt, answer)
+                    handle_reroll = True if clue.startswith("$reroll") else False
+                else:
+                    team1.rerolls = team1.rerolls - 1
+                    await display(
+                        ctx, team1, team2, None, max_score, 0,
+                        text=f"\u200B\n**{team1.psychic.mention}** has rerolled. Your team has **{team1.rerolls}** remaining...\n",
+                        thumbnail=str(team1.psychic.avatar_url)
+                    )
+                    handle_reroll = False
+                    has_rerolled = True
+
+            # If rerolled occurred then restart the turn
+            if has_rerolled:
                 continue
-            else if clue == "__###_reroll_me_##__" and rerolls == 0:
-                clue = f"```{team1.psychic.mention}``` was an diot tried to reroll again... Good luck"
 
             await display(
                 ctx, team1, team2, prompt, max_score, 0,
                 text=f"Clue: ```{clue}```",
                 thumbnail=str(team1.psychic.avatar_url)
             )
-            break
+            turn_in_progress = False
 
         guess = await get_guess(bot, ctx, team1)
         await display(
@@ -180,10 +208,14 @@ async def get_clue(bot, ctx, psychic, prompt, answer):
         return m.author == psychic and \
                (m.channel == dm.channel or (m.channel == ctx.channel and m.content.startswith("$clue ")))
     clue = (await bot.wait_for("message",  check=check)).content
-    if clue.startswith("$reroll "):
-        clue = "__###_reroll_me_##__"
     return clue[6:] if clue.startswith("$clue ") else clue
 
+async def display_thinking(ctx, team1, team2, prompt, max_score, turns):
+    await display(
+        ctx, team1, team2, prompt, max_score, turns,
+        text=f"\u200B\n**{team1.psychic.mention}** is thinking of a clue...\n",
+        thumbnail=str(team1.psychic.avatar_url)
+    )
 
 async def get_guess(bot, ctx, team):
     msg = await ctx.send(
@@ -251,8 +283,10 @@ async def wait(ctx, team, extra_turn):
 
 
 async def display(ctx, team1, team2, prompt, max_score, turns, text, thumbnail):
+    header = f"__{prompt[0]}__  ⟵  0\n vs.\n__{prompt[1]}__  ⟶  100" if prompt != None else f"Informational"
+
     embed = discord.Embed(
-            title=f"__{prompt[0]}__  ⟵  0\n vs.\n__{prompt[1]}__  ⟶  100",
+            title=header,
             description=text,
             color=team1.psychic.color
         )
