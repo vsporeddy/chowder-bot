@@ -141,20 +141,6 @@ class Chowder(commands.Cog):
         await message.channel.send(f"Whoa {message.author.mention} why you deleting messages {name}? Sketch")
 
     @commands.Cog.listener()
-    async def on_message_edit(self, before, after):
-        if before.channel.id not in channels or before.author == self.bot.user:
-            return
-
-        #Stop spamming when someone posts a link
-        #Only send message if edited 5 seconds or more after original 
-        time_cutoff = before.created_at + timedelta(seconds = 5)
-        if after.edited_at and after.edited_at <= time_cutoff:
-            return
-            
-        name = get_name(before.author)
-        await before.channel.send(f"Whoa {before.author.mention} why you editing messages {name}? Sketch")
-
-    @commands.Cog.listener()
     async def on_member_join(self, member):
         channel = self.get_default_channel()
         await channel.send(f"{get_collective_name()}, please welcome {member.mention} {get_emote()}")
