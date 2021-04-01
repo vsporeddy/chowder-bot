@@ -8,7 +8,7 @@ import asyncio
 import discord
 import nltk
 from nltk.stem import WordNetLemmatizer
-from datetime import datetime
+from datetime import datetime, timedelta
 from discord.ext import tasks, commands
 
 with open("chowder/chowder_config.json", "r") as read_file:
@@ -112,6 +112,9 @@ class Chowder(commands.Cog):
         if voice_channel and voice and voice.channel == voice_channel:
             return
         elif voice_channel and voice and voice.is_connected():
+            #If current voice channel has same amount of members do not switch
+            if len(voice.channel.members) == len(voice_channel.members):
+                return
             print(f"Moving from {voice.channel.name} to {voice_channel.name}")
             await voice.disconnect()
             voice = await voice_channel.connect()
@@ -136,13 +139,6 @@ class Chowder(commands.Cog):
             return
         name = get_name(message.author)
         await message.channel.send(f"Whoa {message.author.mention} why you deleting messages {name}? Sketch")
-
-    @commands.Cog.listener()
-    async def on_message_edit(self, before, after):
-        if before.channel.id not in channels or before.author == self.bot.user:
-            return
-        name = get_name(before.author)
-        await before.channel.send(f"Whoa {before.author.mention} why you editing messages {name}? Sketch")
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
