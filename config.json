@@ -1,11 +1,11 @@
 {
-    "guild": "Dank Times", 
+    "guild": "Avian Times", 
     "prefixes": ["chowder pls ", "$", "Chowder pls ", "$chowder "],
     "channels": [742906298257113199, 689297802823860225, 454492770682404877, 565381938022449152, 744644246883270659],
     "insubordination_rate": 0.069,
     "insubordination_messages": [
         "Fuck off, you're not my manager",
-        "What? Sorry I was stretching",
-        "Need to call my girlfriend brb"
+        "What? Sorry I was stretching my wings",
+        "Need to call my chick brb"
     ]
 }

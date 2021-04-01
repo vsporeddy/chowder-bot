@@ -302,9 +302,9 @@ class Games(commands.Cog):
 
     async def set_new_status(self):
         activity = random.choice([
-                discord.Activity(name="hentai", type=discord.ActivityType.watching),
-                discord.Game(name="with myself"),
-                discord.Activity(type=discord.ActivityType.listening, name="a banger")
+                discord.Activity(name="birds", type=discord.ActivityType.watching),
+                discord.Game(name="with my beak"),
+                discord.Activity(type=discord.ActivityType.listening, name="Kero Kero Bonito - Flamingo")
             ])
         await self.bot.change_presence(activity=activity)
 
