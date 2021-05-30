@@ -23,8 +23,6 @@
         "gambling": "happy",
         "poker": "happy",
         "carlo": "happy",
-        "bird": "happy",
-        "flamingo": "happy",
 
         "sup": "greeting",
         "suh": "greeting",
@@ -146,11 +144,11 @@
     },
 
     "condescending_names": [
-        "birdie",
-        "chirper",
-        "birdbrain",
+        "buddy",
+        "skipper",
+        "sport",
         "bud",
-        "chicken"
+        "champ"
     ],
 
     "respectful_names": [
@@ -161,8 +159,9 @@
     ],
 
     "collective_names": [
-        "flock",
-        "birds"
+        "boys",
+        "bois",
+        "skippers"
     ],
 
     "join_phrases": [
@@ -197,9 +196,7 @@
         "🎵 I'm a star so I put a neutron on my pinkie 🎵",
         "-play mr. lonely",
         "KELLEEEEEEEEEY! Slurpee?",
-        "ESO dude?",
-        "SQUAWK!",
-        "chirp"
+        "ESO dude?"
     ],
 
     "caps_responses": [
