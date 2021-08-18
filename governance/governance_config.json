@@ -1,6 +1,6 @@
 {
     "guild_id": 454492770682404875,
-    "promotion_cap": 14,
+    "promotion_cap": 20,
     "promotion_floor": 10,
     "min_nominations": 6,
     "demotion_emote": "<:ChowderRIP:589966977188102161>",
