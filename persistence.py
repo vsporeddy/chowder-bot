@@ -1,6 +1,5 @@
 
 import os
-import ssl
 
 from dotenv import load_dotenv
 from gino import Gino
@@ -34,9 +33,5 @@ class Items(db.Model):
 
 
 async def initialize():
-    ctx = ssl.create_default_context(cafile="")
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-
-    await db.set_bind(DATABASE_URL, echo=True, ssl=ctx)
+    await db.set_bind(DATABASE_URL)
     await db.gino.create_all()
