@@ -55,8 +55,9 @@ class Games(commands.Cog):
             return []
 
         message = await ctx.channel.fetch_message(message.id)
-        reaction = discord.utils.find(lambda r: str(r.emoji) == emote, message.reactions)
-        players = await reaction.users().flatten()
+        # reaction = discord.utils.find(lambda r: str(r.emoji) == emote, message.reactions)
+        # Utils function seems broken so default to using first reaction
+        players = await message.reactions[0].users().flatten()
         players.remove(self.bot.user)
         if initiator not in players:
             players.append(initiator)
