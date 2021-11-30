@@ -49,7 +49,7 @@ if __name__ == "__main__":
 async def on_ready():
     guild = discord.utils.get(bot.guilds, name=config["guild"])
     print(
-        f"{bot.user.name} is connected to the following guild:\n"
+        f"Connected to the following guild:\n"
         f"{guild.name}(id: {guild.id})"
     )
     await persistence.initialize()
