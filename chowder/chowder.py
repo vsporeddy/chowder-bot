@@ -115,19 +115,19 @@ class Chowder(commands.Cog):
         if voice_channel and voice and voice.channel == voice_channel:
             return
         elif voice_channel and voice and voice.is_connected():
-            #If current voice channel has same amount of members do not switch
+            # If current voice channel has same amount of members do not switch
             if len(voice.channel.members) == len(voice_channel.members):
                 return
             print(f"Moving from {voice.channel.name} to {voice_channel.name}")
             await voice.disconnect()
             voice = await voice_channel.connect()
-            await voice.main_ws.voice_state(guild.id, voice_channel.id, self_mute=True)
+            # await voice.main_ws.voice_state(guild.id, voice_channel.id, self_mute=True)
             print(f"Successfully moved from {voice.channel.name} to {voice_channel.name}")
             return
         elif voice_channel:
             print(f"Connecting to voice channel {voice_channel.name}")
             voice = await voice_channel.connect()
-            await voice.main_ws.voice_state(guild.id, voice_channel.id, self_mute=True)
+            # await voice.main_ws.voice_state(guild.id, voice_channel.id, self_mute=True)
             await text_channel.send(get_join_phrase().format(names=names))
 
     @spam.before_loop
