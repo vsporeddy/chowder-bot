@@ -19,11 +19,8 @@ def get_prefix(bot, message):
     prefixes = config["prefixes"]
     return commands.when_mentioned_or(*prefixes)(bot, message)
 
-intents = discord.Intents.default()
-intents.members = True
-intents.presences = True
-intents.reactions = True
-bot = commands.Bot(command_prefix=get_prefix, intents=intents)
+bot_intents = discord.Intents.all()
+bot = commands.Bot(command_prefix=get_prefix, intents=bot_intents)
 channels = set(config["channels"])
 
 
