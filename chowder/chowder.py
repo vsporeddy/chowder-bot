@@ -29,12 +29,10 @@ class Chowder(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.spam.start()
-        self.revive.start()
         self.fomo.start()
 
     def cog_unload(self):
         self.spam.cancel()
-        self.revive.cancel()
         self.fomo.cancel()
 
     @tasks.loop(seconds=config["spam_cooldown"])
@@ -46,7 +44,6 @@ class Chowder(commands.Cog):
             return
         await channel.send(get_spam_quote())
 
-    @tasks.loop(seconds=60)
     async def revive(self):
         """Chowder bot tries to revive the dead server"""
         channel = self.get_default_channel()
@@ -131,7 +128,6 @@ class Chowder(commands.Cog):
             await text_channel.send(get_join_phrase().format(names=names))
 
     @spam.before_loop
-    @revive.before_loop
     @fomo.before_loop
     async def before_spam(self):
         print('waiting...')
