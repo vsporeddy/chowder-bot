@@ -13,5 +13,6 @@
     "fomo_threshold": 3,
     "rip_emote": "<:ChowderRIP:589966977188102161>",
     "happy_emote": "<:ChowderHappy:511436641844461579>",
-    "wtf_emote": "<:ChowderWut:541707580662349856>"
+    "wtf_emote": "<:ChowderWut:541707580662349856>",
+    "join_role": 545495433233825803
 }
