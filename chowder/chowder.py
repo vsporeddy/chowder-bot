@@ -139,6 +139,8 @@ class Chowder(commands.Cog):
     @commands.Cog.listener()
     async def on_member_join(self, member):
         channel = self.get_default_channel()
+        pip = self.bot.get_guild(config["guild_id"]).get_role(config["join_role"])
+        await member.add_roles(pip)
         await channel.send(f"{get_collective_name()}, please welcome {member.mention} {get_emote()}")
 
     @commands.Cog.listener()
