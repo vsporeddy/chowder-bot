@@ -303,7 +303,7 @@ class Games(commands.Cog):
 
     async def set_new_status(self):
         activity = random.choice([
-                discord.Activity(name="hentai", type=discord.ActivityType.watching),
+                discord.Activity(name="nothing", type=discord.ActivityType.watching),
                 discord.Game(name="Sleep Simulator"),
                 discord.Activity(type=discord.ActivityType.listening, name="a lullaby")
             ])
