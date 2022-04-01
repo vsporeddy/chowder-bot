@@ -169,6 +169,10 @@ class Chowder(commands.Cog):
                     response = random.choice(speech['responses'][intent]).format(name=name, word=lemma)
                     await message.channel.send(response)
                     return
+        else:
+            response = ''.join('z' for _ in range(random.randrange(3, 12)))
+            await message.channel.send(response)
+            return
 
     def get_default_channel(self):
         return self.bot.get_channel(config["default_channel"])
