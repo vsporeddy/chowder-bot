@@ -11,6 +11,7 @@
         "government": "tilt",
         "socialism": "tilt",
         "microsoft": "tilt",
+        "salesforce": "tilt",
         "sjw": "tilt",
         "vegan": "tilt",
         "work": "tilt",
@@ -23,6 +24,8 @@
         "gambling": "happy",
         "poker": "happy",
         "carlo": "happy",
+        "sleep": "happy",
+        "zzz": "happy",
 
         "sup": "greeting",
         "suh": "greeting",
