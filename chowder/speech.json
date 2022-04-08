@@ -79,7 +79,15 @@
         "broken": "confusion",
         "dead": "confusion",
         
-        "bot": "bot"
+        "bot": "bot",
+        
+        "nyum": "nyum",
+        
+        "dude": "dude",
+        
+        "bro": "bro",
+        
+        "happens": "happens"
     },
 
     "responses": {
@@ -148,6 +156,19 @@
         ],
         "bot": [
             "bot? what bot?"
+        ],
+        "nyum": [
+            "bro wtf is a nyum",
+            "nyum...? sorry I only speak english"
+        ],
+        "dude": [
+            "bro?"
+        ],
+        "bro": [
+            "dude?"
+        ],
+        "happens": [
+            "happens."
         ]
     },
 
