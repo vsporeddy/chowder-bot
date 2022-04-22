@@ -111,6 +111,7 @@ async def display(ctx, msg, choices):
     )
     choice_list = [f"{number}. {user.name}" for number, user in choices.items()]
     embed.add_field(name="Choices", inline=False, value='\n'.join(choice_list))
+    embed.set_thumbnail(url=config["thinking_img"])
     await ctx.send(embed=embed)
 
 async def display_answer(ctx, msg):
