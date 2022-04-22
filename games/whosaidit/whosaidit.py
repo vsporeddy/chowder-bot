@@ -53,7 +53,7 @@ async def play(bot, ctx, players):
     channel_members.remove(message_to_guess.author)
     authors.update(random.sample(channel_members, 4))
     authors.add(message_to_guess.author)
-    random.shuffle(authors)
+    random.shuffle(list(authors))
 
     choices = {choice + 1: author for choice, author in enumerate(authors)}
     answer = list(choices.keys())[list(choices.values()).index(message_to_guess.author)]
