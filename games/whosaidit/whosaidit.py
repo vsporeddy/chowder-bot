@@ -42,7 +42,7 @@ async def play(bot, ctx, players):
     current_time = datetime.datetime.now(tz=None)
     random_time = target_created_at + \
         datetime.timedelta(seconds=random.randint(0,
-        int(current_time - target_created_at).total_seconds()))
+        int((current_time - target_created_at).total_seconds())))
 
     async for message in target_channel.history(limit = config["history_limit"], after=random_time):
         if bot.get_role(config["required_role"]) in message.author.roles and len(message.content.split(" ")) >= config["min_num_words"]:
