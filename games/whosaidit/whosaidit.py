@@ -38,7 +38,7 @@ async def play(bot, ctx, players):
     authors = set()
 
     possible_channels = [(int(channel), weight) for channel, weight in config["channels"].items()]
-    target_channel = bot.get_channel(random.choices(possible_channels, weights=[c[1] for c in possible_channels], k=1)[0])
+    target_channel = bot.get_channel(random.choices(possible_channels, weights=[c[1] for c in possible_channels], k=1)[0][0])
     target_created_at = target_channel.created_at
     current_time = datetime.datetime.now(tz=None)
 
@@ -55,7 +55,6 @@ async def play(bot, ctx, players):
             except Exception as e:
                 print(f"Failed polling message: {e}")
                 continue
-
 
     message_to_guess = random.choice(messages)
     channel_members = set(bot.get_channel(config["author_channel"]).members)
