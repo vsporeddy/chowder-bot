@@ -45,7 +45,7 @@ async def play(bot, ctx, players):
         int((current_time - target_created_at).total_seconds())))
 
     async for message in target_channel.history(limit = config["history_limit"], after=random_time):
-        if bot.get_role(config["required_role"]) in message.author.roles and len(message.content.split(" ")) >= config["min_num_words"]:
+        if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles and len(message.content.split(" ")) >= config["min_num_words"]:
             messages.append(message)
 
     message_to_guess = random.choice(messages)
