@@ -35,8 +35,8 @@ async def play(bot, ctx, players):
     All messages that have an author of config["required_role"] and a message
     length greater than config["min_num_words"] are added for contention.
 
-    Then, for all members in config["author_channel"], randomly select 4,
-    and add the message's author to choose from.
+    Then, for all members in config["author_channel"], randomly select
+    max (4, number of players + 2) and add the message's author to choose from.
     """
     messages = list()
     authors = set()
@@ -67,7 +67,7 @@ async def play(bot, ctx, players):
     channel_members = set(bot.get_channel(config["author_channel"]).members)
     channel_members = set([member for member in channel_members if not member.bot])
     channel_members.remove(message_to_guess.author)
-    authors.update(random.sample(channel_members, 4))
+    authors.update(random.sample(channel_members, max(4, len(players) + 2)))
     authors.add(message_to_guess.author)
     authors = list(authors)
     random.shuffle(authors)
@@ -83,7 +83,6 @@ async def play(bot, ctx, players):
             winners.append(bot.get_user(player))
             break
 
-    # await ctx.send(f"This quote was from {message_to_guess.author.name} on <t:{int(message_to_guess.created_at.timestamp())}:d>!")
     await display_answer(ctx, message_to_guess)
     return winners
 
