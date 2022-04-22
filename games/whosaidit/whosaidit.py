@@ -44,7 +44,7 @@ async def play(bot, ctx, players):
         datetime.timedelta(seconds=random.randint(0,
         int((current_time - target_created_at).total_seconds())))
 
-    async for message in target_channel.history(limit = config["history_limit"], after=random_time):
+    async for message in target_channel.history(limit = config["history_limit"], after=random_time, oldest_first=True):
         if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles and len(message.content.split(" ")) >= config["min_num_words"]:
             messages.append(message)
 
@@ -66,7 +66,7 @@ async def play(bot, ctx, players):
         if guess == answer:
             winners.append(bot.get_user(player))
 
-    await ctx.send(f"The correct answer was {message_to_guess.author.name}!")
+    await ctx.send(f"This quote was from {message_to_guess.author.name} on {message_to_guess.created_at}!")
 
     return winners
 
