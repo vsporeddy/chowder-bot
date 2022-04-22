@@ -14,8 +14,10 @@ with open("games/whosaidit/whosaidit_config.json", "r") as read_file:
 async def start(bot, ctx, players):
     await ctx.send(f"Starting a game of **Who said it?** with {', '.join([p.mention for p in players])}")
     winners = await play(bot, ctx, players)
-    # cgr_cog = bot.get_cog("Cgr")
-    # await cgr_cog.update_ratings_whosaidit(ctx, players, winner)
+
+    cgr_cog = bot.get_cog("Cgr")
+    await cgr_cog.update_ratings_whosaidit(ctx, players, winners)
+    
     # winners returns 1 person only, go figure?
     if winners:
         await ctx.send(f"👑 {winners[0].mention}")
