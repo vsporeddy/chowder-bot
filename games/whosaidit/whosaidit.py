@@ -40,13 +40,16 @@ async def play(bot, ctx, players):
     target_channel = bot.get_channel(random.choice(config["channels"]))
     target_created_at = target_channel.created_at
     current_time = datetime.datetime.now(tz=None)
-    random_time = target_created_at + \
-        datetime.timedelta(seconds=random.randint(0,
-        int((current_time - target_created_at).total_seconds())))
 
-    async for message in target_channel.history(limit = config["history_limit"], after=random_time, oldest_first=True):
-        if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles and len(message.content.split(" ")) >= config["min_num_words"]:
-            messages.append(message)
+    # If there's ever a case that history() will return 0 messages,
+    # we need to randomly choose another time and do the same calculation.
+    while len(messages) == 0:
+        random_time = target_created_at + \
+            datetime.timedelta(seconds=random.randint(0,
+            int((current_time - target_created_at).total_seconds())))
+        async for message in target_channel.history(limit = config["history_limit"], after=random_time, oldest_first=True):
+            if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles and len(message.content.split(" ")) >= config["min_num_words"]:
+                messages.append(message)
 
     message_to_guess = random.choice(messages)
     channel_members = set(bot.get_channel(config["author_channel"]).members)
