@@ -54,7 +54,7 @@ async def play(bot, ctx, players):
         async for message in target_channel.history(limit = config["history_limit"], after=random_time, oldest_first=True):
             try:
                 if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles:
-                    if len(message.content.split(" ")) >= config["min_num_words"] or message.content == "happens" or message.content == "nyum":
+                    if len(message.content.split(" ")) >= config["min_num_words"] or message.content in config["meme_phrases"]:
                         messages.append(message)
             except Exception as e:
                 print(f"Failed polling message: {e}")

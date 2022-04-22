@@ -14,5 +14,11 @@
     "history_limit": 400,
     "required_role": 612154370460614666,
     "author_channel": 538641451211292673,
-    "game_channel": 565381938022449152
+    "game_channel": 565381938022449152,
+    "meme_phrases": [
+        "dang",
+        "happens",
+        "nyum",
+        "whoa"
+    ]
 }
