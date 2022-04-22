@@ -15,8 +15,8 @@ async def start(bot, ctx, players):
     await ctx.send(f"Starting a game of **Who said it?** with {', '.join([p.mention for p in players])}")
     winners = await play(bot, ctx, players)
 
-    # cgr_cog = bot.get_cog("Cgr")
-    # await cgr_cog.update_ratings_whosaidit(ctx, players, winners)
+    cgr_cog = bot.get_cog("Cgr")
+    await cgr_cog.update_ratings_whosaidit(ctx, players, winners)
     
     # winners returns 1 person only, go figure?
     if winners:
@@ -111,3 +111,8 @@ async def display(ctx, msg, choices):
     choice_list = [f"{number}. {user.name}" for number, user in choices.items()]
     embed.add_field(name="Choices", inline=False, value='\n'.join(choice_list))
     await ctx.send(embed=embed)
+
+async def display_answer(ctx, msg):
+    embed = discord.Embed(
+        title=
+    )
