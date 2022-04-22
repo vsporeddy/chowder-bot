@@ -17,7 +17,8 @@ async def start(bot, ctx, players):
     # cgr_cog = bot.get_cog("Cgr")
     # await cgr_cog.update_ratings_whosaidit(ctx, players, winner)
     # winners returns 1 person only, go figure?
-    await ctx.send(f"👑 {winners[0].mention}")
+    if winners:
+        await ctx.send(f"👑 {winners[0].mention}")
     return winners
 
 
