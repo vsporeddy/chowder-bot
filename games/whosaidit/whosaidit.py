@@ -107,7 +107,7 @@ async def get_choice(bot, ctx, choices, players):
 async def display(ctx, msg, choices):
     embed = discord.Embed(
         title="Who said this?",
-        description=f'"{msg.content}"'
+        description=f'_"{msg.content}"_'
     )
     choice_list = [f"{number}. {user.name}" for number, user in choices.items()]
     embed.add_field(name="Choices", inline=False, value='\n'.join(choice_list))
@@ -117,7 +117,7 @@ async def display(ctx, msg, choices):
 async def display_answer(ctx, msg):
     embed = discord.Embed(
         title="The answer is...",
-        description=f'_{msg.content}_\n - {msg.author.mention}, circa <t:{int(msg.created_at.timestamp())}:d>',
+        description=f'_"{msg.content}"_\n      - {msg.author.mention}, circa <t:{int(msg.created_at.timestamp())}:d>',
         color=msg.author.color
     )
     embed.set_thumbnail(url=str(msg.author.avatar_url))

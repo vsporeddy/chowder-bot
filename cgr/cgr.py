@@ -52,7 +52,9 @@ class Cgr(commands.Cog):
             await self.update_ratings_helper(ctx, [player], r2, 0.4, "chameleon")
 
     async def update_ratings_whosaidit(self, ctx, players, winners):
-        if winners and len(players) > 1:
+        if len(players) == 1:
+            return
+        elif winners:
             players.remove(winners[0])
             loser_rating = await self.get_average_rating(players, "whosaidit")
             winner_rating = await self.get_average_rating(winners, "whosaidit")
