@@ -48,6 +48,7 @@ async def play(bot, ctx, players):
             datetime.timedelta(seconds=random.randint(0,
             int((current_time - target_created_at).total_seconds())))
         async for message in target_channel.history(limit = config["history_limit"], after=random_time, oldest_first=True):
+            # TODO(bug): There are some cases where message.author is not actually populated with a User.
             if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles and len(message.content.split(" ")) >= config["min_num_words"]:
                 messages.append(message)
 
@@ -79,10 +80,10 @@ async def get_choice(bot, ctx, choices, players):
         return guess.author in players and \
                 guess.channel == bot.get_channel(config["game_channel"]) and \
                 guess.content.isnumeric() and \
-                int(guess.content) in range(1, 5)
+                int(guess.content) in range(1, 6)
     guesses = {}
+    # TODO: while loop might win the race condition, poll every few seconds until config["thinking_time"]?
     while len(guesses) < len(players):
-        # TODO: config["thinking_time"] ?
         guess = await bot.wait_for("message", check=check_guess)
         guesses[guess.author.id] = int(guess.content)
 
