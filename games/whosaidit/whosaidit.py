@@ -65,6 +65,8 @@ async def play(bot, ctx, players):
         if guess == answer:
             winners.append(bot.get_user(player))
 
+    await ctx.send(f"The correct answer was {message_to_guess.author.name}!")
+
     return winners
 
 
