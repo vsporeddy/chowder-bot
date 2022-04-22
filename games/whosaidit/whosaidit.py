@@ -6,7 +6,7 @@ import json
 import random
 import discord
 from chowder import chowder
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 with open("games/whosaidit/whosaidit_config.json", "r") as read_file:
     config = json.load(read_file)
@@ -16,7 +16,8 @@ async def start(bot, ctx, players):
     winners = await play(bot, ctx, players)
     # cgr_cog = bot.get_cog("Cgr")
     # await cgr_cog.update_ratings_whosaidit(ctx, players, winner)
-    await ctx.send(f"Winners: {', '.join([w.mention for w in winners])}")
+    # winners returns 1 person only, go figure?
+    await ctx.send(f"👑 {winners[0].mention}")
     return winners
 
 
@@ -38,6 +39,8 @@ async def play(bot, ctx, players):
     authors = set()
 
     possible_channels = [(int(channel), weight) for channel, weight in config["channels"].items()]
+    # random.choices() returns a k-sized list. We only want one, so we select the first element.
+    # Since these channels are stored as tuples for (channel, weight), we select the first element.
     target_channel = bot.get_channel(random.choices(possible_channels, weights=[c[1] for c in possible_channels], k=1)[0][0])
     target_created_at = target_channel.created_at
     current_time = datetime.datetime.now(tz=None)
@@ -73,10 +76,8 @@ async def play(bot, ctx, players):
     for player, guess in guesses.items():
         if guess == answer:
             winners.append(bot.get_user(player))
-
-    await ctx.send(f"This quote was from {message_to_guess.author.name} on <t:{int(message_to_guess.created_at.timestamp())}:d>!")
-
-    return winners
+            await ctx.send(f"This quote was from {message_to_guess.author.name} on <t:{int(message_to_guess.created_at.timestamp())}:d>!")
+            return winners
 
 
 async def get_choice(bot, ctx, choices, players):
@@ -85,11 +86,12 @@ async def get_choice(bot, ctx, choices, players):
                 guess.channel == bot.get_channel(config["game_channel"]) and \
                 guess.content.isnumeric() and \
                 int(guess.content) in range(1, len(choices) + 1)
-    guesses = {}
-    # TODO: Poll every few seconds until config["thinking_time"]?
+
+    guesses = OrderedDict()
     while len(guesses) < len(players):
         guess = await bot.wait_for("message", check=check_guess)
-        guesses[guess.author.id] = int(guess.content)
+        if guess.author.id not in guesses:
+            guesses[guess.author.id] = int(guess.content)
 
     return guesses
 
