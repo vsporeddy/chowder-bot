@@ -69,7 +69,7 @@ async def play(bot, ctx, players):
         if guess == answer:
             winners.append(bot.get_user(player))
 
-    await ctx.send(f"This quote was from {message_to_guess.author.name} on <t:{message_to_guess.created_at.timestamp()}:d>!")
+    await ctx.send(f"This quote was from {message_to_guess.author.name} on <t:{int(message_to_guess.created_at.timestamp())}:d>!")
 
     return winners
 
