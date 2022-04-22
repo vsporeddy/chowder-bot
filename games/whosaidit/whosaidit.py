@@ -78,8 +78,10 @@ async def play(bot, ctx, players):
     for player, guess in guesses.items():
         if guess == answer:
             winners.append(bot.get_user(player))
-            await ctx.send(f"This quote was from {message_to_guess.author.name} on <t:{int(message_to_guess.created_at.timestamp())}:d>!")
-            return winners
+            break
+
+    await ctx.send(f"This quote was from {message_to_guess.author.name} on <t:{int(message_to_guess.created_at.timestamp())}:d>!")
+    return winners
 
 
 async def get_choice(bot, ctx, choices, players):
