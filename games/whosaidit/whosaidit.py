@@ -37,7 +37,8 @@ async def play(bot, ctx, players):
     messages = list()
     authors = set()
 
-    target_channel = bot.get_channel(random.choice(config["channels"]))
+    possible_channels = [(int(channel), weight) for channel, weight in config["channels"].items()]
+    target_channel = bot.get_channel(random.choices(possible_channels, weights=[c[1] for c in possible_channels], k=1)[0])
     target_created_at = target_channel.created_at
     current_time = datetime.datetime.now(tz=None)
 
@@ -48,9 +49,13 @@ async def play(bot, ctx, players):
             datetime.timedelta(seconds=random.randint(0,
             int((current_time - target_created_at).total_seconds())))
         async for message in target_channel.history(limit = config["history_limit"], after=random_time, oldest_first=True):
-            # TODO(bug): There are some cases where message.author is not actually populated with a User.
-            if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles and len(message.content.split(" ")) >= config["min_num_words"]:
-                messages.append(message)
+            try:
+                if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles and len(message.content.split(" ")) >= config["min_num_words"]:
+                    messages.append(message)
+            except Exception as e:
+                print(f"Failed polling message: {e}")
+                continue
+
 
     message_to_guess = random.choice(messages)
     channel_members = set(bot.get_channel(config["author_channel"]).members)
@@ -80,9 +85,9 @@ async def get_choice(bot, ctx, choices, players):
         return guess.author in players and \
                 guess.channel == bot.get_channel(config["game_channel"]) and \
                 guess.content.isnumeric() and \
-                int(guess.content) in range(1, 6)
+                int(guess.content) in range(1, len(choices) + 1)
     guesses = {}
-    # TODO: while loop might win the race condition, poll every few seconds until config["thinking_time"]?
+    # TODO: Poll every few seconds until config["thinking_time"]?
     while len(guesses) < len(players):
         guess = await bot.wait_for("message", check=check_guess)
         guesses[guess.author.id] = int(guess.content)
