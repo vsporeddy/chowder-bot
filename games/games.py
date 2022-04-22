@@ -13,6 +13,7 @@ from games.hangman import hangman
 from games.telewave import telewave
 from games.blackjack import blackjack
 from games.chameleon import chameleon
+from games.whosaidit import whosaidit
 
 with open("games/games_config.json", "r") as read_file:
     config = json.load(read_file)
