@@ -91,5 +91,5 @@ async def display(ctx, msg, choices):
         description=f'"{msg.content}"'
     )
     choice_list = [f"{number}. {user.name}" for number, user in choices.items()]
-    embed.add_field(title="Choices", inline=False, value='\n'.join(choice_list))
+    embed.add_field(name="Choices", inline=False, value='\n'.join(choice_list))
     await ctx.send(embed=embed)
