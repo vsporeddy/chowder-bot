@@ -139,6 +139,10 @@ class Games(commands.Cog):
             pot = game_config[game_name]["ai_win_reward"] * len(players)
             winners = await whosaidit.start(self.bot, ctx, players)
 
+        elif game_name == "whosaidittimed":
+            pot = game_config[game_name]["ai_win_reward"] * len(players)
+            winners = await whosaidit.start(self.bot, ctx, players, True)
+
         winnings = pot / len(winners) if winners else 0
         for winner in winners:
             if game_mode == "coop":
