@@ -50,6 +50,7 @@ async def play(bot, ctx, players):
 
     message_to_guess = random.choice(messages)
     channel_members = set(bot.get_channel(config["author_channel"]).members)
+    channel_members = set([member for member in channel_members if not member.bot])
     channel_members.remove(message_to_guess.author)
     authors.update(random.sample(channel_members, 4))
     authors.add(message_to_guess.author)
@@ -59,7 +60,7 @@ async def play(bot, ctx, players):
     answer = list(choices.keys())[list(choices.values()).index(message_to_guess.author)]
 
     await display(ctx, message_to_guess, choices)
-    guesses = await get_choice(ctx, choices)
+    guesses = await get_choice(bot, ctx, choices, players)
     winners = []
     for player, guess in guesses.items():
         if guess == answer:
