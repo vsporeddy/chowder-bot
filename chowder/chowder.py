@@ -131,7 +131,14 @@ class Chowder(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
+        # If the message deleted is not in a tracked channel, ignore.
         if message.channel.id not in channels or message.author == self.bot.user:
+            return
+        # If the message deleted is one the bot posted, ignore.
+        if message.author == self.bot.user:
+            return
+        # If the message deleted is posted by another bot, ignore.
+        if message.author.bot:
             return
         name = get_name(message.author)
         await message.channel.send(f"Whoa {message.author.mention} why you deleting messages {name}? Sketch")
