@@ -83,7 +83,8 @@ async def play(bot, ctx, players):
             winners.append(bot.get_user(player))
             break
 
-    await ctx.send(f"This quote was from {message_to_guess.author.name} on <t:{int(message_to_guess.created_at.timestamp())}:d>!")
+    # await ctx.send(f"This quote was from {message_to_guess.author.name} on <t:{int(message_to_guess.created_at.timestamp())}:d>!")
+    await display_answer(ctx, message_to_guess)
     return winners
 
 
@@ -110,4 +111,13 @@ async def display(ctx, msg, choices):
     )
     choice_list = [f"{number}. {user.name}" for number, user in choices.items()]
     embed.add_field(name="Choices", inline=False, value='\n'.join(choice_list))
+    await ctx.send(embed=embed)
+
+async def display_answer(ctx, msg):
+    embed = discord.Embed(
+        title="The answer is...",
+        description=f'_{msg.content}_ - {msg.author.mention}, <t:{int(msg.created_at.timestamp())}:d>',
+        color=msg.author.color
+    )
+    embed.set_thumbnail(url=str(msg.author.avatar_url))
     await ctx.send(embed=embed)
