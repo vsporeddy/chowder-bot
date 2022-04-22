@@ -134,6 +134,10 @@ class Games(commands.Cog):
                 pot += buyin
             winners = await chameleon.start(self.bot, ctx, players)
 
+        elif game_name == "whosaidit":
+            pot = game_config[game_name]["ai_win_reward"] * len(players)
+            winners = await whosaidit.start(self.bot, ctx, players)
+
         winnings = pot / len(winners) if winners else 0
         for winner in winners:
             if game_mode == "coop":
