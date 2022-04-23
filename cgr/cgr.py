@@ -59,12 +59,12 @@ class Cgr(commands.Cog):
             loser_rating = await self.get_average_rating(players, "whosaidit")
             winner_rating = await self.get_average_rating(winners, "whosaidit")
             r2 = math.pow(10, loser_rating/400)
-            await self.update_ratings_helper(ctx, winners, r2, 1.6, "whosaidit")
+            await self.update_ratings_helper(ctx, winners, r2, 1, "whosaidit")
             r2 = math.pow(10, winner_rating/400)
             for player in players:
-                await self.update_ratings_helper(ctx, [player], r2, 0.4, "whosaidit")
+                await self.update_ratings_helper(ctx, [player], r2, 0, "whosaidit")
         else:
-            await self.update_ratings_ai(ctx, players, winners, "whosaidit", game_config["whosaidit"]["base_rating"])
+            await self.update_ratings_ai(ctx, players, False, "whosaidit", game_config["whosaidit"]["base_rating"])
 
     async def update_ratings_blackjack(self, ctx, players, winners):
         losers = set(players) - set(winners)
