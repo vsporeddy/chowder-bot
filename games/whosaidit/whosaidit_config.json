@@ -16,7 +16,11 @@
     "required_role": 612154370460614666,
     "author_channel": 538641451211292673,
     "game_channel": 565381938022449152,
-    "thinking_img": "https://media.discordapp.net/attachments/742569511978270730/967160899838300270/IrisThinking.png",
+    "thinking_images": [
+        "https://media.discordapp.net/attachments/742569511978270730/967160899838300270/IrisThinking.png",
+        "https://cdn.discordapp.com/attachments/742569511978270730/967500280751075398/6mG.gif",
+        "https://acegif.com/wp-content/gif/thinking-emoji-30.gif"
+    ],
     "meme_phrases": [
         "dang",
         "happens",
