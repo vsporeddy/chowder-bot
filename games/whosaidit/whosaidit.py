@@ -67,7 +67,7 @@ async def play(bot, ctx, players):
     channel_members = set(bot.get_channel(config["author_channel"]).members)
     channel_members = set([member for member in channel_members if not member.bot])
     channel_members.remove(message_to_guess.author)
-    authors.update(random.sample(channel_members, min(9, max(4, len(players) + 2))))
+    authors.update(random.sample(channel_members, min(9, max(4, len(players) + 1))))
     authors.add(message_to_guess.author)
     authors = list(authors)
     random.shuffle(authors)
