@@ -13,6 +13,7 @@ from games.hangman import hangman
 from games.telewave import telewave
 from games.blackjack import blackjack
 from games.chameleon import chameleon
+from games.whosaidit import whosaidit
 
 with open("games/games_config.json", "r") as read_file:
     config = json.load(read_file)
@@ -133,6 +134,10 @@ class Games(commands.Cog):
                 await cc_cog.subtract_coin(player, buyin)
                 pot += buyin
             winners = await chameleon.start(self.bot, ctx, players)
+
+        elif game_name == "whosaidit":
+            pot = game_config[game_name]["ai_win_reward"] * len(players)
+            winners = await whosaidit.start(self.bot, ctx, players)
 
         winnings = pot / len(winners) if winners else 0
         for winner in winners:

@@ -14,6 +14,10 @@
             "base_rating": 1000,
             "k_factor": 60000
         },
+        "whosaidit": {
+            "base_rating": 1000,
+            "k_factor": 60000
+        },
         "blackjack": {
             "base_rating": 1000,
             "k_factor": 60000,

@@ -51,6 +51,21 @@ class Cgr(commands.Cog):
         for player in players:
             await self.update_ratings_helper(ctx, [player], r2, 0.4, "chameleon")
 
+    async def update_ratings_whosaidit(self, ctx, players, winners):
+        if len(players) == 1:
+            return
+        elif winners:
+            players.remove(winners[0])
+            loser_rating = await self.get_average_rating(players, "whosaidit")
+            winner_rating = await self.get_average_rating(winners, "whosaidit")
+            r2 = math.pow(10, loser_rating/400)
+            await self.update_ratings_helper(ctx, winners, r2, 1, "whosaidit")
+            r2 = math.pow(10, winner_rating/400)
+            for player in players:
+                await self.update_ratings_helper(ctx, [player], r2, 0, "whosaidit")
+        else:
+            await self.update_ratings_ai(ctx, players, False, "whosaidit", game_config["whosaidit"]["base_rating"])
+
     async def update_ratings_blackjack(self, ctx, players, winners):
         losers = set(players) - set(winners)
         # r2 represents other team's rating. For Blackjack, it will be chowdertron
