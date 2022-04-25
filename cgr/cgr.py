@@ -59,11 +59,13 @@ class Cgr(commands.Cog):
             loser_rating = await self.get_average_rating(players, "whosaidit")
             winner_rating = await self.get_average_rating([winners[0]], "whosaidit")
             r2 = math.pow(10, loser_rating/400)
-            await self.update_ratings_helper(ctx, winners, r2, 1.0 + (0.5 * len(players)), "whosaidit")
+            await self.update_ratings_helper(ctx, winners, r2, 1.0 + (0.2 * len(players)), "whosaidit")
             r2 = math.pow(10, winner_rating/400)
             for player in players:
                 if player not in winners:
-                    self.update_ratings_helper(ctx, [player], r2, 0.2, "whosaidit")
+                    self.update_ratings_helper(ctx, [player], r2, 0, "whosaidit")
+                else:
+                    self.update_ratings_helper(ctx, [player], r2, 0.4, "whosaidit")
         else:
             await self.update_ratings_ai(ctx, players, False, "whosaidit", game_config["whosaidit"]["base_rating"])
 

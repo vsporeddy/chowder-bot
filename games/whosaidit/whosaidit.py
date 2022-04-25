@@ -20,6 +20,7 @@ async def start(bot, ctx, players):
     
     # winners returns 1 person only, go figure?
     if winners:
+        winners = [winners[0]]
         await ctx.send(f"👑 {winners[0].mention}")
     return winners
 
