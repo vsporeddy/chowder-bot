@@ -81,7 +81,6 @@ async def play(bot, ctx, players):
     for player, guess in guesses.items():
         if guess == answer:
             winners.append(bot.get_user(player))
-            break
 
     await display_answer(ctx, message_to_guess)
     return winners
