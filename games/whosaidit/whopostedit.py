@@ -37,18 +37,20 @@ async def play(bot, ctx, players):
 
     # If there's ever a case that history() will return 0 messages,
     # we need to randomly choose another time and do the same calculation.
-    while len(messages) == 0:
-        random_time = target_created_at + \
-            datetime.timedelta(seconds=random.randint(0,
-            int((current_time - target_created_at).total_seconds())))
-        async for message in target_channel.history(limit = config["history_limit"], after=random_time, oldest_first=True):
-            try:
-                if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles:
-                    if message.attachments and len(message.attachments) > 0 and message.attachments[0].content_type and message.attachments[0].content_type.startswith("image"):
-                        messages.append(message)
-            except Exception as e:
-                print(f"Failed polling message: {e}")
-                continue
+
+    async with bot.get_channel(config["game_channel"]).typing():
+        while len(messages) == 0:
+            random_time = target_created_at + \
+                datetime.timedelta(seconds=random.randint(0,
+                int((current_time - target_created_at).total_seconds())))
+            async for message in target_channel.history(limit = config["history_limit"], after=random_time, oldest_first=True):
+                try:
+                    if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles:
+                        if message.attachments and len(message.attachments) > 0 and message.attachments[0].content_type and message.attachments[0].content_type.startswith("image"):
+                            messages.append(message)
+                except Exception as e:
+                    print(f"Failed polling message: {e}")
+                    continue
 
     message_to_guess = random.choice(messages)
     channel_members = set(bot.get_channel(config["author_channel"]).members)
