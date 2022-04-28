@@ -51,19 +51,25 @@ class Cgr(commands.Cog):
         await self.update_ratings_helper(ctx, players, r2, 0.4, "chameleon")
 
     async def update_ratings_whosaidit(self, ctx, players, winners):
+        await self.update_ratings_who_helper(ctx, players, winners, "whosaidit")
+
+    async def update_ratings_whopostedit(self, ctx, players, winners):
+        await self.update_ratings_who_helper(ctx, players, winners, "whopostedit")
+
+    async def update_ratings_who_helper(self, ctx, players, winners, game_name):
         if len(players) == 1:
             return
         elif winners:
             players.remove(winners[0])
-            loser_rating = await self.get_average_rating(players, "whosaidit")
-            winner_rating = await self.get_average_rating([winners[0]], "whosaidit")
+            loser_rating = await self.get_average_rating(players, game_name)
+            winner_rating = await self.get_average_rating([winners[0]], game_name)
             r2 = math.pow(10, loser_rating/400)
-            await self.update_ratings_helper(ctx, [winners[0]], r2, 1.0 + (0.2 * len(players)), "whosaidit")
+            await self.update_ratings_helper(ctx, [winners[0]], r2, 1.0 + (0.2 * len(players)), game_name)
             r2 = math.pow(10, winner_rating/400)
-            await self.update_ratings_helper(ctx, winners[1:], r2, 0.4, "whosaidit")
-            await self.update_ratings_helper(ctx, [p for p in players if p not in winners], r2, 0, "whosaidit")
+            await self.update_ratings_helper(ctx, winners[1:], r2, 0.4, game_name)
+            await self.update_ratings_helper(ctx, [p for p in players if p not in winners], r2, 0, game_name)
         else:
-            await self.update_ratings_ai(ctx, players, False, "whosaidit", game_config["whosaidit"]["base_rating"])
+            await self.update_ratings_ai(ctx, players, False, game_name, game_config[game_name]["base_rating"])
 
     async def update_ratings_blackjack(self, ctx, players, winners):
         losers = set(players) - set(winners)

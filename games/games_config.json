@@ -52,6 +52,14 @@
             "start_req": 0,
             "stop_req": 0,
             "ai_win_reward": 0.01
+        },
+        "whopostedit": {
+            "emote": "<:IrisThink:963905707177041940>",
+            "min_players": 1,
+            "wait_time": 5,
+            "start_req": 0,
+            "stop_req": 0,
+            "ai_win_reward": 0.01
         }
     }
 }
