@@ -93,7 +93,7 @@ async def display(ctx, msg, choices):
     embed = discord.Embed(
         title="Who posted this?"
     )
-    embed.set_image(msg.attachments[0].proxy_url)
+    embed.set_image(url=str(msg.attachments[0].proxy_url))
     choice_list = [f"{number}. {user.name}" for number, user in choices.items()]
     embed.add_field(name="Choices", inline=False, value='\n'.join(choice_list))
     embed.set_thumbnail(url=random.choice(config["thinking_images"]))
@@ -106,6 +106,6 @@ async def display_answer(ctx, msg):
         color=msg.author.color
     )
 
-    embed.set_image(msg.attachments[0].proxy_url)
+    embed.set_image(url=str(msg.attachments[0].proxy_url))
     embed.set_thumbnail(url=str(msg.author.avatar_url))
     await ctx.send(embed=embed)
