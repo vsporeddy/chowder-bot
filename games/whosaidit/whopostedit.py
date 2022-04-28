@@ -44,7 +44,7 @@ async def play(bot, ctx, players):
         async for message in target_channel.history(limit = config["history_limit"], after=random_time, oldest_first=True):
             try:
                 if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles:
-                    if message.attachments and len(message.attachments) > 0 and message.attachments[0].content_type.startswith("image"):
+                    if message.attachments and len(message.attachments) > 0 and message.attachments[0].content_type and message.attachments[0].content_type.startswith("image"):
                         messages.append(message)
             except Exception as e:
                 print(f"Failed polling message: {e}")
@@ -91,9 +91,9 @@ async def get_choice(bot, ctx, choices, players):
 
 async def display(ctx, msg, choices):
     embed = discord.Embed(
-        title="Who posted this?",
-        image=msg.attachments[0].proxy_url
+        title="Who posted this?"
     )
+    embed.set_image(msg.attachments[0].proxy_url)
     choice_list = [f"{number}. {user.name}" for number, user in choices.items()]
     embed.add_field(name="Choices", inline=False, value='\n'.join(choice_list))
     embed.set_thumbnail(url=random.choice(config["thinking_images"]))
@@ -102,8 +102,10 @@ async def display(ctx, msg, choices):
 async def display_answer(ctx, msg):
     embed = discord.Embed(
         title="The answer is...",
-        description=f'{msg.attachments[0].proxy_url}\n\t - {msg.author.mention}, circa <t:{int(msg.created_at.timestamp())}:d>',
+        description=f'{msg.author.mention}, circa <t:{int(msg.created_at.timestamp())}:d>',
         color=msg.author.color
     )
+
+    embed.set_image(msg.attachments[0].proxy_url)
     embed.set_thumbnail(url=str(msg.author.avatar_url))
     await ctx.send(embed=embed)
