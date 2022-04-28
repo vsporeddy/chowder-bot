@@ -20,6 +20,7 @@ async def start(bot, ctx, players):
     
     # winners returns 1 person only, go figure?
     if winners:
+        winners = [winners[0]]
         await ctx.send(f"👑 {winners[0].mention}")
     return winners
 
@@ -81,7 +82,6 @@ async def play(bot, ctx, players):
     for player, guess in guesses.items():
         if guess == answer:
             winners.append(bot.get_user(player))
-            break
 
     await display_answer(ctx, message_to_guess)
     return winners
