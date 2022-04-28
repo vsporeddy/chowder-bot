@@ -120,4 +120,5 @@ async def display_answer(ctx, msg):
         color=msg.author.color
     )
     embed.set_thumbnail(url=str(msg.author.avatar_url))
+    embed.set_footer(text=f"[Go to original post]({msg.jump_url})")
     await ctx.send(embed=embed)
