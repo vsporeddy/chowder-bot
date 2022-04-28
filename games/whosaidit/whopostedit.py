@@ -106,6 +106,5 @@ async def display_answer(ctx, msg):
         color=msg.author.color
     )
 
-    embed.set_image(url=str(msg.attachments[0].proxy_url))
     embed.set_thumbnail(url=str(msg.author.avatar_url))
     await ctx.send(embed=embed)
