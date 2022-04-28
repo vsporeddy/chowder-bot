@@ -55,6 +55,8 @@ class Cgr(commands.Cog):
             return
         elif winners:
             players.remove(winners[0])
+            print(f"players: {players}")
+            print(f"winners: {winners}")
             loser_rating = await self.get_average_rating(players, "whosaidit")
             winner_rating = await self.get_average_rating([winners[0]], "whosaidit")
             r2 = math.pow(10, loser_rating/400)
