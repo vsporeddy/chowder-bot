@@ -102,7 +102,7 @@ async def display(ctx, msg, choices):
 async def display_answer(ctx, msg):
     embed = discord.Embed(
         title="The answer is...",
-        description=f'{msg.author.mention}, circa <t:{int(msg.created_at.timestamp())}:d> \n [Go to original post]({msg.jump_url})',
+        description=f'{msg.author.mention}, circa <t:{int(msg.created_at.timestamp())}:d> \n\n [Go to original post]({msg.jump_url})',
         color=msg.author.color
     )
 
