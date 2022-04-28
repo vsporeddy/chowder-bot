@@ -60,8 +60,8 @@ class Cgr(commands.Cog):
             r2 = math.pow(10, loser_rating/400)
             await self.update_ratings_helper(ctx, [winners[0]], r2, 1.0 + (0.2 * len(players)), "whosaidit")
             r2 = math.pow(10, winner_rating/400)
-            self.update_ratings_helper(ctx, winners[1:], r2, 0.4, "whosaidit")
-            self.update_ratings_helper(ctx, [p for p in players if p not in winners], r2, 0, "whosaidit")
+            await self.update_ratings_helper(ctx, winners[1:], r2, 0.4, "whosaidit")
+            await self.update_ratings_helper(ctx, [p for p in players if p not in winners], r2, 0, "whosaidit")
         else:
             await self.update_ratings_ai(ctx, players, False, "whosaidit", game_config["whosaidit"]["base_rating"])
 
