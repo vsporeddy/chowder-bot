@@ -69,7 +69,7 @@ class Cgr(commands.Cog):
             self.update_ratings_helper(ctx, winners[1:], r2, 0.4, game_name)
             self.update_ratings_helper(ctx, [p for p in players not in winners], r2, 0, game_name)
         else:
-            await self.update_ratings_ai(ctx, players, False, game_name, game_config["whosaidit"]["base_rating"])
+            await self.update_ratings_ai(ctx, players, False, game_name, game_config[game_name]["base_rating"])
 
     async def update_ratings_blackjack(self, ctx, players, winners):
         losers = set(players) - set(winners)

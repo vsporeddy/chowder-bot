@@ -44,7 +44,7 @@ async def play(bot, ctx, players):
         async for message in target_channel.history(limit = config["history_limit"], after=random_time, oldest_first=True):
             try:
                 if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles:
-                    if message.attachments and len(message.attachments) > 0:
+                    if message.attachments and len(message.attachments) > 0 and message.attachments[0].content_type.startswith("image"):
                         messages.append(message)
             except Exception as e:
                 print(f"Failed polling message: {e}")
@@ -92,7 +92,7 @@ async def get_choice(bot, ctx, choices, players):
 async def display(ctx, msg, choices):
     embed = discord.Embed(
         title="Who posted this?",
-        description=msg.attachments[0].proxy_url
+        image=msg.attachments[0].proxy_url
     )
     choice_list = [f"{number}. {user.name}" for number, user in choices.items()]
     embed.add_field(name="Choices", inline=False, value='\n'.join(choice_list))
