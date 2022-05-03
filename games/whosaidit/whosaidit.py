@@ -51,18 +51,19 @@ async def play(bot, ctx, players):
 
     # If there's ever a case that history() will return 0 messages,
     # we need to randomly choose another time and do the same calculation.
-    while len(messages) == 0:
-        random_time = target_created_at + \
-            datetime.timedelta(seconds=random.randint(0,
-            int((current_time - target_created_at).total_seconds())))
-        async for message in target_channel.history(limit = config["history_limit"], after=random_time, oldest_first=True):
-            try:
-                if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles:
-                    if len(message.content.split(" ")) >= config["min_num_words"] or message.content in config["meme_phrases"]:
-                        messages.append(message)
-            except Exception as e:
-                print(f"Failed polling message: {e}")
-                continue
+    async with bot.get_channel(config["game_channel"]).typing():
+        while len(messages) == 0:
+            random_time = target_created_at + \
+                datetime.timedelta(seconds=random.randint(0,
+                int((current_time - target_created_at).total_seconds())))
+            async for message in target_channel.history(limit = config["history_limit"], after=random_time, oldest_first=True):
+                try:
+                    if bot.get_guild(config["guild_id"]).get_role(config["required_role"]) in message.author.roles:
+                        if len(message.content.split(" ")) >= config["min_num_words"] or message.content in config["meme_phrases"]:
+                            messages.append(message)
+                except Exception as e:
+                    print(f"Failed polling message: {e}")
+                    continue
 
     message_to_guess = random.choice(messages)
     channel_members = set(bot.get_channel(config["author_channel"]).members)
@@ -108,7 +109,7 @@ async def display(ctx, msg, choices):
         title="Who said this?",
         description=f'_"{msg.content}"_'
     )
-    choice_list = [f"{number}. {user.name}" for number, user in choices.items()]
+    choice_list = [f"{number}. {user.name} ({user.mention})" for number, user in choices.items()]
     embed.add_field(name="Choices", inline=False, value='\n'.join(choice_list))
     embed.set_thumbnail(url=random.choice(config["thinking_images"]))
     await ctx.send(embed=embed)
@@ -116,7 +117,7 @@ async def display(ctx, msg, choices):
 async def display_answer(ctx, msg):
     embed = discord.Embed(
         title="The answer is...",
-        description=f'_"{msg.content}"_\n\t - {msg.author.mention}, circa <t:{int(msg.created_at.timestamp())}:d>',
+        description=f'_"{msg.content}"_\n\t - {msg.author.mention}, circa <t:{int(msg.created_at.timestamp())}:d> \n\n [Go to original post]({msg.jump_url})',
         color=msg.author.color
     )
     embed.set_thumbnail(url=str(msg.author.avatar_url))
