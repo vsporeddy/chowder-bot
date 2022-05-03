@@ -96,7 +96,7 @@ async def display(ctx, msg, choices):
         title="Who posted this?"
     )
     embed.set_image(url=str(msg.attachments[0].proxy_url))
-    choice_list = [f"{number}. {user.name}" for number, user in choices.items()]
+    choice_list = [f"{number}. {user.name} ({user.mention})" for number, user in choices.items()]
     embed.add_field(name="Choices", inline=False, value='\n'.join(choice_list))
     embed.set_thumbnail(url=random.choice(config["thinking_images"]))
     await ctx.send(embed=embed)
