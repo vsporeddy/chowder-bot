@@ -37,7 +37,6 @@ async def play(bot, ctx, players):
 
     # If there's ever a case that history() will return 0 messages,
     # we need to randomly choose another time and do the same calculation.
-
     async with bot.get_channel(config["game_channel"]).typing():
         while len(messages) == 0:
             random_time = target_created_at + \
